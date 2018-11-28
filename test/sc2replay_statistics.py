@@ -13,8 +13,9 @@ def worker_created(replay, player_id):
     return workers
 
 
-def worker_compare(benchmark, player_workers, total):
+def worker_compare(benchmark, player_workers):
     compare = []
+    total = min(len(benchmark), len(player_workers))
     for x in range(total):
         compare.append(benchmark[x] - player_workers[x])
 
@@ -37,7 +38,7 @@ rep_test = sc2reader.load_replay("C:\\Users\\matthew\\Documents\\StarCraft II\\A
 wc_bench = worker_created(rep_bench, 1)
 wc_test = worker_created(rep_test, 1)
 
-wc = worker_compare(wc_bench, wc_test, len(wc_bench))
+wc = worker_compare(wc_bench, wc_test)
 
 wc_roc = ROC(wc, len(wc))
 
@@ -56,3 +57,16 @@ plt.plot(wc, label='worker time')
 plt.plot(wc_roc, label='roc')
 plt.legend(loc=2)
 plt.savefig('C:\\Users\\matthew\\Documents\\combined.svg')
+
+plt.figure()
+yb = []
+for y in range(len(wc_bench)):
+    yb.append(y)
+plt.plot(wc_bench, yb, label='benchmark workers')
+
+yp = []
+for y in range(len(wc_test)):
+    yp.append(y)
+plt.plot(wc_test, yp, label='player workers')
+plt.legend(loc=2)
+plt.savefig('C:\\Users\\matthew\\Documents\\worker_created.svg')

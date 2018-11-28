@@ -21,6 +21,17 @@ def worker_compare(benchmark, player_workers):
 
     return compare
 
+
+def adept_created(replay, player_id):
+    adepts = []
+    for event in replay.events:
+        if event.name == "UnitBornEvent" and event.control_pid == player_id:
+            if event.unit.name == "Adept":
+                adepts.append(event.second)
+
+    return adepts
+
+
 def ROC(wp, total):
     roc = []
     x = 0

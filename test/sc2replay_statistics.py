@@ -40,12 +40,25 @@ wc_test = worker_created(rep_test, 1)
 
 wc = worker_compare(wc_bench, wc_test)
 
-wc_roc = ROC(wc, len(wc))
+#sum up the deviation at each point that a worker is created
+w_dev = []
+w_sum = 0
+for x in range(len(wc)):
+    w_sum += wc[x]
+    w_dev.append(w_sum)
+
+#wc_roc = ROC(wc, len(wc))
+wc_roc = ROC(w_dev, len(w_dev))
 
 plt.figure()
 plt.plot(wc, label='worker time')
 plt.legend(loc=2)
 plt.savefig('C:\\Users\\matthew\\Documents\\worker_time.svg')
+
+plt.figure()
+plt.plot(w_dev, label='worker deviation')
+plt.legend(loc=2)
+plt.savefig('C:\\Users\\matthew\\Documents\\worker_dev.svg')
 
 plt.figure()
 plt.plot(wc_roc, label='roc')
@@ -54,6 +67,7 @@ plt.savefig('C:\\Users\\matthew\\Documents\\roc.svg')
 
 plt.figure()
 plt.plot(wc, label='worker time')
+plt.plot(w_dev, label='worker deviation')
 plt.plot(wc_roc, label='roc')
 plt.legend(loc=2)
 plt.savefig('C:\\Users\\matthew\\Documents\\combined.svg')

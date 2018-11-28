@@ -26,10 +26,20 @@ def adept_created(replay, player_id):
     adepts = []
     for event in replay.events:
         if event.name == "UnitBornEvent" and event.control_pid == player_id:
-            if event.unit.name == "Adept":
+            if event.unit.name == "Adept" or event.unit.name == "adept":
                 adepts.append(event.second)
 
     return adepts
+
+
+def army_created(replay, player_id):
+    army = []
+    for event in replay.events:
+        if event.name == "UnitBornEvent" and event.control_pid == player_id:
+            if event.unit.is_army:
+                army.append([event.second, event.unit.name])
+
+    return army
 
 
 def ROC(wp, total):
@@ -43,8 +53,8 @@ def ROC(wp, total):
     return roc
 
 
-rep_bench = sc2reader.load_replay("C:\\Users\\matthew\\Documents\\StarCraft II\\Accounts\\62997088\\1-S2-1-440880\\Replays\\Multiplayer\\PVZ_ADEPT_BENCHMARK.SC2Replay")
-rep_test = sc2reader.load_replay("C:\\Users\\matthew\\Documents\\StarCraft II\\Accounts\\62997088\\1-S2-1-440880\\Replays\\Multiplayer\\PVZ_ADEPT_TESTCASE1.SC2Replay")
+rep_bench = sc2reader.load_replay("test_replays\\PVZ_ADEPT_BENCHMARK.SC2Replay")
+rep_test = sc2reader.load_replay("test_replays\\PVZ_ADEPT_TESTCASE1.SC2Replay")
 
 wc_bench = worker_created(rep_bench, 1)
 wc_test = worker_created(rep_test, 1)
@@ -64,24 +74,24 @@ wc_roc = ROC(w_dev, len(w_dev))
 plt.figure()
 plt.plot(wc, label='worker time')
 plt.legend(loc=2)
-plt.savefig('C:\\Users\\matthew\\Documents\\worker_time.svg')
+plt.savefig('bin\\worker_time.svg')
 
 plt.figure()
 plt.plot(w_dev, label='worker deviation')
 plt.legend(loc=2)
-plt.savefig('C:\\Users\\matthew\\Documents\\worker_dev.svg')
+plt.savefig('bin\\worker_dev.svg')
 
 plt.figure()
 plt.plot(wc_roc, label='roc')
 plt.legend(loc=2)
-plt.savefig('C:\\Users\\matthew\\Documents\\roc.svg')
+plt.savefig('bin\\roc.svg')
 
 plt.figure()
 plt.plot(wc, label='worker time')
 plt.plot(w_dev, label='worker deviation')
 plt.plot(wc_roc, label='roc')
 plt.legend(loc=2)
-plt.savefig('C:\\Users\\matthew\\Documents\\combined.svg')
+plt.savefig('bin\\combined.svg')
 
 plt.figure()
 yb = []
@@ -94,4 +104,4 @@ for y in range(len(wc_test)):
     yp.append(y)
 plt.plot(wc_test, yp, label='player workers')
 plt.legend(loc=2)
-plt.savefig('C:\\Users\\matthew\\Documents\\worker_created.svg')
+plt.savefig('bin\\worker_created.svg')

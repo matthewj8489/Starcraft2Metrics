@@ -59,6 +59,8 @@ def ROC(wp, total):
 
 rep_bench = sc2reader.load_replay("test_replays\\PVZ_ADEPT_BENCHMARK.SC2Replay")
 rep_test = sc2reader.load_replay("test_replays\\PVZ_ADEPT_TESTCASE1.SC2Replay")
+length_of_bench = rep_bench.frames // 24
+length_of_test = rep_test.frames // 24
 
 #### WORKER TRACKING ####
 
@@ -70,13 +72,20 @@ wc = worker_compare(wc_bench, wc_test)
 #sum up the deviation at each point that a worker is created
 w_dev = []
 w_sum = 0
+w_sum_abs = 0
 for x in range(len(wc)):
     w_sum += wc[x]
+    w_sum_abs += abs(wc[x])
     w_dev.append(w_sum)
 
 #wc_roc = ROC(wc, len(wc))
 wc_roc = ROC(w_dev, len(w_dev))
 
+bo_w_dev_score = w_sum_abs / min(length_of_bench, length_of_test)
+
+print("BODw = {}".format(bo_w_dev_score))
+
+## Plotting
 plt.figure()
 plt.plot(wc, label='worker time')
 plt.legend(loc=2)
@@ -123,8 +132,10 @@ ac = worker_compare(ac_bench, ac_test)
 #sum up the deviation at each point that an adept is created
 a_dev = []
 a_sum = 0
+a_sum_abs = 0
 for x in range(len(ac)):
     a_sum += ac[x]
+    a_sum_abs += abs(ac[x])
     a_dev.append(a_sum)
 
 #ac_roc = ROC(ac, len(ac))

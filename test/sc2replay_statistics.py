@@ -57,6 +57,19 @@ def ROC(wp, total):
     return roc
 
 
+def BODw(bench_units, player_units, game_length):
+    bench_units_filter = list(filter(lambda tm: tm <= game_length, bench_units))
+    player_units_filter = list(filter(lambda tm: tm <= game_length, player_units))
+
+    unit_comp = worker_compare(bench_units_filter, player_units_filter)
+
+    w_sum_abs = 0
+    for x in range(len(unit_comp)):
+        w_sum_abs += abs(unit_comp[x])
+
+    return w_sum_abs / len(unit_comp)
+
+
 rep_bench = sc2reader.load_replay("test_replays\\PVZ_ADEPT_BENCHMARK.SC2Replay")
 rep_test = sc2reader.load_replay("test_replays\\PVZ_ADEPT_TESTCASE1.SC2Replay")
 length_of_bench = rep_bench.frames // 24
@@ -81,10 +94,26 @@ for x in range(len(wc)):
 #wc_roc = ROC(wc, len(wc))
 wc_roc = ROC(w_dev, len(w_dev))
 
-bo_w_dev_score = w_sum_abs / min(length_of_bench, length_of_test)
+#bo_w_dev_score = w_sum_abs / min(length_of_bench, length_of_test)
+bo_w_dev_score = w_sum_abs / len(wc)
 
-print("BODw = {}".format(bo_w_dev_score))
+#print("BODw = {}: Time_total = {}".format(bo_w_dev_score, min(length_of_bench, length_of_test)))
+print("BODw = {}s/w: Worker_total = {}".format(bo_w_dev_score, len(wc)))
 
+bod_w_100 = BODw(wc_bench, wc_test, 100)
+bod_w_200 = BODw(wc_bench, wc_test, 200)
+bod_w_300 = BODw(wc_bench, wc_test, 300)
+bod_w_400 = BODw(wc_bench, wc_test, 400)
+bod_w_500 = BODw(wc_bench, wc_test, 500)
+
+print("BODw@100 = {} s/w".format(bod_w_100))
+print("BODw@200 = {} s/w".format(bod_w_200))
+print("BODw@300 = {} s/w".format(bod_w_300))
+print("BODw@400 = {} s/w".format(bod_w_400))
+print("BODw@500 = {} s/w".format(bod_w_500))
+
+
+"""
 ## Plotting
 plt.figure()
 plt.plot(wc, label='worker time')
@@ -176,3 +205,4 @@ plt.plot(ac_test, yp, label='player adepts')
 plt.legend(loc=2)
 plt.savefig('bin\\adept_created.svg')
 
+"""

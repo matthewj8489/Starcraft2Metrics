@@ -112,6 +112,10 @@ print("BODw@300 = {} s/w".format(bod_w_300))
 print("BODw@400 = {} s/w".format(bod_w_400))
 print("BODw@500 = {} s/w".format(bod_w_500))
 
+# build order similarity score : 1 / (BOD / game_length) ==> 1 / ((w/s) / (s)) = w(orkers)
+print("BOSw@300 = {} w".format(1 / (bod_w_300 / 300)))
+print("BOSw@400 = {} w".format(1 / (bod_w_400 / 400)))
+print("BOSw@500 = {} w".format(1 / (bod_w_500 / 500)))
 
 """
 ## Plotting

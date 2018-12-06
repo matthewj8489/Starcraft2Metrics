@@ -13,11 +13,11 @@ def worker_created(replay, player_id):
     return workers
 
 
-def worker_compare(benchmark, player_workers):
+def unit_compare(benchmark, player):
     compare = []
-    total = min(len(benchmark), len(player_workers))
+    total = min(len(benchmark), len(player))
     for x in range(total):
-        compare.append(benchmark[x] - player_workers[x])
+        compare.append(benchmark[x] - player[x])
 
     return compare
 
@@ -57,11 +57,11 @@ def ROC(wp, total):
     return roc
 
 
-def BODw(bench_units, player_units, game_length):
+def BOD(bench_units, player_units, game_length):
     bench_units_filter = list(filter(lambda tm: tm <= game_length, bench_units))
     player_units_filter = list(filter(lambda tm: tm <= game_length, player_units))
 
-    unit_comp = worker_compare(bench_units_filter, player_units_filter)
+    unit_comp = unit_compare(bench_units_filter, player_units_filter)
 
     w_sum_abs = 0
     for x in range(len(unit_comp)):
@@ -72,15 +72,15 @@ def BODw(bench_units, player_units, game_length):
 
 rep_bench = sc2reader.load_replay("test_replays\\PVZ_ADEPT_BENCHMARK.SC2Replay")
 rep_test = sc2reader.load_replay("test_replays\\PVZ_ADEPT_TESTCASE1.SC2Replay")
-length_of_bench = rep_bench.frames // 24
-length_of_test = rep_test.frames // 24
+length_of_bench = rep_bench.frames // rep_bench.game_fps
+length_of_test = rep_test.frames // rep_test.game_fps
 
 #### WORKER TRACKING ####
 
 wc_bench = worker_created(rep_bench, 1)
 wc_test = worker_created(rep_test, 1)
 
-wc = worker_compare(wc_bench, wc_test)
+wc = unit_compare(wc_bench, wc_test)
 
 #sum up the deviation at each point that a worker is created
 w_dev = []
@@ -98,24 +98,30 @@ wc_roc = ROC(w_dev, len(w_dev))
 bo_w_dev_score = w_sum_abs / len(wc)
 
 #print("BODw = {}: Time_total = {}".format(bo_w_dev_score, min(length_of_bench, length_of_test)))
-print("BODw = {}s/w: Worker_total = {}".format(bo_w_dev_score, len(wc)))
+print("(why is this different?) BODw = {}s/w: Worker_total = {}".format(bo_w_dev_score, len(wc)))
 
-bod_w_100 = BODw(wc_bench, wc_test, 100)
-bod_w_200 = BODw(wc_bench, wc_test, 200)
-bod_w_300 = BODw(wc_bench, wc_test, 300)
-bod_w_400 = BODw(wc_bench, wc_test, 400)
-bod_w_500 = BODw(wc_bench, wc_test, 500)
+#bod_w_100 = BOD(wc_bench, wc_test, 100)
+#bod_w_200 = BOD(wc_bench, wc_test, 200)
+#bod_w_300 = BOD(wc_bench, wc_test, 300)
+#bod_w_400 = BOD(wc_bench, wc_test, 400)
+#bod_w_500 = BOD(wc_bench, wc_test, 500)
+bod_w_all = BOD(wc_bench, wc_test, min(length_of_bench, length_of_test))
 
-print("BODw@100 = {} s/w".format(bod_w_100))
-print("BODw@200 = {} s/w".format(bod_w_200))
-print("BODw@300 = {} s/w".format(bod_w_300))
-print("BODw@400 = {} s/w".format(bod_w_400))
-print("BODw@500 = {} s/w".format(bod_w_500))
+#print("BODw@100 = {} s/w".format(bod_w_100))
+#print("BODw@200 = {} s/w".format(bod_w_200))
+#print("BODw@300 = {} s/w".format(bod_w_300))
+#print("BODw@400 = {} s/w".format(bod_w_400))
+#print("BODw@500 = {} s/w".format(bod_w_500))
+print("BODw = {} s/w".format(bod_w_all))
+
+final_dev_w = wc[len(wc)-1]
+
+print("DEVw = {} s".format(final_dev_w))
 
 # build order similarity score : 1 / (BOD / game_length) ==> 1 / ((w/s) / (s)) = w(orkers)
-print("BOSw@300 = {} w".format(1 / (bod_w_300 / 300)))
-print("BOSw@400 = {} w".format(1 / (bod_w_400 / 400)))
-print("BOSw@500 = {} w".format(1 / (bod_w_500 / 500)))
+#print("BOSw@300 = {} w".format(1 / (bod_w_300 / 300)))
+#print("BOSw@400 = {} w".format(1 / (bod_w_400 / 400)))
+#print("BOSw@500 = {} w".format(1 / (bod_w_500 / min(500, length_of_bench, length_of_test))))
 
 """
 ## Plotting
@@ -154,13 +160,14 @@ plt.plot(wc_test, yp, label='player workers')
 plt.legend(loc=2)
 plt.savefig('bin\\worker_created.svg')
 
+"""
 
 #### ADEPT TRACKING ####
 
 ac_bench = adept_created(rep_bench, 1)
 ac_test = adept_created(rep_test, 1)
 
-ac = worker_compare(ac_bench, ac_test)
+ac = unit_compare(ac_bench, ac_test)
 
 #sum up the deviation at each point that an adept is created
 a_dev = []
@@ -174,6 +181,14 @@ for x in range(len(ac)):
 #ac_roc = ROC(ac, len(ac))
 ac_roc = ROC(a_dev, len(a_dev))
 
+bod_a = BOD(ac_bench, ac_test, min(length_of_test, length_of_bench))
+final_dev_a = ac[len(ac)-1]
+
+print("BODa = {} s/a".format(bod_a))
+print("DEVa = {} s".format(final_dev_a))
+
+"""
+## Plotting
 plt.figure()
 plt.plot(ac, label='adept time')
 plt.legend(loc=2)
@@ -210,3 +225,8 @@ plt.legend(loc=2)
 plt.savefig('bin\\adept_created.svg')
 
 """
+
+### BOD all ###
+bod_all = (bod_w_all + bod_a) / 2
+
+print("BOD = {} seconds / unit".format(bod_all))

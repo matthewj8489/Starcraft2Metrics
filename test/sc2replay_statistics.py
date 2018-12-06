@@ -42,6 +42,9 @@ def army_created(replay, player_id):
         if event.name == "UnitBornEvent" and event.control_pid == player_id:
             if event.unit.is_army:
                 army.append([event.second, event.unit.name])
+        elif event.name == "UnitInitEvent" and event.control_pid == player_id:
+            if event.unit.is_army:
+                army.append([event.second, event.unit_name])
 
     return army
 

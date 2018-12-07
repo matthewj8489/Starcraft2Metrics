@@ -126,29 +126,31 @@ print("DEVw = {} s".format(final_dev_w))
 #print("BOSw@400 = {} w".format(1 / (bod_w_400 / 400)))
 #print("BOSw@500 = {} w".format(1 / (bod_w_500 / min(500, length_of_bench, length_of_test))))
 
-"""
+
 ## Plotting
 plt.figure()
-plt.plot(wc, label='worker time')
-plt.legend(loc=2)
+plt.plot(wc, label='worker time deviations')
+plt.xlabel('workers')
+plt.ylabel('time (s)')
+plt.legend()
 plt.savefig('bin\\worker_time.svg')
 
-plt.figure()
-plt.plot(w_dev, label='worker deviation')
-plt.legend(loc=2)
-plt.savefig('bin\\worker_dev.svg')
+#plt.figure()
+#plt.plot(w_dev, label='worker deviation')
+#plt.legend(loc=2)
+#plt.savefig('bin\\worker_dev.svg')
 
-plt.figure()
-plt.plot(wc_roc, label='roc')
-plt.legend(loc=2)
-plt.savefig('bin\\worker_roc.svg')
+#plt.figure()
+#plt.plot(wc_roc, label='roc')
+#plt.legend(loc=2)
+#plt.savefig('bin\\worker_roc.svg')
 
-plt.figure()
-plt.plot(wc, label='worker time')
-plt.plot(w_dev, label='worker deviation')
-plt.plot(wc_roc, label='roc')
-plt.legend(loc=2)
-plt.savefig('bin\\worker_combined.svg')
+#plt.figure()
+#plt.plot(wc, label='worker time')
+#plt.plot(w_dev, label='worker deviation')
+#plt.plot(wc_roc, label='roc')
+#plt.legend(loc=2)
+#plt.savefig('bin\\worker_combined.svg')
 
 plt.figure()
 yb = []
@@ -160,10 +162,12 @@ yp = []
 for y in range(len(wc_test)):
     yp.append(y)
 plt.plot(wc_test, yp, label='player workers')
+plt.ylabel('workers')
+plt.xlabel('time (s)')
 plt.legend(loc=2)
-plt.savefig('bin\\worker_created.svg')
+plt.savefig('bin\\workers_created_comparison.svg')
 
-"""
+
 
 #### ADEPT TRACKING ####
 
@@ -190,29 +194,31 @@ final_dev_a = ac[len(ac)-1]
 print("BODa = {} s/a".format(bod_a))
 print("DEVa = {} s".format(final_dev_a))
 
-"""
+
 ## Plotting
 plt.figure()
-plt.plot(ac, label='adept time')
+plt.plot(ac, label='adept time deviations')
+plt.xlabel('adepts')
+plt.ylabel('time (s)')
 plt.legend(loc=2)
-plt.savefig('bin\\adept_time.svg')
+plt.savefig('bin\\adept_time_deviations.svg')
 
-plt.figure()
-plt.plot(a_dev, label='adept deviation')
-plt.legend(loc=2)
-plt.savefig('bin\\adept_dev.svg')
+#plt.figure()
+#plt.plot(a_dev, label='adept deviation')
+#plt.legend(loc=2)
+#plt.savefig('bin\\adept_dev.svg')
 
-plt.figure()
-plt.plot(ac_roc, label='roc')
-plt.legend(loc=2)
-plt.savefig('bin\\adept_roc.svg')
+#plt.figure()
+#plt.plot(ac_roc, label='roc')
+#plt.legend(loc=2)
+#plt.savefig('bin\\adept_roc.svg')
 
-plt.figure()
-plt.plot(ac, label='adept time')
-plt.plot(a_dev, label='adept deviation')
-plt.plot(ac_roc, label='roc')
-plt.legend(loc=2)
-plt.savefig('bin\\adept_combined.svg')
+#plt.figure()
+#plt.plot(ac, label='adept time')
+#plt.plot(a_dev, label='adept deviation')
+#plt.plot(ac_roc, label='roc')
+#plt.legend(loc=2)
+#plt.savefig('bin\\adept_combined.svg')
 
 plt.figure()
 yb = []
@@ -225,9 +231,11 @@ for y in range(len(ac_test)):
     yp.append(y)
 plt.plot(ac_test, yp, label='player adepts')
 plt.legend(loc=2)
-plt.savefig('bin\\adept_created.svg')
+plt.ylabel('adepts')
+plt.xlabel('time (s)')
+plt.savefig('bin\\adept_created_comparison.svg')
 
-"""
+
 
 ### BOD all ###
 bod_all = (bod_w_all + bod_a) / 2

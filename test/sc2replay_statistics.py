@@ -13,15 +13,6 @@ def worker_created(replay, player_id):
     return workers
 
 
-def unit_compare(benchmark, player):
-    compare = []
-    total = min(len(benchmark), len(player))
-    for x in range(total):
-        compare.append(benchmark[x] - player[x])
-
-    return compare
-
-
 def adept_created(replay, player_id):
     adepts = []
     for event in replay.events:
@@ -49,6 +40,15 @@ def army_created(replay, player_id):
     return army
 
 
+def unit_compare(benchmark, player):
+    compare = []
+    total = min(len(benchmark), len(player))
+    for x in range(total):
+        compare.append(benchmark[x] - player[x])
+
+    return compare
+
+
 def ROC(wp, total):
     roc = []
     x = 0
@@ -59,10 +59,13 @@ def ROC(wp, total):
 
     return roc
 
+def filter_on_game_length(rep_units, game_length):
+    rep_units_filter = list(filter(lambda tm: tm <= game_length, rep_units))
+    return rep_units_filter
 
 def BOD(bench_units, player_units, game_length):
-    bench_units_filter = list(filter(lambda tm: tm <= game_length, bench_units))
-    player_units_filter = list(filter(lambda tm: tm <= game_length, player_units))
+    bench_units_filter = filter_on_game_length(bench_units, game_length)
+    player_units_filter = filter_on_game_length(player_units, game_length)
 
     unit_comp = unit_compare(bench_units_filter, player_units_filter)
 
@@ -77,31 +80,34 @@ rep_bench = sc2reader.load_replay("test_replays\\PVZ_ADEPT_BENCHMARK.SC2Replay")
 rep_test = sc2reader.load_replay("test_replays\\PVZ_ADEPT_TESTCASE1.SC2Replay")
 length_of_bench = rep_bench.frames // rep_bench.game_fps
 length_of_test = rep_test.frames // rep_test.game_fps
+min_game_length = min(length_of_bench, length_of_test)
 
 #### WORKER TRACKING ####
 
 wc_bench = worker_created(rep_bench, 1)
 wc_test = worker_created(rep_test, 1)
 
-wc = unit_compare(wc_bench, wc_test)
+wc_b_filter = filter_on_game_length(wc_bench, min_game_length)
+wc_t_filter = filter_on_game_length(wc_test, min_game_length)
+
+wc = unit_compare(wc_b_filter, wc_t_filter)
 
 #sum up the deviation at each point that a worker is created
-w_dev = []
-w_sum = 0
-w_sum_abs = 0
-for x in range(len(wc)):
-    w_sum += wc[x]
-    w_sum_abs += abs(wc[x])
-    w_dev.append(w_sum)
+#w_dev = []
+#w_sum = 0
+#w_sum_abs = 0
+#for x in range(len(wc)):
+#    w_sum += wc[x]
+#    w_sum_abs += abs(wc[x])
+#    w_dev.append(w_sum)
 
-#wc_roc = ROC(wc, len(wc))
-wc_roc = ROC(w_dev, len(w_dev))
+#wc_roc = ROC(w_dev, len(w_dev))
 
-#bo_w_dev_score = w_sum_abs / min(length_of_bench, length_of_test)
-bo_w_dev_score = w_sum_abs / len(wc)
+#bo_w_dev_score = w_sum_abs / len(wc)
 
-#print("BODw = {}: Time_total = {}".format(bo_w_dev_score, min(length_of_bench, length_of_test)))
-print("(why is this different?) BODw = {}s/w: Worker_total = {}".format(bo_w_dev_score, len(wc)))
+#this is different because wc_bench and wc_test might have the total workers from each replay, but the replays are different
+#   lengths of time. 
+#print("(why is this different?) BODw = {}s/w: Worker_total = {}".format(bo_w_dev_score, len(wc)))
 
 #bod_w_100 = BOD(wc_bench, wc_test, 100)
 #bod_w_200 = BOD(wc_bench, wc_test, 200)
@@ -154,14 +160,14 @@ plt.savefig('bin\\worker_time.svg')
 
 plt.figure()
 yb = []
-for y in range(len(wc_bench)):
+for y in range(len(wc_b_filter)):
     yb.append(y)
-plt.plot(wc_bench, yb, label='benchmark workers')
+plt.plot(wc_b_filter, yb, label='benchmark workers')
 
 yp = []
-for y in range(len(wc_test)):
+for y in range(len(wc_t_filter)):
     yp.append(y)
-plt.plot(wc_test, yp, label='player workers')
+plt.plot(wc_t_filter, yp, label='player workers')
 plt.ylabel('workers')
 plt.xlabel('time (s)')
 plt.legend(loc=2)
@@ -174,19 +180,22 @@ plt.savefig('bin\\workers_created_comparison.svg')
 ac_bench = adept_created(rep_bench, 1)
 ac_test = adept_created(rep_test, 1)
 
-ac = unit_compare(ac_bench, ac_test)
+ac_b_filter = filter_on_game_length(ac_bench, min_game_length)
+ac_t_filter = filter_on_game_length(ac_test, min_game_length)
+
+ac = unit_compare(ac_b_filter, ac_t_filter)
 
 #sum up the deviation at each point that an adept is created
-a_dev = []
-a_sum = 0
-a_sum_abs = 0
-for x in range(len(ac)):
-    a_sum += ac[x]
-    a_sum_abs += abs(ac[x])
-    a_dev.append(a_sum)
+#a_dev = []
+#a_sum = 0
+#a_sum_abs = 0
+#for x in range(len(ac)):
+#    a_sum += ac[x]
+#    a_sum_abs += abs(ac[x])
+#    a_dev.append(a_sum)
 
 #ac_roc = ROC(ac, len(ac))
-ac_roc = ROC(a_dev, len(a_dev))
+#ac_roc = ROC(a_dev, len(a_dev))
 
 bod_a = BOD(ac_bench, ac_test, min(length_of_test, length_of_bench))
 final_dev_a = ac[len(ac)-1]
@@ -222,14 +231,14 @@ plt.savefig('bin\\adept_time_deviations.svg')
 
 plt.figure()
 yb = []
-for y in range(len(ac_bench)):
+for y in range(len(ac_b_filter)):
     yb.append(y)
-plt.plot(ac_bench, yb, label='benchmark adepts')
+plt.plot(ac_b_filter, yb, label='benchmark adepts')
 
 yp = []
-for y in range(len(ac_test)):
+for y in range(len(ac_t_filter)):
     yp.append(y)
-plt.plot(ac_test, yp, label='player adepts')
+plt.plot(ac_t_filter, yp, label='player adepts')
 plt.legend(loc=2)
 plt.ylabel('adepts')
 plt.xlabel('time (s)')

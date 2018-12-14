@@ -42,9 +42,9 @@ def build_order_deviation(bench_replay_location, player_replay_location, player_
     rep_unit_init_events = rep_events_of_type["UnitInitEvent"]
 
     bench_player_ube = list(filter(lambda evt: evt.control_pid == bench_pid, bench_unit_born_events))
-    bench_player_ubi = list(filter(lambda evt: evt.control_pid == bench_pid, bench_unit_init_events))
+    bench_player_uie = list(filter(lambda evt: evt.control_pid == bench_pid, bench_unit_init_events))
     replay_player_ube = list(filter(lambda evt: evt.control_pid == rep_pid, rep_unit_born_events))
-    replay_player_ubi = list(filter(lambda evt: evt.control_pid == rep_pid, rep_unit_init_events))      
+    replay_player_uie = list(filter(lambda evt: evt.control_pid == rep_pid, rep_unit_init_events))      
 
 
     # Find all units created (worker, army, building)
@@ -58,11 +58,11 @@ def build_order_deviation(bench_replay_location, player_replay_location, player_
                 bench_units_created[ube.unit.name] = []
             bench_units_created[ube.unit.name].append(ube.second)
 
-    for ubi in bench_player_ubi:
-        if ubi.unit.is_army:
-            if not ubi.unit.name in bench_units_created:
-                bench_units_created[ubi.unit.name] = []
-            bench_units_created[ubi.unit.name].append(ubi.second)
+    for uie in bench_player_uie:
+        if uie.unit.is_army:
+            if not uie.unit.name in bench_units_created:
+                bench_units_created[uie.unit.name] = []
+            bench_units_created[uie.unit.name].append(uie.second)
 
     replay_units_created = dict()
     replay_units_created['worker'] = []
@@ -74,11 +74,11 @@ def build_order_deviation(bench_replay_location, player_replay_location, player_
                 replay_units_created[ube.unit.name] = []
             replay_units_created[ube.unit.name].append(ube.second)
 
-    for ubi in replay_player_ubi:
-        if ubi.unit.is_army:
-            if not ubi.unit.name in replay_units_created:
-                replay_units_created[ubi.unit.name] = []
-            replay_units_created[ubi.unit.name].append(ubi.second)
+    for uie in replay_player_uie:
+        if uie.unit.is_army:
+            if not uie.unit.name in replay_units_created:
+                replay_units_created[uie.unit.name] = []
+            replay_units_created[uie.unit.name].append(uie.second)
 
 
     # Calculate the BOD for each unit
@@ -89,7 +89,7 @@ def build_order_deviation(bench_replay_location, player_replay_location, player_
 
     # Print results
     for bod_unit in BODu:
-        print("BOD({}) : {}".format(bod_unit, BODu[bod_unit]))
+        print("BOD({}) : {} s/u".format(bod_unit, BODu[bod_unit]))
         
 
   

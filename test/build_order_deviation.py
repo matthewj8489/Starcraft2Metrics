@@ -5,26 +5,12 @@ def build_order_deviation(bench_replay_location, player_replay_location, player_
     rep_bench = sc2reader.load_replay(bench_replay_location)
     rep_player = sc2reader.load_replay(player_replay_location)
 
+
     # retrieve the shortest game length between the two replays
     b_game_length = rep_bench.frames // rep_bench.game_fps
     p_game_length = rep_player.frames // rep_player.game_fps
     min_game_length = min(b_game_length, p_game_length)
 
-    # create a dictionary of events
-    bench_event_names = set([event.name for event in rep_bench.events])
-    bench_events_of_type = (name: [] for name in event_names)
-    bench_unit_born_events = events_of_type["UnitBornEvent"]
-    bench_unit_init_events = events_of_type["UnitInitEvent"]
-
-    rep_event_names = set([event.name for event in rep_player.events])
-    rep_events_of_type = (name: [] for name in event_names)
-    rep_unit_born_events = events_of_type["UnitBornEvent"]
-    rep_unit_init_events = events_of_type["UnitInitEvent"]
-
-    bench_units_born = list(filter(lambda evt: evt.control_pid == bench_pid, bench_unit_born_events))
-    bench_units_init = list(filter(lambda evt: evt.control_pid == bench_pid, bench_unit_init_events))
-    replay_units_born = list(filter(lambda evt: evt.control_pid == rep_pid, rep_unit_born_events))
-    replay_units_init = list(filter(lambda evt: evt.control_pid == rep_pid, rep_unit_init_events))    
 
     # determine the pid of the player testing the BO deviation
     bench_pid = 0
@@ -37,12 +23,74 @@ def build_order_deviation(bench_replay_location, player_replay_location, player_
     if rep_player.players[0].name == player_name:
         rep_pid = rep_player.players[0].pid
     else:
-        rep_pid = rep_player.players[1].pid   
-
-    # for each relevant unit (a unit that was created), calculate a BOD and DEV
+        rep_pid = rep_player.players[1].pid 
 
 
-    
+    # create a dictionary of events
+    bench_event_names = set([event.name for event in rep_bench.events])
+    bench_events_of_type = {name: [] for name in bench_event_names}
+    for event in rep_bench.events:
+        bench_events_of_type[event.name].append(event)
+    bench_unit_born_events = bench_events_of_type["UnitBornEvent"]       
+    bench_unit_init_events = bench_events_of_type["UnitInitEvent"]
+
+    rep_event_names = set([event.name for event in rep_player.events])
+    rep_events_of_type = {name: [] for name in rep_event_names}
+    for event in rep_player.events:
+        rep_events_of_type[event.name].append(event)
+    rep_unit_born_events = rep_events_of_type["UnitBornEvent"]
+    rep_unit_init_events = rep_events_of_type["UnitInitEvent"]
+
+    bench_player_ube = list(filter(lambda evt: evt.control_pid == bench_pid, bench_unit_born_events))
+    bench_player_ubi = list(filter(lambda evt: evt.control_pid == bench_pid, bench_unit_init_events))
+    replay_player_ube = list(filter(lambda evt: evt.control_pid == rep_pid, rep_unit_born_events))
+    replay_player_ubi = list(filter(lambda evt: evt.control_pid == rep_pid, rep_unit_init_events))      
+
+
+    # Find all units created (worker, army, building)
+    bench_units_created = dict()
+    bench_units_created['worker'] = []
+    for ube in bench_player_ube:
+        if ube.unit.is_worker:
+            bench_units_created['worker'].append(ube.second)
+        if ube.unit.is_army:
+            if not ube.unit.name in bench_units_created:
+                bench_units_created[ube.unit.name] = []
+            bench_units_created[ube.unit.name].append(ube.second)
+
+    for ubi in bench_player_ubi:
+        if ubi.unit.is_army:
+            if not ubi.unit.name in bench_units_created:
+                bench_units_created[ubi.unit.name] = []
+            bench_units_created[ubi.unit.name].append(ubi.second)
+
+    replay_units_created = dict()
+    replay_units_created['worker'] = []
+    for ube in replay_player_ube:
+        if ube.unit.is_worker:
+            replay_units_created['worker'].append(ube.second)
+        if ube.unit.is_army:
+            if not ube.unit.name in replay_units_created:
+                replay_units_created[ube.unit.name] = []
+            replay_units_created[ube.unit.name].append(ube.second)
+
+    for ubi in replay_player_ubi:
+        if ubi.unit.is_army:
+            if not ubi.unit.name in replay_units_created:
+                replay_units_created[ubi.unit.name] = []
+            replay_units_created[ubi.unit.name].append(ubi.second)
+
+
+    # Calculate the BOD for each unit
+    BODu = dict()
+    for unit_created in bench_units_created:
+        if unit_created in replay_units_created:
+            BODu[unit_created] = BOD(bench_units_created[unit_created], replay_units_created[unit_created], min_game_length)
+
+    # Print results
+    for bod_unit in BODu:
+        print("BOD({}) : {}".format(bod_unit, BODu[bod_unit]))
+        
 
   
 #### PRIVATE FUNCTIONS ####
@@ -65,6 +113,9 @@ def BOD(bench_units, player_units, game_length):
     player_units_filter = filter_on_game_length(player_units, game_length)
 
     unit_comp = unit_compare(bench_units_filter, player_units_filter)
+
+    if len(unit_comp) == 0:
+        return -1
 
     w_sum_abs = 0
     for x in range(len(unit_comp)):

@@ -55,6 +55,16 @@ for ade in adept_done_events:
     total_adepts_done += 1
 
 
-print("Total Adepts Born ({})".format(total_adepts_born))        
-print("Total Adepts Init ({})".format(total_adepts_init))
-print("Total Adepts Done ({})".format(total_adepts_done))        
+player_stats_events = events_of_type["PlayerStatsEvent"]
+player1_stats_events = []
+player2_stats_events = []
+for pse in player_stats_events:
+    if pse.pid == 1:
+        player1_stats_events.append(pse)
+    elif pse.pid == 2:
+        player2_stats_events.append(pse)
+
+
+#print("Total Adepts Born ({})".format(total_adepts_born))        
+#print("Total Adepts Init ({})".format(total_adepts_init))
+#print("Total Adepts Done ({})".format(total_adepts_done))        

@@ -11,24 +11,24 @@ for event in replay.events:
 
 unit_born_events = events_of_type["UnitBornEvent"]
 
-for ube in unit_born_events:
-    if ube.control_pid == 1:
-        print("{} created {} at second {}".format(ube.unit_controller,
-                                                  ube.unit,
-                                                  ube.second))
+#for ube in unit_born_events:
+#    if ube.control_pid == 1:
+#        print("{} created {} at second {}".format(ube.unit_controller,
+#                                                  ube.unit,
+#                                                  ube.second))
 
 unit_init_events = events_of_type["UnitInitEvent"]
 
-for uie in unit_init_events:
-    if uie.control_pid == 1:
-        print("{} started creating {} at second {}".format(uie.unit_controller,
-                                                           uie.unit,
-                                                           uie.second))
+#for uie in unit_init_events:
+#    if uie.control_pid == 1:
+#        print("{} started creating {} at second {}".format(uie.unit_controller,
+#                                                           uie.unit,
+#                                                           uie.second))
 
 unit_done_events = events_of_type["UnitDoneEvent"]
 
-for ude in unit_done_events:
-    print("{} finished".format(ude.unit))
+#for ude in unit_done_events:
+#    print("{} finished".format(ude.unit))
 
 
 adept_born_events = list(filter(lambda ube: ube.unit.name == "Adept", unit_born_events))
@@ -36,7 +36,7 @@ adept_born_events = list(filter(lambda ube: ube.unit.name == "Adept", unit_born_
 total_adepts_born = 0
 for abe in adept_born_events:
     if abe.control_pid == 1:
-        print("{} created at second {}".format(abe.unit, abe.second))
+        #print("{} created at second {}".format(abe.unit, abe.second))
         total_adepts_born += 1
 
 

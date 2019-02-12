@@ -1,8 +1,15 @@
 import sc2reader
 
-#replay = sc2reader.load_replay("test_replays\\PVZ_ADEPT_BENCHMARK.SC2Replay")
-replay = sc2reader.load_replay("temp\\Year Zero LE (9).SC2Replay")
+replay = sc2reader.load_replay("test_replays\\PVZ_ADEPT_BENCHMARK.SC2Replay")
+#replay = sc2reader.load_replay("temp\\Year Zero LE (9).SC2Replay")
 
+units=set([obj.name for obj in replay.objects.values()])
+
+units_of_type = {name: [] for name in units}
+for obj in replay.objects.values():
+    units_of_type[obj.name].append(obj)
+    
+	
 event_names = set([event.name for event in replay.events])
 
 events_of_type = {name: [] for name in event_names}
@@ -68,12 +75,14 @@ player2_stats_events = list(filter(lambda pse: pse.pid == 2, player_stats_events
 ##    elif pse.pid == 2:
 ##        player2_stats_events.append(pse)
 
-ude_units = {"cols": 0, "zeals": 0, "archs": 0, "stalks": 0, "sents": 0, "obs": 0}
+ude_units = {"cols": 0, "zeals": 0, "adepts": 0, "archs": 0, "stalks": 0, "sents": 0, "obs": 0}
 for x in p1_army_ude:
     if x.unit.name == "Colossus":
         ude_units["cols"] += 1
     elif x.unit.name == "Zealot":
         ude_units["zeals"] += 1
+    elif x.unit.name == "Adept":
+        ude_units["adepts"] += 1
     elif x.unit.name == "Archon":
         ude_units["archs"] += 1
     elif x.unit.name == "Stalker":
@@ -83,12 +92,14 @@ for x in p1_army_ude:
     elif x.unit.name == "Observer":
         ude_units["obs"] += 1
 
-ube_units = {"cols": 0, "zeals": 0, "archs": 0, "stalks": 0, "sents": 0, "obs": 0}
+ube_units = {"cols": 0, "zeals": 0, "adepts": 0, "archs": 0, "stalks": 0, "sents": 0, "obs": 0}
 for x in p1_army_ube:
     if x.unit.name == "Colossus":
         ube_units["cols"] += 1
     elif x.unit.name == "Zealot":
         ube_units["zeals"] += 1
+    elif x.unit.name == "Adept":
+        ube_units["adepts"] += 1
     elif x.unit.name == "Archon":
         ube_units["archs"] += 1
     elif x.unit.name == "Stalker":
@@ -98,12 +109,14 @@ for x in p1_army_ube:
     elif x.unit.name == "Observer":
         ube_units["obs"] += 1
 
-uie_units = {"cols": 0, "zeals": 0, "archs": 0, "stalks": 0, "sents": 0, "obs": 0}
+uie_units = {"cols": 0, "zeals": 0, "adepts": 0, "archs": 0, "stalks": 0, "sents": 0, "obs": 0}
 for x in p1_army_uie:
     if x.unit.name == "Colossus":
         uie_units["cols"] += 1
     elif x.unit.name == "Zealot":
         uie_units["zeals"] += 1
+    elif x.unit.name == "Adept":
+        uie_units["adepts"] += 1
     elif x.unit.name == "Archon":
         uie_units["archs"] += 1
     elif x.unit.name == "Stalker":

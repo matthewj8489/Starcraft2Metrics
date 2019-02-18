@@ -126,6 +126,14 @@ for x in p1_army_uie:
     elif x.unit.name == "Observer":
         uie_units["obs"] += 1
 
+col_events = []
+for x in p1_army_ube:
+    if x.unit.name == "Colossus":
+        col_events.append(x)
+
+for x in p1_army_uie:
+    if x.unit.name == "Colossus":
+        col_events.append(x)
 		
 #print("Total Adepts Born ({})".format(total_adepts_born))        
 #print("Total Adepts Init ({})".format(total_adepts_init))

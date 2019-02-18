@@ -87,6 +87,30 @@ def gas_mined_benchmark(event_dict, player_id, benchmark_time_s):
 
     return gas_mined
 
+def units_created(event_dict, player_id, benchmark_time_s):
+    if not 'UnitBornEvent' in event_dict or not 'UnitInitEvent' in event_dict:
+        return 0
+    units_created = {"Probe": 0, "Zealot": 0, "Sentry": 0, "Stalker": 0, "Adept": 0, "HighTemplar": 0,
+                     "DarkTemplar": 0, "Archon": 0, "Observer": 0, "Immortal": 0, "Colossus": 0,
+                     "Disruptor": 0, "Phoenix": 0, "Oracle": 0, "VoidRay": 0, "Carrier": 0, "Tempest": 0}
+
+    unit_born_events = event_dict['UnitBornEvent']
+    unit_init_events = event_dict['UnitInitEvent']   
+    
+    player_ube = list(filter(lambda ube: ube.control_pid == player_id, unit_born_events))
+    player_uie = list(filter(lambda uie: uie.control_pid == player_id, unit_init_events))
+
+    for ube in player_ube:
+        if (ube.second <= benchmark_time_s) and (ube.unit.name in units_created) and (ube.unit.hallucinated == False):
+            units_created[ube.unit.name] += 1
+
+    for uie in player_uie:
+        if (uie.second <= benchmark_time_s) and (uie.unit.name in units_created) and (uie.unit.hallucinated == False):
+            units_created[uie.unit.name] += 1
+
+    return units_created
+    
+
 ########## Testing ###########
 if __name__ == '__main__':
     replay = sc2reader.load_replay("..\\test\\test_replays\\Year Zero LE (9).SC2Replay")
@@ -96,5 +120,13 @@ if __name__ == '__main__':
     for event in replay.events:
         events_dictionary[event.name].append(event)
 
-    workers = worker_created_benchmark(events_dictionary, 1, 618)
-    army = army_created_benchmark(events_dictionary, 1, 618)
+    real_bench_time_s = 618
+    real_fps = replay.frames / replay.game_length.seconds
+    bench_frame = real_bench_time_s * real_fps
+    bench_time_s = bench_frame // replay.game_fps
+
+    #bench_time_s = 866
+
+    workers = worker_created_benchmark(events_dictionary, 1, bench_time_s)
+    army = army_created_benchmark(events_dictionary, 1, bench_time_s)
+    unit_dict = units_created(events_dictionary, 1, bench_time_s)

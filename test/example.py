@@ -1,7 +1,7 @@
 import sc2reader
 
-replay = sc2reader.load_replay("test_replays\\PVZ_ADEPT_BENCHMARK.SC2Replay")
-#replay = sc2reader.load_replay("temp\\Year Zero LE (9).SC2Replay")
+#replay = sc2reader.load_replay("test_replays\\PVZ_ADEPT_BENCHMARK.SC2Replay")
+replay = sc2reader.load_replay("test_replays\\Year Zero LE (9).SC2Replay")
 
 units=set([obj.name for obj in replay.objects.values()])
 

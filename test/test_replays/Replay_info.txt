@@ -1,0 +1,26 @@
+Year Zero LE (9)
+----------------
+Game Length: 11:51 (711s)
+Max (200/200): 10:18 (618s)
+Units:
+	- 75 probes
+	- 1 observer
+	- 23 zealots
+	- 8 archons
+	- 5 colossi
+	- 7 stalkers
+	- 1 sentry
+	(- 1 hallucinated colossus)
+Unspent Resources:
+	- 760 minerals
+	- 343 gas
+Upgrades:
+	- 2 weapons
+	- 0 armor
+	- 0 shield
+Income:
+	- 2631 minerals
+	- 1052 gas
+Army Value:
+	- 6150 minerals
+	- 3725 gas

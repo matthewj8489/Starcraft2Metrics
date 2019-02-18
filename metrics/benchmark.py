@@ -89,12 +89,12 @@ def gas_mined_benchmark(event_dict, player_id, benchmark_time_s):
 
 ########## Testing ###########
 if __name__ == '__main__':
-    replay = sc2reader.load_replay("..\\test\\test_replays\\PVZ_ADEPT_BENCHMARK.SC2Replay")
+    replay = sc2reader.load_replay("..\\test\\test_replays\\Year Zero LE (9).SC2Replay")
 
     event_names = set([event.name for event in replay.events])
     events_dictionary = {name: [] for name in event_names}
     for event in replay.events:
         events_dictionary[event.name].append(event)
 
-    workers = worker_created_benchmark(events_dictionary, 1, 600)
-    army = army_created_benchmark(events_dictionary, 1, 600)
+    workers = worker_created_benchmark(events_dictionary, 1, 618)
+    army = army_created_benchmark(events_dictionary, 1, 618)

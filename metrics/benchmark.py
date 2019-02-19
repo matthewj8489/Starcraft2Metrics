@@ -1,6 +1,35 @@
 import sc2reader
+import util
 
 def benchmark(replay_file, player_id, benchmark_time_s):
+    '''
+    Find benchmark metrics for the given replay file at the given real time.
+    (Benchmarks include 'Total Supply Created', 'Workers Created', 'Army Created')
+
+    Keyword arguments:
+    replay_file -- the location of the replay to parse.
+    player_id -- the id number of the player to monitor in the replay
+    benchmark_time_s -- the real time of when to take the benchmark measurement
+
+    Output:
+    Dictionary containing the following keys:
+    'BenchmarkLength' : Length of time measured in the benchmark, relevant if the replay was shorter than the benchmark_time_s parameter
+    'TotalSupply' : Total supply created by the player. (This is NOT current supply at given time)
+    'Workers' : Total number of workers created by the player.
+    'Army' : Total army supply created by the player.
+    'Upgrades' : Total count of upgrades. (+1/2/3 weapons, psionic storm, charge, etc.)
+    'TimeTo66Probes' : Time at which the user created 66 probes (3-base saturation).
+    'TimeTo75Probes' : Time at which the user created 75 probes.
+    'TimeTo3Base' : Time at which a third base is finished.
+    'TimeTo4Base' : Time at which a fourth base is finished.
+    'TimeTo5Base' : Time at which a fifth base is finished.
+    'SupplyBlocked' : Time spent supply blocked.
+    'SQ' : Spending quotient.
+    'AvgAPM' : Average APM
+    'AvgSPM' : Average SPM
+    'Units' : Dictionary of all the units created, keyed by the units' names.
+    '''
+    
     replay = sc2reader.load_replay(replay_file)
 
     event_names = set([event.name for event in replay.events])
@@ -8,8 +37,10 @@ def benchmark(replay_file, player_id, benchmark_time_s):
     for event in replay.events:
         events_dictionary[event.name].append(event)
 
-    workers = worker_created_benchmark(events_dictionary, player_id, benchmark_time_s)
-    army = army_created_benchmark(events_dictionary, player_id, benchmark_time_s)
+    game_bench_time_s = util.convert_realtime_to_gametime_r(replay, benchmark_time_s)
+
+    workers = worker_created_benchmark(events_dictionary, player_id, game_bench_time_s)
+    army = army_created_benchmark(events_dictionary, player_id, game_bench_time_s)
     total_supply_created = workers + army
     replay_time_measured = min(benchmark_time_s, replay.game_length.seconds)
     
@@ -52,18 +83,6 @@ def army_created_benchmark(event_dict, player_id, benchmark_time_s):
     for uie in player_army_uie:
         if (uie.second <= benchmark_time_s) and (uie.unit.name != "Archon") and (not uie.unit.hallucinated):
             army_supply_count += uie.unit.supply
-
-##    for ube in unit_born_events:
-##        if ube.control_pid == player_id:
-##            if ube.unit.is_army and ube.second <= benchmark_time_s:
-##                if (ube.unit.name != "Archon") and (ube.unit.hallucinated == False):
-##                    army_supply_count += ube.unit.supply
-##
-##    for uie in unit_init_events:
-##        if uie.control_pid == player_id:
-##            if uie.unit.is_army and uie.second <= benchmark_time_s:
-##                if (uie.unit.name != "Archon") and (uie.unit.hallucinated == False):
-##                    army_supply_count += uie.unit.supply
 
     return army_supply_count
 
@@ -120,13 +139,10 @@ if __name__ == '__main__':
     for event in replay.events:
         events_dictionary[event.name].append(event)
 
-    real_bench_time_s = 618
-    real_fps = replay.frames / replay.game_length.seconds
-    bench_frame = real_bench_time_s * real_fps
-    bench_time_s = bench_frame // replay.game_fps
-
-    #bench_time_s = 866
+    bench_time_s = util.convert_realtime_to_gametime_r(replay, 618)
 
     workers = worker_created_benchmark(events_dictionary, 1, bench_time_s)
     army = army_created_benchmark(events_dictionary, 1, bench_time_s)
     unit_dict = units_created(events_dictionary, 1, bench_time_s)
+
+    bench_dict = benchmark("..\\test\\test_replays\\Year Zero LE (9).SC2Replay", 1, 618)

@@ -46,18 +46,16 @@ class Benchmark(object):
         #: The ID of the player for whom to parse benchmark data
         self._player_id = player_id
 
-
+\
     def workers_created(self, real_time_s):
-        if not 'UnitBornEvent' in self._events:
-            return 0
-        unit_born_events = self._events['UnitBornEvent']
-        worker_count = 0
+        units = list(filter(lambda ut: ut.owner.pid == self._player_id and ut.is_worker and (ut.hallucinated == False), self._replay.player[self._player_id].units))
         game_time_s = util.convert_realtime_to_gametime_r(self._replay, real_time_s)
+        units_r = sorted(units, key=lambda ut: ut.finished_at)
 
-        for ube in unit_born_events:
-            if ube.control_pid == self._player_id:
-                if ube.unit.is_worker and ube.second <= game_time_s:
-                    worker_count += ube.unit.supply
+        worker_count = 0
+        for ut in units_r:
+            if util.convert_frame_to_gametime_r(self._replay, ut.finished_at) <= game_time_s:
+                worker_count += 1
 
         return worker_count
 
@@ -96,27 +94,23 @@ class Benchmark(object):
 
 
     def time_to_worker_count(self, worker_count):
-        if not 'UnitBornEvent' in self._events:
-            return 0
+        units = list(filter(lambda ut: ut.owner.pid == self._player_id and ut.is_worker and (ut.hallucinated == False), self._replay.player[self._player_id].units))
 
-        unit_born_events = self._events['UnitBornEvent']
-        wc = 0
-
-        for ube in unit_born_events:
-            if (ube.control_pid == self._player_id) and (ube.unit.is_worker):
-                wc += 1
-                if wc >= worker_count:
-                    return util.convert_gametime_to_realtime_r(self._replay, ube.second)
+        supp = 0
+        for ut in units:
+            supp += ut.supply
+            if supp >= worker_count:
+                return util.convert_frame_to_realtime_r(self._replay, ut.finished_at)
 
         return -1
-
+    
 
     def time_to_66_workers(self):
         return self.time_to_worker_count(66)
 
 
     def time_to_supply_count(self, supply_count):
-        # filter all the objects into just the units (workers + army) that were not hallucinated
+        # filter all of the player units into just the workers + army that were not hallucinated
         units = list(filter(lambda ut: ut.owner.pid == self._player_id and (ut.is_army or ut.is_worker) and (ut.hallucinated == False), self._replay.player[self._player_id].units))
 
         # filter out special cases, such as Archons that were morphed from templars
@@ -154,25 +148,6 @@ class Benchmark(object):
                 units_created[uie.unit.name] += 1
 
         return units_created
-
-
-    def unit_list(self):
-        if not 'UnitBornEvent' in self._events or not 'UnitInitEvent' in self._events:
-            return 0
-        
-        unit_born_events = self._events['UnitBornEvent']
-        unit_init_events = self._events['UnitInitEvent']
-
-        player_ube = list(filter(lambda ube: ube.control_pid == self._player_id, unit_born_events))
-        player_uie = list(filter(lambda uie: uie.control_pid == self._player_id, unit_init_events))
-
-        unit_list = []
-
-        for ube in player_ube:
-            unit_list.append([ube.unit, ube.second])
-
-        for uie in player_uie:
-            unit_list.append([uie.unit, uie.second])
 
 
 

@@ -138,3 +138,10 @@ for x in p1_army_uie:
 #print("Total Adepts Born ({})".format(total_adepts_born))        
 #print("Total Adepts Init ({})".format(total_adepts_init))
 #print("Total Adepts Done ({})".format(total_adepts_done))        
+
+replay.is_ladder
+replay.map_name
+replay.humans
+replay.computers
+total_players = len(replay.humans) + len(replay.computers)
+total_players

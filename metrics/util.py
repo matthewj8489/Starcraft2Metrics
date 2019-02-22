@@ -32,3 +32,16 @@ def convert_gametime_to_realtime(game_time_s, game_frames, game_fps, game_length
 
 def convert_gametime_to_realtime_r(replay, game_time_s):
     return convert_gametime_to_realtime(game_time_s, replay.frames, replay.game_fps, replay.game_length.seconds)
+
+
+def convert_frame_to_gametime(game_frame, game_fps):
+    return game_frame // game_fps
+
+
+def convert_frame_to_gametime_r(replay, game_frame):
+    return convert_frame_to_gametime(game_frame, replay.game_fps)
+
+
+def convert_frame_to_realtime_r(replay, game_frame):
+    gt = convert_frame_to_gametime_r(replay, game_frame)
+    return convert_gametime_to_realtime_r(replay, gt)

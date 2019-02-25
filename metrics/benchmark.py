@@ -46,7 +46,7 @@ class Benchmark(object):
         #: The ID of the player for whom to parse benchmark data
         self._player_id = player_id
 
-\
+
     def workers_created(self, real_time_s):
         units = list(filter(lambda ut: ut.owner.pid == self._player_id and ut.is_worker and (ut.hallucinated == False), self._replay.player[self._player_id].units))
         game_time_s = util.convert_realtime_to_gametime_r(self._replay, real_time_s)
@@ -123,6 +123,16 @@ class Benchmark(object):
                 return util.convert_frame_to_realtime_r(self._replay, ut.finished_at)
 
         return -1
+
+
+    def time_to_total_bases(self, total_bases):
+        bases = list(filter(lambda ut: ut.name == 'Nexus' and ut.finished_at is not None, self._replay.player[self._player_id].units))
+        bases_r = sorted(bases, key=lambda ut: ut.finished_at)
+
+        if total_bases <= len(bases_r):
+            return util.convert_frame_to_realtime_r(self._replay, bases_r[total_bases - 1].finished_at)
+        else:
+            return -1       
         
 
     def units_created(self, real_time_s):

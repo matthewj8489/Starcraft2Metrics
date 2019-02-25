@@ -20,14 +20,14 @@ class Benchmark(object):
     'Upgrades' : Total count of upgrades. (+1/2/3 weapons, psionic storm, charge, etc.)
     'TimeTo66Probes' : Time at which the user created 66 probes (3-base saturation).
     'TimeTo75Probes' : Time at which the user created 75 probes.
-    'TimeTo3Base' : Time at which a third base is finished.
-    'TimeTo4Base' : Time at which a fourth base is finished.
-    'TimeTo5Base' : Time at which a fifth base is finished.
+    'TimeToTotalBases' : Time at which the specified number of bases are finished.
     'TimeToSupply : Time at which the user created the specified supply.
     'SupplyBlocked' : Time spent supply blocked.
     'SQ' : Spending quotient.
     'AvgAPM' : Average APM
+    'AvgEPM' : Average EPM
     'AvgSPM' : Average SPM
+    'AvgMacroCycleTime : Average time spent issuing macro commands (vs army commands) (or maybe the avg time between giving a worker a command and issuing another command not to the worker)
     'Units' : Dictionary of all the units created, keyed by the units' names.
     '''   
 
@@ -42,7 +42,6 @@ class Benchmark(object):
         for event in self._replay.events:
             self._events[event.name].append(event)
          
-
         #: The ID of the player for whom to parse benchmark data
         self._player_id = player_id
 

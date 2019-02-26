@@ -114,7 +114,7 @@ class Benchmark(object):
 
         # filter out special cases, such as Archons that were morphed from templars
         units_r = list(filter(lambda ut: ut.name != "Archon", units))
-                
+              
         supp = 0
         for ut in units_r:
             supp += ut.supply

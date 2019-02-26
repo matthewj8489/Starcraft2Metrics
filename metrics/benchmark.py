@@ -108,7 +108,7 @@ class Benchmark(object):
         return self.time_to_worker_count(66)
 
 
-    def time_to_supply_count(self, supply_count):
+    def time_to_supply_count_created(self, supply_count):
         # filter all of the player units into just the workers + army that were not hallucinated
         units = list(filter(lambda ut: ut.owner.pid == self._player_id and (ut.is_army or ut.is_worker) and (ut.hallucinated == False), self._replay.player[self._player_id].units))
 
@@ -123,6 +123,22 @@ class Benchmark(object):
 
         return -1
 
+
+    def time_to_supply_count_created_excluding_extra_workers(self, supply_count, max_workers_counted):
+        units = list(filter(lambda ut: ut.owner.pid == self._player_id and (ut.is_army or ut.is_worker) and (ut.hallucinated == False), self._replay.player[self._player_id].units))
+        units_r = list(filter(lambda ut: ut.name != "Archon", units))
+        
+        supp = 0
+        workers = 0
+        for ut in units_r:
+            if not ut.is_worker or workers < max_workers_counted:
+                supp += ut.supply
+                if supp >= supply_count:
+                    return util.convert_frame_to_realtime_r(self._replay, ut.finished_at)
+                if ut.is_worker:
+                    workers += 1
+
+        return -1
 
     def time_to_total_bases(self, total_bases):
         bases = list(filter(lambda ut: ut.name == 'Nexus' and ut.finished_at is not None, self._replay.player[self._player_id].units))

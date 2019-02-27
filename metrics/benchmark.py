@@ -1,4 +1,6 @@
 import sc2reader
+from sc2reader.engine.plugins import APMTracker
+sc2reader.engine.register_plugin(APMTracker())
 import util
 
 class Benchmark(object):
@@ -13,26 +15,28 @@ class Benchmark(object):
 
     Output:
     Dictionary containing the following keys:
-    'BenchmarkLength' : Length of time measured in the benchmark, relevant if the replay was shorter than the benchmark_time_s parameter
     'TotalSupply' : Total supply created by the player. (This is NOT current supply at given time)
     'Workers' : Total number of workers created by the player.
     'Army' : Total army supply created by the player.
     'Upgrades' : Total count of upgrades. (+1/2/3 weapons, psionic storm, charge, etc.)
-    'TimeTo66Probes' : Time at which the user created 66 probes (3-base saturation).
-    'TimeTo75Probes' : Time at which the user created 75 probes.
-    'TimeToTotalBases' : Time at which the specified number of bases are finished.
-    'TimeToSupply : Time at which the user created the specified supply.
+    'TimeTo66Workers' : Time at which the user created 66 workers (3-base saturation).
+    'TimeTo75Workers' : Time at which the user created 75 workers.
+    'TimeTo3Bases' : Time at which the 3 bases are finished.
+    'TimeTo4Bases' : Time at which the 4 bases are finished.
+    'TimeToMax' : Time at which the total supply created is 199 or above (stops counting workers above 75)
     'SupplyBlocked' : Time spent supply blocked.
     'SQ' : Spending quotient.
     'AvgAPM' : Average APM
     'AvgEPM' : Average EPM
     'AvgSPM' : Average SPM
     'AvgMacroCycleTime : Average time spent issuing macro commands (vs army commands) (or maybe the avg time between giving a worker a command and issuing another command not to the worker)
+    'IdleBaseTime66' : Total time town halls are idle (not making workers) before 66 workers
+    'IdleBaseTime75' : Total time town halls are idle (not making workers) before 75 workers
     'Units' : Dictionary of all the units created, keyed by the units' names.
     '''   
 
     
-    def __init__(self, replay_file, player_id):
+    def __init__(self, replay_file, player_id):       
         #: Replay structure
         self._replay = sc2reader.load_replay(replay_file)
 
@@ -44,6 +48,20 @@ class Benchmark(object):
          
         #: The ID of the player for whom to parse benchmark data
         self._player_id = player_id
+
+
+    def benchmarks(self):
+        return {'TimeToMax' : self.time_to_supply_count_created_excluding_extra_workers(199, 75),
+                'TimeTo3Bases' : self.time_to_total_bases(3),
+                'TimeTo4Bases' : self.time_to_total_bases(4),
+                'TimeTo66Workers' : self.time_to_worker_count(66),
+                'TimeTo75Workers' : self.time_to_worker_count(75),
+                'AvgAPM' : self.avg_apm()
+               }             
+        
+
+    def avg_apm(self):
+        return self._replay.player[self._player_id].avg_apm / util.gametime_to_realtime_constant_r(self._replay)
 
 
     def workers_created(self, real_time_s):
@@ -95,17 +113,10 @@ class Benchmark(object):
     def time_to_worker_count(self, worker_count):
         units = list(filter(lambda ut: ut.owner.pid == self._player_id and ut.is_worker and (ut.hallucinated == False), self._replay.player[self._player_id].units))
 
-        supp = 0
-        for ut in units:
-            supp += ut.supply
-            if supp >= worker_count:
-                return util.convert_frame_to_realtime_r(self._replay, ut.finished_at)
-
-        return -1
-    
-
-    def time_to_66_workers(self):
-        return self.time_to_worker_count(66)
+        if worker_count <= len(units):
+            return util.convert_frame_to_realtime_r(self._replay, units[worker_count - 1].finished_at)
+        else:
+            return -1
 
 
     def time_to_supply_count_created(self, supply_count):

@@ -24,13 +24,34 @@ for root, dirs, files in os.walk(replays_directory):
     for name in files:
         replay_files.append(os.path.join(root, name))
 
-benchmarks = []
+
+#: {ReplayName, RaceMatchup, GameLength, GameType, IsLadder, Benchmark.benchmarks}
+
+replay_data = []
 for rep in replay_files:
+    data_dict = {'ReplayName' : '',
+                 'RaceMatchup' : '',
+                 'GameLength' : 0,
+                 'GameType' : '',
+                 'IsLadder' : False,
+                }
     player_id = get_player_id(rep, player_name)
     if player_id >= 0:
-        benchmarks.append(benchmark.benchmark(rep, player_id, benchmark_time_s))
+        rep_obj = sc2reader.load_replay(rep, load_level=2)
+        matchup = ""
+        for team in replay.teams:
+            for player in team:
+                matchup += player.pick_race[0]
+            matchup += "v"
+        
+        data_dict['ReplayName'] = rep
+        data_dict['RaceMatchup'] = matchup
+        data_dict['GameLength'] = rep_obj.game_length.seconds
+        data_dict['GameType'] = rep_obj.game_type
+        data_dict['IsLadder'] = rep_obj.is_ladder
+        bc = benchmark.Benchmark(rep)
+        data_dict.update(bc.benchmarks)
 
-for bench in benchmarks:
-    if bench['BenchmarkLength'] == benchmark_time_s:
-        print(bench)
-                                 
+        replay_data.append(data_dict)
+
+   

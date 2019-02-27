@@ -1,5 +1,11 @@
 import sc2reader
 
+def gametime_to_realtime_constant_r(replay):
+    return replay.game_fps * replay.game_length.seconds / replay.frames
+
+def realtime_to_gametime_constant_r(replay):
+    return 1 / gametime_to_realtime_constant_r(replay)
+
 def convert_realtime_to_gametime(real_time_s, game_frames, game_fps, game_length_s):
     game_time = 0
 

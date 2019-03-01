@@ -2,12 +2,14 @@ import sys
 import os
 import sc2reader
 import benchmark
+import csv
 
 #replays_directory = "C:\\Users\\matthew\\Documents\\StarCraft II\\Accounts\\62997088\\1-S2-1-440880\\Replays\\Multiplayer"
 #replays_directory = "C:\\Users\\matthew\\Documents\\Starcraft2Metrics\\test\\test_replays"
 replays_directory = "C:\\Users\\matthew\\Documents\\Starcraft2Metrics\\test\\temp"
+benchmark_data_file = "C:\\Users\\matthew\\Documents\\SC2Benchmarks\\benchmarks.csv"
 player_name = "NULL"
-benchmark_time_s = 720
+
 
 def get_player_id(replay_file, player_name):
     replay = sc2reader.load_replay(replay_file)
@@ -19,39 +21,55 @@ def get_player_id(replay_file, player_name):
     return -1
 
 
-replay_files = []
-for root, dirs, files in os.walk(replays_directory):
-    for name in files:
-        replay_files.append(os.path.join(root, name))
-
-
 #: {ReplayName, RaceMatchup, GameLength, GameType, IsLadder, Benchmark.benchmarks}
+def get_replay_data(replay_files):
+    replay_data = []
+    for rep in replay_files:
+        data_dict = {'ReplayName' : '',
+                     'Date' : '',                     
+                     'Map' : '',
+                     'RaceMatchup' : '',
+                     'GameLength' : 0,
+                     'GameType' : '',
+                     'IsLadder' : False,
+                    }
+        player_id = get_player_id(rep, player_name)
+        if player_id >= 0:
+            rep_obj = sc2reader.load_replay(rep, load_level=2)
+            matchup = ""
+            for team in replay.teams:
+                for player in team:
+                    matchup += player.pick_race[0]
+                matchup += "v"
+            
+            data_dict['ReplayName'] = rep_obj.filename
+            data_dict['Date'] = rep_obj.start_time
+            data_dict['Map'] = rep_obj.map_name
+            data_dict['RaceMatchup'] = matchup
+            data_dict['GameLength'] = rep_obj.game_length.seconds
+            data_dict['GameType'] = rep_obj.game_type
+            data_dict['IsLadder'] = rep_obj.is_ladder
+            bc = benchmark.Benchmark(rep)
+            data_dict.update(bc.benchmarks)
 
-replay_data = []
-for rep in replay_files:
-    data_dict = {'ReplayName' : '',
-                 'RaceMatchup' : '',
-                 'GameLength' : 0,
-                 'GameType' : '',
-                 'IsLadder' : False,
-                }
-    player_id = get_player_id(rep, player_name)
-    if player_id >= 0:
-        rep_obj = sc2reader.load_replay(rep, load_level=2)
-        matchup = ""
-        for team in replay.teams:
-            for player in team:
-                matchup += player.pick_race[0]
-            matchup += "v"
-        
-        data_dict['ReplayName'] = rep
-        data_dict['RaceMatchup'] = matchup
-        data_dict['GameLength'] = rep_obj.game_length.seconds
-        data_dict['GameType'] = rep_obj.game_type
-        data_dict['IsLadder'] = rep_obj.is_ladder
-        bc = benchmark.Benchmark(rep)
-        data_dict.update(bc.benchmarks)
+            replay_data.append(data_dict)
 
-        replay_data.append(data_dict)
+    return replay_data
 
-   
+
+############ MAIN ##############
+if __name__ == '__main__':
+    replay_files = []
+#    for root, dirs, files in os.walk(replays_directory):
+#        for name in files:
+#            replay_files.append(os.path.join(root, name))
+
+    for path in sc2reader.utils.get_files(replays_directory, extension='SC2Replay'):
+        replay_files.append(path)
+
+    with open(benchmark_data_file, 'w') as csvfile:
+        rep_data = get_replay_data(replay_files)
+        if len(rep_data) > 0:
+            writer = csv.DictWriter(csvfile, fieldnames=rep_data[0].keys())
+            for rd in rep_data:
+                writer.writerow(rd)

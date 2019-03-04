@@ -1,5 +1,6 @@
 import sys
 import os
+import argparse
 import sc2reader
 import benchmark
 import csv
@@ -43,7 +44,7 @@ def get_replay_data(replay_files):
                 matchup += "v"
             
             data_dict['ReplayName'] = rep_obj.filename
-            data_dict['Date'] = rep_obj.start_time
+            data_dict['Date'] = rep_obj.start_time.strftime("%Y-%m-%d %H:%M:%s")
             data_dict['Map'] = rep_obj.map_name
             data_dict['RaceMatchup'] = matchup
             data_dict['GameLength'] = rep_obj.game_length.seconds
@@ -59,12 +60,19 @@ def get_replay_data(replay_files):
 
 ############ MAIN ##############
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Parse benchmarks from a set of replays')
+
+    parser.add_argument('path', type=str, help='The folder path containing the replays to be parsed')
+    parser.add_argument('--recursive', action='store_true', default=True, help='Recursively read through the specified directory, searching for Starcraft II Replay files [default on]')
+    parser.add_argument('--outfile', type=str, help='Specify the filepath for the output .csv file filled with benchmark data. [default is same location as replay folder]')
+    arguments = parser.parse_args()
+    
     replay_files = []
 #    for root, dirs, files in os.walk(replays_directory):
 #        for name in files:
 #            replay_files.append(os.path.join(root, name))
 
-    for path in sc2reader.utils.get_files(replays_directory, extension='SC2Replay'):
+    for path in sc2reader.utils.get_files(arguments.path, extension='SC2Replay'):
         replay_files.append(path)
 
     with open(benchmark_data_file, 'w') as csvfile:

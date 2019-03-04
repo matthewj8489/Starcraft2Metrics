@@ -25,6 +25,7 @@ class Benchmark(object):
     'TimeTo4Bases' : Time at which the 4 bases are finished.
     'TimeToMax' : Time at which the total supply created is 199 or above (stops counting workers above 75)
     'SupplyBlocked' : Time spent supply blocked.
+    'SupplyCreateRate' : Average rate at which supply buildings are created until 200 supply
     'SQ' : Spending quotient.
     'AvgAPM' : Average APM
     'AvgEPM' : Average EPM

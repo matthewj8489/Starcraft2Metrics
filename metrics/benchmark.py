@@ -31,6 +31,7 @@ class Benchmark(object):
     'AvgEPM' : Average EPM
     'AvgSPM' : Average SPM
     'AvgMacroCycleTime : Average time spent issuing macro commands (vs army commands) (or maybe the avg time between giving a worker a command and issuing another command not to the worker)
+    'AvgHarassDeflection' : A score that rates the player's ability to deflect and minimize damage incurred from harassment attacks. (works off of minerals/probes/tech/mining time lost?)
     'IdleBaseTime66' : Total time town halls are idle (not making workers) before 66 workers
     'IdleBaseTime75' : Total time town halls are idle (not making workers) before 75 workers
     'Units' : Dictionary of all the units created, keyed by the units' names.

@@ -7,8 +7,8 @@ import csv
 
 #replays_directory = "C:\\Users\\matthew\\Documents\\StarCraft II\\Accounts\\62997088\\1-S2-1-440880\\Replays\\Multiplayer"
 #replays_directory = "C:\\Users\\matthew\\Documents\\Starcraft2Metrics\\test\\test_replays"
-replays_directory = "C:\\Users\\matthew\\Documents\\Starcraft2Metrics\\test\\temp"
-benchmark_data_file = "C:\\Users\\matthew\\Documents\\SC2Benchmarks\\benchmarks.csv"
+replays_directory = "C:\\Users\\matthew\\Documents\\gitprojects\\Starcraft2Metrics\\test\\test_replays"
+benchmark_data_file = "C:\\Users\\matthew\\Documents\\gitprojects\\Starcraft2Metrics\\test\\bin\\bench.csv"
 player_name = "NULL"
 
 
@@ -38,20 +38,22 @@ def get_replay_data(replay_files):
         if player_id >= 0:
             rep_obj = sc2reader.load_replay(rep, load_level=2)
             matchup = ""
-            for team in replay.teams:
+            for team in rep_obj.teams:
                 for player in team:
                     matchup += player.pick_race[0]
-                matchup += "v"
+                if team != rep_obj.teams[len(rep_obj.teams)-1]:
+                    matchup += "v"
             
-            data_dict['ReplayName'] = rep_obj.filename
-            data_dict['Date'] = rep_obj.start_time.strftime("%Y-%m-%d %H:%M:%s")
+            
+            data_dict['ReplayName'] = os.path.basename(rep_obj.filename)
+            data_dict['Date'] = rep_obj.start_time.strftime("%m/%d/%Y %H:%M:%S")
             data_dict['Map'] = rep_obj.map_name
             data_dict['RaceMatchup'] = matchup
             data_dict['GameLength'] = rep_obj.game_length.seconds
             data_dict['GameType'] = rep_obj.game_type
             data_dict['IsLadder'] = rep_obj.is_ladder
-            bc = benchmark.Benchmark(rep)
-            data_dict.update(bc.benchmarks)
+            bc = benchmark.Benchmark(rep, player_id)
+            data_dict.update(bc.benchmarks())
 
             replay_data.append(data_dict)
 
@@ -72,12 +74,20 @@ if __name__ == '__main__':
 #        for name in files:
 #            replay_files.append(os.path.join(root, name))
 
+    data_file = ''
+    if not arguments.outfile:
+        data_file = os.path.join(arguments.path, "bench.csv")
+    else:
+        data_file = arguments.outfile
+        
+
     for path in sc2reader.utils.get_files(arguments.path, extension='SC2Replay'):
         replay_files.append(path)
 
-    with open(benchmark_data_file, 'w') as csvfile:
+    with open(data_file, 'w', newline='') as csvfile:
         rep_data = get_replay_data(replay_files)
         if len(rep_data) > 0:
             writer = csv.DictWriter(csvfile, fieldnames=rep_data[0].keys())
+            writer.writeheader()
             for rd in rep_data:
                 writer.writerow(rd)

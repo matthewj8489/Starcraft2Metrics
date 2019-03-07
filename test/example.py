@@ -1,9 +1,9 @@
 import sc2reader
-from sc2reader.engine.plugins import APMTracker, SelectionTracker, ContextLoader#, SupplyTracker
-sc2reader.engine.register_plugin(APMTracker())
-sc2reader.engine.register_plugin(SelectionTracker())
-sc2reader.engine.register_plugin(ContextLoader())
-#sc2reader.engine.register_plugin(SupplyTracker())
+from sc2reader.engine.plugins import APMTracker, SelectionTracker, ContextLoader, SupplyTracker
+#sc2reader.engine.register_plugin(APMTracker())
+#sc2reader.engine.register_plugin(SelectionTracker())
+#sc2reader.engine.register_plugin(ContextLoader())
+sc2reader.engine.register_plugin(SupplyTracker())
 
 
 #replay = sc2reader.load_replay("test_replays\\PVZ_ADEPT_BENCHMARK.SC2Replay")

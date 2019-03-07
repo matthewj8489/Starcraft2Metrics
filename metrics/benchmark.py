@@ -2,6 +2,7 @@ import sc2reader
 from sc2reader.engine.plugins import APMTracker
 sc2reader.engine.register_plugin(APMTracker())
 import util
+import math
 
 class Benchmark(object):
     '''
@@ -26,7 +27,6 @@ class Benchmark(object):
     'TimeToMax' : Time at which the total supply created is 199 or above (stops counting workers above 75)
     'SupplyBlocked' : Time spent supply blocked.
     'SupplyCreateRate' : Average rate at which supply buildings are created until 200 supply
-    'SQ' : Spending quotient.
     'AvgAPM' : Average APM
     'AvgEPM' : Average EPM
     'AvgSPM' : Average SPM
@@ -34,6 +34,8 @@ class Benchmark(object):
     'AvgHarassDeflection' : A score that rates the player's ability to deflect and minimize damage incurred from harassment attacks. (works off of minerals/probes/tech/mining time lost?)
     'IdleBaseTime66' : Total time town halls are idle (not making workers) before 66 workers
     'IdleBaseTime75' : Total time town halls are idle (not making workers) before 75 workers
+    'AvgSQ' : Spending Quotient. SQ(i,u)=35(0.00137i-ln(u))+240, where i=resource collection rate, u=average unspent resources
+    'AvgSQPreMax' : Spending Quotient before maxed out.
     'Units' : Dictionary of all the units created, keyed by the units' names.
     '''   
 
@@ -53,17 +55,65 @@ class Benchmark(object):
 
 
     def benchmarks(self):
-        return {'TimeToMax' : self.time_to_supply_count_created_excluding_extra_workers(199, 75),
+        return {'TimeToMax' : self.time_to_supply_count_created_excluding_extra_workers(198, 75),
                 'TimeTo3Bases' : self.time_to_total_bases(3),
                 'TimeTo4Bases' : self.time_to_total_bases(4),
                 'TimeTo66Workers' : self.time_to_worker_count(66),
                 'TimeTo75Workers' : self.time_to_worker_count(75),
-                'AvgAPM' : self.avg_apm()
+                'AvgAPM' : self.avg_apm(),
+                'AvgSQ' : self.avg_sq(),
+                'AvgSQPreMax' : self.avg_sq_pre_max()
                }             
         
 
     def avg_apm(self):
         return self._replay.player[self._player_id].avg_apm / util.gametime_to_realtime_constant_r(self._replay)
+
+
+    def sq(self, player_stats_events):
+        sum_res_col_rate = 0
+        sum_unspent_res = 0
+        for pse in player_stats_events:
+            sum_res_col_rate += (pse.minerals_collection_rate + pse.vespene_collection_rate)
+            sum_unspent_res += (pse.minerals_current + pse.vespene_current)
+
+        avg_col_rate = sum_res_col_rate / len(player_stats_events)
+        avg_unspent = sum_unspent_res / len(player_stats_events)
+
+        # SQ(i,u)=35(0.00137i-ln(u))+240, where i=resource collection rate, u=average unspent resources
+        sq = 35 * (0.00137 * avg_col_rate - math.log(avg_unspent)) + 240
+                
+        return sq
+    
+
+    def avg_sq_at_time(self, time_s):
+        player_stats_events = list(filter(lambda pse: pse.pid == self._player_id, self._events['PlayerStatsEvent']))
+        pse_at_time = list()
+
+        idx = 0
+        while (idx < len(player_stats_events) and player_stats_events[idx].second <= time_s):
+            pse_at_time.append(player_stats_events[idx])
+            idx += 1
+            
+        return self.sq(pse_at_time)
+
+
+    def avg_sq(self):
+        player_stats_events = list(filter(lambda pse: pse.pid == self._player_id, self._events['PlayerStatsEvent']))
+                       
+        return self.sq(player_stats_events)
+
+
+    def avg_sq_pre_max(self):
+        player_stats_events = list(filter(lambda pse: pse.pid == self._player_id, self._events['PlayerStatsEvent']))
+        pse_premax = list()
+
+        idx = 0
+        while (idx < len(player_stats_events) and player_stats_events[idx].food_used <= 198):
+            pse_premax.append(player_stats_events[idx])
+            idx += 1
+        
+        return self.sq(pse_premax)
 
 
     def workers_created(self, real_time_s):

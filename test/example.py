@@ -3,7 +3,7 @@ from sc2reader.engine.plugins import APMTracker, SelectionTracker, ContextLoader
 #sc2reader.engine.register_plugin(APMTracker())
 #sc2reader.engine.register_plugin(SelectionTracker())
 #sc2reader.engine.register_plugin(ContextLoader())
-sc2reader.engine.register_plugin(SupplyTracker())
+#sc2reader.engine.register_plugin(SupplyTracker())
 
 
 #replay = sc2reader.load_replay("test_replays\\PVZ_ADEPT_BENCHMARK.SC2Replay")
@@ -47,6 +47,10 @@ p1_army_ude = list(filter(lambda ude: ude.unit.is_army, player1_ude))
 #for ude in unit_done_events:
 #    print("{} finished".format(ude.unit))
 
+
+basic_cmd_events = events_of_type["BasicCommandEvent"]
+p1_bce = list(filter(lambda bce: bce.player.pid == 1, basic_cmd_events))
+p1_halluc_bce = list(filter(lambda bce: 'Hallucinate' in bce.ability_name, p1_bce))
 
 adept_born_events = list(filter(lambda ube: ube.unit.name == "Adept", unit_born_events))
 

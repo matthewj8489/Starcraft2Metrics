@@ -121,7 +121,7 @@ class Benchmark(object):
 
 
     def workers_created(self, real_time_s):
-        units = list(filter(lambda ut: ut.owner.pid == self._player_id and ut.is_worker and (ut.hallucinated == False), self._replay.player[self._player_id].units))
+        units = list(filter(lambda ut: ut.owner.pid == self._player_id and ut.is_worker and (self._isHallucinated(ut) == False), self._replay.player[self._player_id].units))
         game_time_s = util.convert_realtime_to_gametime_r(self._replay, real_time_s)
         units_r = sorted(units, key=lambda ut: ut.finished_at)
 
@@ -145,14 +145,14 @@ class Benchmark(object):
         player_army_ube = list(filter(lambda ube: ube.unit.is_army, player_ube))
 
         for ube in player_army_ube:
-            if (ube.second <= game_time_s) and (ube.unit.name != "Archon") and (not ube.unit.flags == 0):#(not ube.unit.hallucinated):
+            if (ube.second <= game_time_s) and (ube.unit.name != "Archon") and (not self._isHallucinated(ube.unit)):
                 army_supply_count += ube.unit.supply
 
         player_uie = list(filter(lambda uie: uie.control_pid == self._player_id, unit_init_events))
         player_army_uie = list(filter(lambda uie: uie.unit.is_army, player_uie))
 
         for uie in player_army_uie:
-            if (uie.second <= game_time_s) and (uie.unit.name != "Archon") and (not uie.unit.flags == 0):#(not uie.unit.hallucinated):
+            if (uie.second <= game_time_s) and (uie.unit.name != "Archon") and (not self._isHallucinated(uie.unit)):
                 army_supply_count += uie.unit.supply
 
         return army_supply_count
@@ -167,7 +167,7 @@ class Benchmark(object):
 
 
     def time_to_worker_count(self, worker_count):
-        units = list(filter(lambda ut: ut.owner.pid == self._player_id and ut.is_worker and (ut.hallucinated == False), self._replay.player[self._player_id].units))
+        units = list(filter(lambda ut: ut.owner.pid == self._player_id and ut.is_worker and (not self._isHallucinated(ut)), self._replay.player[self._player_id].units))
 
         if worker_count <= len(units):
             return util.convert_frame_to_realtime_r(self._replay, units[worker_count - 1].finished_at)
@@ -177,7 +177,7 @@ class Benchmark(object):
 
     def time_to_supply_count_created(self, supply_count):
         # filter all of the player units into just the workers + army that were not hallucinated
-        units = list(filter(lambda ut: ut.owner.pid == self._player_id and ((ut.is_army and ut.flags != 0) or ut.is_worker) and (ut.hallucinated == False), self._replay.player[self._player_id].units))
+        units = list(filter(lambda ut: ut.owner.pid == self._player_id and (ut.is_army or ut.is_worker) and (not self._isHallucinated(ut)), self._replay.player[self._player_id].units))
 
         # filter out special cases, such as Archons that were morphed from templars
         units_r = list(filter(lambda ut: ut.name != "Archon", units))
@@ -192,7 +192,7 @@ class Benchmark(object):
 
 
     def time_to_supply_count_created_excluding_extra_workers(self, supply_count, max_workers_counted):
-        units = list(filter(lambda ut: ut.owner.pid == self._player_id and ((ut.is_army and ut.flags != 0) or ut.is_worker) and (ut.hallucinated == False) and (ut.flags != 0), self._replay.player[self._player_id].units))
+        units = list(filter(lambda ut: ut.owner.pid == self._player_id and (ut.is_army or ut.is_worker) and (not self._isHallucinated(ut)) and (ut.flags != 0), self._replay.player[self._player_id].units))
         units_r = list(filter(lambda ut: ut.name != "Archon", units))
         
         supp = 0
@@ -232,17 +232,17 @@ class Benchmark(object):
         player_uie = list(filter(lambda uie: uie.control_pid == self._player_id, unit_init_events))
 
         for ube in player_ube:
-            if (ube.second <= game_time_s) and (ube.unit.name in units_created) and (ube.unit.hallucinated == False):
+            if (ube.second <= game_time_s) and (ube.unit.name in units_created) and (not self._isHallucinated(ube.unit)):
                 units_created[ube.unit.name] += 1
 
         for uie in player_uie:
-            if (uie.second <= game_time_s) and (uie.unit.name in units_created) and (uie.unit.hallucinated == False):
+            if (uie.second <= game_time_s) and (uie.unit.name in units_created) and (not self._isHallucinated(uie.unit)):
                 units_created[uie.unit.name] += 1
 
         return units_created
 
 
-    def _isHallucinated(unit):
+    def _isHallucinated(self, unit):
         ################ bug : for whatever reason hallucinated attribute does not return correctly, it seems flags == 0 indicates hallucination (but only applies for army ########################
         #return unit.hallucinated
         return not ((unit.is_army and unit.flags != 0) or unit.is_worker)

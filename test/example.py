@@ -1,5 +1,7 @@
 import sc2reader
-from sc2reader.engine.plugins import APMTracker, SelectionTracker, ContextLoader, SupplyTracker
+from sc2reader.engine.plugins import APMTracker#, SelectionTracker, ContextLoader, SupplyTracker
+import supply
+from supply import SupplyTracker
 #sc2reader.engine.register_plugin(APMTracker())
 #sc2reader.engine.register_plugin(SelectionTracker())
 #sc2reader.engine.register_plugin(ContextLoader())

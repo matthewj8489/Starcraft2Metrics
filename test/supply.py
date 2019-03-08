@@ -46,12 +46,12 @@ class SupplyTracker(object):
 
 
     def handleUnitInitEvent(self,event,replay):
-        if event.unit.is_worker or event.unit.is_army and not event.unit.hallucinated:
+        if event.unit.is_worker or event.unit.is_army and not self._isHallucinated(event.unit):
             self.add_to_units_alive(event,replay)
 
 
     def handleUnitBornEvent(self,event,replay):
-        if event.unit.is_worker or event.unit.is_army and not event.unit.hallucinated:
+        if event.unit.is_worker or event.unit.is_army and not self._isHallucinated(event.unit):
             self.add_to_units_alive(event,replay)
 
 
@@ -61,7 +61,7 @@ class SupplyTracker(object):
 
 
     def handleUnitDiedEvent(self,event,replay):
-        if event.unit.is_worker or event.unit.is_army and not event.unit.hallucinated:
+        if event.unit.is_worker or event.unit.is_army and not self._isHallucinated(event.unit):
             self.remove_from_units_alive(event,replay)
         elif event.unit.is_building and (event.unit.name in self.supply_gen_unit): #and event.unit.supply != 0:
             self.remove_from_supply_gen(event,replay)
@@ -71,4 +71,9 @@ class SupplyTracker(object):
         for player in replay.players:
             player.current_food_used = sorted(player.current_food_used.items(), key=lambda x:x[0])
             player.current_food_made = sorted(player.current_food_made.items(), key=lambda x:x[0])
-        
+
+
+    def _isHallucinated(self, unit):
+        ################ bug : for whatever reason hallucinated attribute does not return correctly, it seems flags == 0 indicates hallucination (but only applies for army ########################
+        return unit.hallucinated
+        #return not ((unit.is_army and unit.flags != 0) or unit.is_worker)

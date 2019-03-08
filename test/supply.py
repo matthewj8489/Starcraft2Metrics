@@ -75,5 +75,5 @@ class SupplyTracker(object):
 
     def _isHallucinated(self, unit):
         ################ bug : for whatever reason hallucinated attribute does not return correctly, it seems flags == 0 indicates hallucination (but only applies for army ########################
-        return unit.hallucinated
-        #return not ((unit.is_army and unit.flags != 0) or unit.is_worker)
+        #return unit.hallucinated
+        return not ((unit.is_army and unit.flags != 0) or unit.is_worker)

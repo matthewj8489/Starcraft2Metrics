@@ -192,7 +192,7 @@ class Benchmark(object):
 
 
     def time_to_supply_count_created_excluding_extra_workers(self, supply_count, max_workers_counted):
-        units = list(filter(lambda ut: ut.owner.pid == self._player_id and (ut.is_army or ut.is_worker) and (not self._isHallucinated(ut)) and (ut.flags != 0), self._replay.player[self._player_id].units))
+        units = list(filter(lambda ut: ut.owner.pid == self._player_id and (ut.is_army or ut.is_worker) and (not self._isHallucinated(ut)), self._replay.player[self._player_id].units))
         units_r = list(filter(lambda ut: ut.name != "Archon", units))
         
         supp = 0

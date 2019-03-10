@@ -27,7 +27,8 @@ def get_replay_data(replay_files):
     replay_data = []
     for rep in replay_files:
         data_dict = {'ReplayName' : '',
-                     'Date' : '',                     
+                     'Date' : '',
+                     'Result' : '',
                      'Map' : '',
                      'RaceMatchup' : '',
                      'GameLength' : 0,
@@ -47,6 +48,7 @@ def get_replay_data(replay_files):
             
             data_dict['ReplayName'] = os.path.basename(rep_obj.filename)
             data_dict['Date'] = rep_obj.start_time.strftime("%m/%d/%Y %H:%M:%S")
+            data_dict['Result'] = rep_obj.player[player_id].result
             data_dict['Map'] = rep_obj.map_name
             data_dict['RaceMatchup'] = matchup
             data_dict['GameLength'] = rep_obj.game_length.seconds

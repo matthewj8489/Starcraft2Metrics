@@ -23,9 +23,9 @@ def get_player_id(replay_file, player_name):
 
 
 #: {ReplayName, RaceMatchup, GameLength, GameType, IsLadder, Benchmark.benchmarks}
-def get_replay_data(replay_files):
+def get_replay_data(replay_files, args):
     replay_data = []
-    for rep in replay_files:
+    for rep in replay_files:       
         data_dict = {'ReplayName' : '',
                      'Date' : '',                     
                      'Map' : '',
@@ -37,6 +37,14 @@ def get_replay_data(replay_files):
         player_id = get_player_id(rep, player_name)
         if player_id >= 0:
             rep_obj = sc2reader.load_replay(rep, load_level=2)
+
+            if args.ladder and not rep_obj.is_ladder:
+                continue
+
+            if args.gametype and rep_obj.game_type != args.gametype:
+                continue          
+
+            
             matchup = ""
             for team in rep_obj.teams:
                 for player in team:
@@ -67,6 +75,8 @@ if __name__ == '__main__':
     parser.add_argument('path', type=str, help='The folder path containing the replays to be parsed')
     parser.add_argument('--recursive', action='store_true', default=True, help='Recursively read through the specified directory, searching for Starcraft II Replay files [default on]')
     parser.add_argument('--outfile', type=str, help='Specify the filepath for the output .csv file filled with benchmark data. [default is same location as replay folder]')
+    parser.add_argument('--gametype', type=str, help='Specify a game type to filter the replays upon.')
+    parser.add_argument('--ladder', action='store_true', default=False, help='Filters out all replays that are not ladder games.')
     arguments = parser.parse_args()
     
     replay_files = []
@@ -85,7 +95,7 @@ if __name__ == '__main__':
         replay_files.append(path)
 
     with open(data_file, 'w', newline='') as csvfile:
-        rep_data = get_replay_data(replay_files)
+        rep_data = get_replay_data(replay_files, arguments)
         if len(rep_data) > 0:
             writer = csv.DictWriter(csvfile, fieldnames=rep_data[0].keys())
             writer.writeheader()

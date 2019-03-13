@@ -40,7 +40,7 @@ def get_replay_data(replay_files, args):
             rep_obj = sc2reader.load_replay(rep, load_level=2)
 
             #: Make sure that this replay is v2.0.8+, otherwise it won't be possible to pull useful data from it
-            if rep_obj.versions[1] < 2 or (rep_obj.versions[1] = 2 and rep_obj.versions[2] < 0) or (rep_obj.versions[1] = 2 and rep_obj.versions[2] = 0 and rep_obj.versions[3] < 8):
+            if rep_obj.versions[1] < 2 or (rep_obj.versions[1] == 2 and rep_obj.versions[2] < 0) or (rep_obj.versions[1] == 2 and rep_obj.versions[2] == 0 and rep_obj.versions[3] < 8):
                 continue
 
             if args.ladder and not rep_obj.is_ladder:

@@ -36,6 +36,10 @@ class Benchmark(object):
     'IdleBaseTime75' : Total time town halls are idle (not making workers) before 75 workers
     'AvgSQ' : Spending Quotient. SQ(i,u)=35(0.00137i-ln(u))+240, where i=resource collection rate, u=average unspent resources
     'AvgSQPreMax' : Spending Quotient before maxed out.
+    'AvgUnspent' : Average unspent resources during the game.
+    'AvgUnspentPreMax' : Average unspent resources before maxed out.
+    'AvgColRate' : Average resource collection rate during the game.
+    'AvgColRatePreMax' : Average resource collection rate before maxed out.
     'Units' : Dictionary of all the units created, keyed by the units' names.
     'PPM' : average(mean) PAC per minute
     'PAL' : PAC action latency. e.g.: how long it takes you to take your first action after each fixation shift. (mean average)
@@ -66,7 +70,11 @@ class Benchmark(object):
                 'TimeTo75Workers' : self.time_to_worker_count(75),
                 'AvgAPM' : self.avg_apm(),
                 'AvgSQ' : self.avg_sq(),
-                'AvgSQPreMax' : self.avg_sq_pre_max()
+                'AvgSQPreMax' : self.avg_sq_pre_max(),
+                'AvgUnspent' : self.avg_unspent(),
+                'AvgUnspentPreMax' : self.avg_unspent_pre_max(),
+                'AvgColRate' : self.avg_col_rate(),
+                'AvgColRatePreMax' : self.avg_col_rate_pre_max()
                }             
         
 
@@ -118,6 +126,82 @@ class Benchmark(object):
             idx += 1
         
         return self.sq(pse_premax)
+
+
+    def avg_unspent_resources(self, player_stats_events):
+        sum_unspent_res = 0
+        for pse in player_stats_events:
+            sum_unspent_res += (pse.minerals_current + pse.vespene_current)
+
+        return sum_unspent_res / len(player_stats_events)
+
+
+    def avg_unspent(self):
+        player_stats_events = list(filter(lambda pse: pse.pid == self._player_id, self._events['PlayerStatsEvent']))
+
+        return self.avg_unspent_resources(player_stats_events)
+
+
+    def avg_unspent_at_time(self, time_s):
+        player_stats_events = list(filter(lambda pse: pse.pid == self._player_id, self._events['PlayerStatsEvent']))
+        pse_at_time = list()
+
+        idx = 0
+        while (idx < len(player_stats_events) and player_stats_events[idx].second <= time_s):
+            pse_at_time.append(player_stats_events[idx])
+            idx += 1
+
+        return self.avg_unspent_resources(pse_at_time)
+
+
+    def avg_unspent_pre_max(self):
+        player_stats_events = list(filter(lambda pse: pse.pid == self._player_id, self._events['PlayerStatsEvent']))
+        pse_premax = list()
+
+        idx = 0
+        while (idx < len(player_stats_events) and player_stats_events[idx].food_used <= 198):
+            pse_premax.append(player_stats_events[idx])
+            idx += 1
+
+        return self.avg_unspent_resources(pse_premax)
+
+
+    def avg_collection_rate(self, player_stats_events):
+        sum_res_col_rate = 0
+        for pse in player_stats_events:
+            sum_res_col_rate += (pse.minerals_collection_rate + pse.vespene_collection_rate)
+
+        return sum_res_col_rate / len(player_stats_events)
+
+
+    def avg_col_rate(self):
+        player_stats_events = list(filter(lambda pse: pse.pid == self._player_id, self._events['PlayerStatsEvent']))
+
+        return self.avg_collection_rate(player_stats_events)
+
+
+    def avg_col_rate_at_time(self, time_s):
+        player_stats_events = list(filter(lambda pse: pse.pid == self._player_id, self._events['PlayerStatsEvent']))
+        pse_at_time = list()
+
+        idx = 0
+        while (idx < len(player_stats_events) and player_stats_events[idx].second <= time_s):
+            pse_at_time.append(player_stats_events[idx])
+            idx += 1
+
+        return self.avg_collection_rate(pse_at_time)
+
+
+    def avg_col_rate_pre_max(self):
+        player_stats_events = list(filter(lambda pse: pse.pid == self._player_id, self._events['PlayerStatsEvent']))
+        pse_premax = list()
+
+        idx = 0
+        while (idx < len(player_stats_events) and player_stats_events[idx].food_used <= 198):
+            pse_premax.append(player_stats_events[idx])
+            idx += 1
+
+        return self.avg_collection_rate(pse_premax)
 
 
     def workers_created(self, real_time_s):

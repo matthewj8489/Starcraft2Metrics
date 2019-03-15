@@ -74,6 +74,23 @@ def get_replay_data(replay_files, args):
     return replay_data
 
 
+def multi_replay_analysis(bench_data):
+    # metric[0] = best
+    # metric[1] = avg 30 games
+
+    metric_dict = {metric: {'Best' : 0, 'Avg30Games' : 0} for metric in bench_data.keys}
+
+    ttm_filter = list(filter(lambda ttm: ttm >= 0, bench_data['TimeToMax']))
+    metric_dict['TimeToMax']['Best'] = min(ttm_filter)
+    ttm_avg_idx = min(len(ttm_filter) - 1, 29)
+    ttm_sum = 0
+    for idx in range(len(ttm_filter) - 1 - ttm_avg_idx, len(ttm_filter) - 1, 1):
+        ttm_sum += ttm_filter[idx]
+    ttm_avg = ttm_sum / (ttm_avg_idx + 1)
+    metric_dict['TimeToMax']['Avg30Games'] = ttm_avg
+                   
+
+
 ############ MAIN ##############
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Parse benchmarks from a set of replays')

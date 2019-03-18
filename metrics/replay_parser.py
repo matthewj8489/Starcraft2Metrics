@@ -12,6 +12,11 @@ benchmark_data_file = "C:\\Users\\matthew\\Documents\\gitprojects\\Starcraft2Met
 player_name = "NULL"
 
 
+raw_filename = 'metrics.csv'
+trend_filename = 'trends.csv'
+
+
+
 def get_player_id(replay_file, player_name):
     replay = sc2reader.load_replay(replay_file)
 
@@ -21,6 +26,69 @@ def get_player_id(replay_file, player_name):
 
     return -1
 
+
+def matches_filter(rep_file, args):
+    rep = sc2reader.load_replay(rep_file, load_level=2)
+
+    #: Make sure that this replay is v2.0.8+, otherwise it won't be possible to pull useful data from it
+    if rep.versions[1] < 2 or (rep.versions[1] == 2 and rep.versions[2] < 0) or (rep.versions[1] == 2 and rep.versions[2] == 0 and rep.versions[3] < 8):
+        return False
+
+    if args.ladder and not rep.is_ladder:
+        return False
+
+    if args.gametype and rep.game_type != args.gametype:
+        return False
+
+    return True
+
+
+def get_replay_metadata(rep_file, player_id, args):
+    meta = {'ReplayName' : '',
+            'Date' : '',
+            'Result' : '',
+            'Map' : '',
+            'RaceMatchup' : '',
+            'GameLength' : 0,
+            'GameType' : '',
+            'IsLadder' : False,
+            }
+
+    if player_id >= 0:
+        rep = sc2reader.load_replay(rep_file, load_level=2)
+
+        matchup = ""
+        for team in rep.teams:
+            for player in team:
+                matchup += player.pick_race[0]
+            if team != rep.teams[len(rep.teams)-1]:
+                matchup += "v"
+        
+        
+        meta['ReplayName'] = os.path.basename(rep.filename)
+        meta['Date'] = rep.start_time.strftime("%m/%d/%Y %H:%M:%S")
+        meta['Result'] = rep.player[player_id].result
+        meta['Map'] = rep.map_name
+        meta['RaceMatchup'] = matchup
+        meta['GameLength'] = rep.game_length.seconds
+        meta['GameType'] = rep.game_type
+        meta['IsLadder'] = rep.is_ladder
+
+        return meta
+
+
+def get_replay_raw_metrics(rep_file, player_id, args):
+    return benchmark.Benchmark(rep_file, player_id).benchmarks()
+
+
+def write_raw_output(outfilepath, metric_data, write_mode):
+    with open(outfilepath, write_mode, newline='') as csvfile:
+        if len(metric_data) > 0:
+            writer = csv.DictWriter(csvfile, fieldnames=metric_data[0].keys())
+            writer.writeheader()
+            for rd in metric_data:
+                writer.writerow(rd)
+        
 
 #: {ReplayName, RaceMatchup, GameLength, GameType, IsLadder, Benchmark.benchmarks}
 def get_replay_data(replay_files, args):
@@ -96,31 +164,37 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Parse benchmarks from a set of replays')
 
     parser.add_argument('path', type=str, help='The folder path containing the replays to be parsed')
+    parser.add_argument('player_name', type=str, help='The name of the player to gather the metric data on.')
     parser.add_argument('--recursive', action='store_true', default=True, help='Recursively read through the specified directory, searching for Starcraft II Replay files [default on]')
-    parser.add_argument('--outfile', type=str, help='Specify the filepath for the output .csv file filled with benchmark data. [default is same location as replay folder]')
+    parser.add_argument('--outpath', type=str, help='Specify the path for the output files. [default is same location as replay folder]')
     parser.add_argument('--gametype', type=str, help='Specify a game type to filter the replays upon.')
-    parser.add_argument('--ladder', action='store_true', default=False, help='Filters out all replays that are not ladder games.')
-    arguments = parser.parse_args()
+    parser.add_argument('--ladder-only', action='store_true', default=False, help='Filters out all replays that are not ladder games.')
+    parser.add_argument('--overwrite', action='store_true', default=False, help='Overwrites output files when run. If not set, will append to any output files found.')
+    parser.add_argument('--auto', action='store_true', default=False, help='Runs in the background and will automatically update output files when new replays appear.')
+    args = parser.parse_args()
     
     replay_files = []
 #    for root, dirs, files in os.walk(replays_directory):
 #        for name in files:
 #            replay_files.append(os.path.join(root, name))
 
-    data_file = ''
-    if not arguments.outfile:
-        data_file = os.path.join(arguments.path, "bench.csv")
+    raw_filepath = ''
+    if not args.outpath:
+        raw_filepath = os.path.join(args.path, raw_filename)
     else:
-        data_file = arguments.outfile
+        raw_filepath = os.path.join(args.outpath, raw_filename)
         
 
-    for path in sc2reader.utils.get_files(arguments.path, extension='SC2Replay'):
+    for path in sc2reader.utils.get_files(args.path, extension='SC2Replay'):
         replay_files.append(path)
 
-    with open(data_file, 'w', newline='') as csvfile:
-        rep_data = get_replay_data(replay_files, arguments)
-        if len(rep_data) > 0:
-            writer = csv.DictWriter(csvfile, fieldnames=rep_data[0].keys())
-            writer.writeheader()
-            for rd in rep_data:
-                writer.writerow(rd)
+    raw_data = []
+    for rep_file in replay_files:
+        if (matches_filter(rep_file, args)):
+            pid = get_player_id(rep_file, args.player_name)
+            data = get_replay_metadata(rep_file, pid, args)
+            data.update(get_replay_raw_metrics(rep_file, pid, args))
+            raw_data.append(data)
+
+
+    

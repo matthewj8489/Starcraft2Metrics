@@ -24,6 +24,10 @@ Notes:
 			- sqmax : Average Spending Quotient before reaching actual max supply.
 			- apm : Average actions per minute
 			- sc : Time spent supply capped
+			- aur : Average unspent resources (minerals + vespene)
+			- aurmax : Average unspent resources before reaching actual max supply.
+			- rcr : Average resource collection rate.
+			- rcrmax : Average resource collection rate before reaching actual max supply.
 	- Sc2MultiMetricAnalyzer
 		- Takes multiple Sc2MetricAnalyzers and uses the metrics generated to develop trends.
 	- Sc2ReplayParser

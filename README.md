@@ -13,13 +13,13 @@ To Do:
 Notes:
 - Class structure
 	- Sc2MetricAnalyzer
-		Analyzes a replay and gives access to metrics from the replay at given points.
+		- Analyzes a replay and gives access to metrics from the replay at given points.
 	- Sc2MultiMetricAnalyzer
-		Takes multiple Sc2MetricAnalyzers and uses the metrics generated to develop trends.
+		- Takes multiple Sc2MetricAnalyzers and uses the metrics generated to develop trends.
 	- Sc2ReplayParser
-		Parses SC2 replays in order to extract metric data from them. The replays can be filtered.
+		- Parses SC2 replays in order to extract metric data from them. The replays can be filtered.
 	- Sc2MetricVisualizer
-		Generates graphs of metric trends.
+		- Generates graphs of metric trends.
 
 - Outputs
 	- Raw replay metric data from each replay

@@ -14,6 +14,16 @@ Notes:
 - Class structure
 	- Sc2MetricAnalyzer
 		- Analyzes a replay and gives access to metrics from the replay at given points.
+		- Metrics:
+			- ttm : Time to (theoretical) Max.
+			- ttw66 : Time to a worker count of 66
+			- ttw75 : Time to a worker count of 75
+			- ttb3 : Time to a base count of 3
+			- ttb4 : Time to a base count of 4
+			- sq : Average Spending Quotient
+			- sqmax : Average Spending Quotient before reaching actual max supply.
+			- apm : Average actions per minute
+			- sc : Time spent supply capped
 	- Sc2MultiMetricAnalyzer
 		- Takes multiple Sc2MetricAnalyzers and uses the metrics generated to develop trends.
 	- Sc2ReplayParser

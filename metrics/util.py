@@ -1,12 +1,16 @@
 import sc2reader
 
+
 def gametime_to_realtime_constant_r(replay):
     return replay.game_fps * replay.game_length.seconds / replay.frames
+
 
 def realtime_to_gametime_constant_r(replay):
     return 1 / gametime_to_realtime_constant_r(replay)
 
-def convert_realtime_to_gametime(real_time_s, game_frames, game_fps, game_length_s):
+
+def convert_realtime_to_gametime(real_time_s, game_frames,
+                                 game_fps, game_length_s):
     game_time = 0
 
     real_fps = game_frames / game_length_s
@@ -18,16 +22,21 @@ def convert_realtime_to_gametime(real_time_s, game_frames, game_fps, game_length
 
 def convert_realtime_to_gametime_r(replay, real_time_s):
     '''
-    Converts the real time of a point in the replay to the internally calculated game time.
+    Converts the real time of a point in the replay to the internally
+    calculated game time.
 
     Keyword arguments:
-    replay -- the sc2reader replay object from which to convert the real time to.
+    replay -- the sc2reader replay object from which to convert the
+              real time to.
     real_time_s -- the real time in the replay in seconds.
     '''
-    return convert_realtime_to_gametime(real_time_s, replay.frames, replay.game_fps, replay.game_length.seconds)
+    return convert_realtime_to_gametime(real_time_s, replay.frames,
+                                        replay.game_fps,
+                                        replay.game_length.seconds)
 
 
-def convert_gametime_to_realtime(game_time_s, game_frames, game_fps, game_length_s):
+def convert_gametime_to_realtime(game_time_s, game_frames,
+                                 game_fps, game_length_s):
     real_time = 0
 
     real_game_frame = game_time_s * game_fps
@@ -36,8 +45,11 @@ def convert_gametime_to_realtime(game_time_s, game_frames, game_fps, game_length
 
     return real_time
 
+
 def convert_gametime_to_realtime_r(replay, game_time_s):
-    return convert_gametime_to_realtime(game_time_s, replay.frames, replay.game_fps, replay.game_length.seconds)
+    return convert_gametime_to_realtime(game_time_s, replay.frames,
+                                        replay.game_fps,
+                                        replay.game_length.seconds)
 
 
 def convert_frame_to_gametime(game_frame, game_fps):

@@ -1,8 +1,11 @@
+import util
+import math
+
+
 import sc2reader
 from sc2reader.engine.plugins import APMTracker
 sc2reader.engine.register_plugin(APMTracker())
-import util
-import math
+
 
 class Benchmark(object):
     '''

@@ -24,10 +24,35 @@ Notes:
 			- sqmax : Average Spending Quotient before reaching actual max supply.
 			- apm : Average actions per minute
 			- sc : Time spent supply capped
+			- aur : Average unspent resources (minerals + vespene)
+			- aurmax : Average unspent resources before reaching actual max supply.
+			- rcr : Average resource collection rate.
+			- rcrmax : Average resource collection rate before reaching actual max supply.
 	- Sc2MultiMetricAnalyzer
 		- Takes multiple Sc2MetricAnalyzers and uses the metrics generated to develop trends.
 	- Sc2ReplayParser
 		- Parses SC2 replays in order to extract metric data from them. The replays can be filtered.
+		- Options:
+			- Recursion into a folder (to a specified depth)
+			- Automatically monitors a folder for replays, parses new replays, adds their data to the output files
+			- Overwrite. If set to true, the outputs will be overwritten. If false, any matching replays in the output files will not be parsed again, but their data will still be used in the trends.
+			- filters:
+				- game-type : 1v1, 2v2, 3v3, or 4v4
+				- ladder-only : filters out all non-ladder replays
+			- outputs:
+				- raw .csv file with metric data from each replay along with replay info:
+					- replay name
+					- date
+					- result
+					- map
+					- race matchup
+					- game length
+					- game type
+					- is ladder?
+				- metric trend data:
+					- best
+					- average last 30 games
+				- data visualization graphs of each metric trend
 	- Sc2MetricVisualizer
 		- Generates graphs of metric trends.
 

@@ -43,6 +43,14 @@ def matches_filter(rep_lvl2, args):
     return True
 
 
+def already_parsed(rep_file, parsed_files):
+    for fl in parsed_files:
+        if rep_file == fl:
+            return True
+    
+    return False
+    
+
 def get_replay_metadata(rep_lvl2, player_id, args):
     meta = {'ReplayName' : '',
             'Date' : '',
@@ -85,12 +93,13 @@ def write_raw_output(outfilepath, metric_data, write_mode):
     with open(outfilepath, write_mode, newline='') as csvfile:
         if len(metric_data) > 0:
             writer = csv.DictWriter(csvfile, fieldnames=metric_data[0].keys())
-            writer.writeheader()
+            # write the header if this is a new file (not appended file)
+            if write_mode == 'w':
+                writer.writeheader()
             for rd in metric_data:
                 writer.writerow(rd)
         
 
-#: {ReplayName, RaceMatchup, GameLength, GameType, IsLadder, Benchmark.benchmarks}
 def get_replay_data(replay_files, args):
     replay_data = []
     for rep in replay_files:       
@@ -161,6 +170,12 @@ def multi_replay_analysis(bench_data):
 
 ############ MAIN ##############
 if __name__ == '__main__':
+    replay_files = []
+    write_mode = ''
+    raw_filepath = ''
+    raw_data = []
+    parsed_rep_files = []
+    
     parser = argparse.ArgumentParser(description='Parse benchmarks from a set of replays')
 
     parser.add_argument('path', type=str, help='The folder path containing the replays to be parsed')
@@ -173,23 +188,28 @@ if __name__ == '__main__':
     parser.add_argument('--auto', action='store_true', default=False, help='Runs in the background and will automatically update output files when new replays appear.')
     args = parser.parse_args()
     
-    replay_files = []
+
 #    for root, dirs, files in os.walk(replays_directory):
 #        for name in files:
 #            replay_files.append(os.path.join(root, name))
 
     # Handle the arguments
-    raw_filepath = ''
     if not args.outpath:
         raw_filepath = os.path.join(args.path, raw_filename)
     else:
         raw_filepath = os.path.join(args.outpath, raw_filename)
 
-    write_mode = ''
     if args.overwrite:
         write_mode = 'w'
     else:
-        write_mode = 'a'
+        if os.path.isfile(raw_filepath):
+            write_mode = 'a'
+            with open(raw_filepath, newline='') as csvfile:
+                rep_rdr = csv.DictReader(csvfile)
+                for row in rep_rdr:
+                    parsed_rep_files.append(row['ReplayName'])
+        else:
+            write_mode = 'w'
 
         
     # Find all possible replay files
@@ -198,14 +218,14 @@ if __name__ == '__main__':
 
 
     # parse replay files
-    raw_data = []
     for rep_file in replay_files:
-        rep_lvl2 = sc2reader.load_replay(rep_file, load_level=2)
-        if (matches_filter(rep_lvl2, args)):
-            pid = get_player_id(rep_lvl2, args.player_name)
-            data = get_replay_metadata(rep_lvl2, pid, args)
-            data.update(get_replay_raw_metrics(rep_file, pid, args))
-            raw_data.append(data)
+        if (not already_parsed(os.path.basename(rep_file), parsed_rep_files)):
+            rep_lvl2 = sc2reader.load_replay(rep_file, load_level=2)
+            if (matches_filter(rep_lvl2, args)):
+                pid = get_player_id(rep_lvl2, args.player_name)
+                data = get_replay_metadata(rep_lvl2, pid, args)
+                data.update(get_replay_raw_metrics(rep_file, pid, args))
+                raw_data.append(data)
 
 
     # write the raw output file

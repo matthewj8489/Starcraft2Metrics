@@ -10,9 +10,9 @@ To Do:
 	- Another possibility is to creat a new metric: Worker Creation Rate Pre X Workers. This metric could compare the rate at which workers were created.
 	- The Time To X Workers metric might be good enough for comparing, though Worker Creation Rate would account for # bases and when chrono boosts are used.
 	
-Notes:
+Notes: **_ToDo_**
 - Class structure
-	- Sc2MetricAnalyzer
+	- **_Sc2MetricAnalyzer_**
 		- Analyzes a replay and gives access to metrics from the replay at given points.
 		- Metrics:
 			- ttm : Time to (theoretical) Max.
@@ -23,18 +23,18 @@ Notes:
 			- sq : Average Spending Quotient
 			- sqmax : Average Spending Quotient before reaching actual max supply.
 			- apm : Average actions per minute
-			- sc : Time spent supply capped
+			- **_sc : Time spent supply capped_**
 			- aur : Average unspent resources (minerals + vespene)
 			- aurmax : Average unspent resources before reaching actual max supply.
 			- rcr : Average resource collection rate.
 			- rcrmax : Average resource collection rate before reaching actual max supply.
-	- Sc2MultiMetricAnalyzer
-		- Takes multiple Sc2MetricAnalyzers and uses the metrics generated to develop trends.
-	- Sc2ReplayParser
+	- **_Sc2MultiMetricAnalyzer_**
+		- **_Takes multiple Sc2MetricAnalyzers and uses the metrics generated to develop trends._**
+	- **_Sc2ReplayParser_**
 		- Parses SC2 replays in order to extract metric data from them. The replays can be filtered.
 		- Options:
-			- Recursion into a folder (to a specified depth)
-			- Automatically monitors a folder for replays, parses new replays, adds their data to the output files
+			- Recursion into a folder **_(to a specified depth)_**
+			- **_Automatically monitors a folder for replays, parses new replays, adds their data to the output files_**
 			- Overwrite. If set to true, the outputs will be overwritten. If false, any matching replays in the output files will not be parsed again, but their data will still be used in the trends.
 			- filters:
 				- game-type : 1v1, 2v2, 3v3, or 4v4
@@ -49,14 +49,14 @@ Notes:
 					- game length
 					- game type
 					- is ladder?
-				- metric trend data:
-					- best
-					- average last 30 games
-				- data visualization graphs of each metric trend
-	- Sc2MetricVisualizer
-		- Generates graphs of metric trends.
+				- **_metric trend data:_**
+					- **_best_**
+					- **_average last 30 games_**
+				- **_data visualization graphs of each metric trend_**
+	- **_Sc2MetricVisualizer_**
+		- **_Generates graphs of metric trends._**
 
 - Outputs
 	- Raw replay metric data from each replay
-	- Multi-replay metric trend data
-	- Graphs of the metric trends
+	- **_Multi-replay metric trend data_**
+	- **_Graphs of the metric trends_**

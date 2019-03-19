@@ -174,7 +174,7 @@ if __name__ == '__main__':
     write_mode = ''
     raw_filepath = ''
     raw_data = []
-    parsed_rep_files = []
+    parsed_rep_filenames = []
     
     parser = argparse.ArgumentParser(description='Parse benchmarks from a set of replays')
 
@@ -207,7 +207,7 @@ if __name__ == '__main__':
             with open(raw_filepath, newline='') as csvfile:
                 rep_rdr = csv.DictReader(csvfile)
                 for row in rep_rdr:
-                    parsed_rep_files.append(row['ReplayName'])
+                    parsed_rep_filenames.append(row['ReplayName'])
         else:
             write_mode = 'w'
 
@@ -219,7 +219,7 @@ if __name__ == '__main__':
 
     # parse replay files
     for rep_file in replay_files:
-        if (not already_parsed(os.path.basename(rep_file), parsed_rep_files)):
+        if (not already_parsed(os.path.basename(rep_file), parsed_rep_filenames)):
             rep_lvl2 = sc2reader.load_replay(rep_file, load_level=2)
             if (matches_filter(rep_lvl2, args)):
                 pid = get_player_id(rep_lvl2, args.player_name)

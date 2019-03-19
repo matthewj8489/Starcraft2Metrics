@@ -28,7 +28,7 @@ Notes: **_ToDo_**
 			- aurmax : Average unspent resources before reaching actual max supply.
 			- rcr : Average resource collection rate.
 			- rcrmax : Average resource collection rate before reaching actual max supply.
-	- **_Sc2MultiMetricAnalyzer_**
+	- **_Sc2TrendAnalyzer_**
 		- **_Takes multiple Sc2MetricAnalyzers and uses the metrics generated to develop trends._**
 	- **_Sc2ReplayParser_**
 		- Parses SC2 replays in order to extract metric data from them. The replays can be filtered.
@@ -53,7 +53,7 @@ Notes: **_ToDo_**
 					- **_best_**
 					- **_average last 30 games_**
 				- **_data visualization graphs of each metric trend_**
-	- **_Sc2MetricVisualizer_**
+	- **_Sc2TrendVisualizer_**
 		- **_Generates graphs of metric trends._**
 
 - Outputs

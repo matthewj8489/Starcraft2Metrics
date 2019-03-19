@@ -7,9 +7,9 @@ import csv
 
 #replays_directory = "C:\\Users\\matthew\\Documents\\StarCraft II\\Accounts\\62997088\\1-S2-1-440880\\Replays\\Multiplayer"
 #replays_directory = "C:\\Users\\matthew\\Documents\\Starcraft2Metrics\\test\\test_replays"
-replays_directory = "C:\\Users\\matthew\\Documents\\gitprojects\\Starcraft2Metrics\\test\\test_replays"
-benchmark_data_file = "C:\\Users\\matthew\\Documents\\gitprojects\\Starcraft2Metrics\\test\\bin\\bench.csv"
-player_name = "NULL"
+#replays_directory = "C:\\Users\\matthew\\Documents\\gitprojects\\Starcraft2Metrics\\test\\test_replays"
+#benchmark_data_file = "C:\\Users\\matthew\\Documents\\gitprojects\\Starcraft2Metrics\\test\\bin\\bench.csv"
+#player_name = "NULL"
 
 
 raw_filename = 'metrics.csv'
@@ -17,33 +17,33 @@ trend_filename = 'trends.csv'
 
 
 
-def get_player_id(replay_file, player_name):
-    replay = sc2reader.load_replay(replay_file)
+def get_player_id(rep_lvl2, player_name):
+    #replay = sc2reader.load_replay(replay_file, load_level=2)
 
-    for player in replay.players:
+    for player in rep_lvl2.players:
         if player_name in player.name:
             return player.pid
 
     return -1
 
 
-def matches_filter(rep_file, args):
-    rep = sc2reader.load_replay(rep_file, load_level=2)
+def matches_filter(rep_lvl2, args):
+    #rep = sc2reader.load_replay(rep_file, load_level=2)
 
     #: Make sure that this replay is v2.0.8+, otherwise it won't be possible to pull useful data from it
-    if rep.versions[1] < 2 or (rep.versions[1] == 2 and rep.versions[2] < 0) or (rep.versions[1] == 2 and rep.versions[2] == 0 and rep.versions[3] < 8):
+    if rep_lvl2.versions[1] < 2 or (rep_lvl2.versions[1] == 2 and rep_lvl2.versions[2] < 0) or (rep_lvl2.versions[1] == 2 and rep_lvl2.versions[2] == 0 and rep_lvl2.versions[3] < 8):
         return False
 
-    if args.ladder and not rep.is_ladder:
+    if args.ladderonly and not rep_lvl2.is_ladder:
         return False
 
-    if args.gametype and rep.game_type != args.gametype:
+    if args.gametype and rep_lvl2.game_type != args.gametype:
         return False
 
     return True
 
 
-def get_replay_metadata(rep_file, player_id, args):
+def get_replay_metadata(rep_lvl2, player_id, args):
     meta = {'ReplayName' : '',
             'Date' : '',
             'Result' : '',
@@ -55,24 +55,24 @@ def get_replay_metadata(rep_file, player_id, args):
             }
 
     if player_id >= 0:
-        rep = sc2reader.load_replay(rep_file, load_level=2)
+        #rep = sc2reader.load_replay(rep_file, load_level=2)
 
         matchup = ""
-        for team in rep.teams:
+        for team in rep_lvl2.teams:
             for player in team:
                 matchup += player.pick_race[0]
-            if team != rep.teams[len(rep.teams)-1]:
+            if team != rep_lvl2.teams[len(rep_lvl2.teams)-1]:
                 matchup += "v"
         
         
-        meta['ReplayName'] = os.path.basename(rep.filename)
-        meta['Date'] = rep.start_time.strftime("%m/%d/%Y %H:%M:%S")
-        meta['Result'] = rep.player[player_id].result
-        meta['Map'] = rep.map_name
+        meta['ReplayName'] = os.path.basename(rep_lvl2.filename)
+        meta['Date'] = rep_lvl2.start_time.strftime("%m/%d/%Y %H:%M:%S")
+        meta['Result'] = rep_lvl2.player[player_id].result
+        meta['Map'] = rep_lvl2.map_name
         meta['RaceMatchup'] = matchup
-        meta['GameLength'] = rep.game_length.seconds
-        meta['GameType'] = rep.game_type
-        meta['IsLadder'] = rep.is_ladder
+        meta['GameLength'] = rep_lvl2.game_length.seconds
+        meta['GameType'] = rep_lvl2.game_type
+        meta['IsLadder'] = rep_lvl2.is_ladder
 
         return meta
 
@@ -168,7 +168,7 @@ if __name__ == '__main__':
     parser.add_argument('--recursive', action='store_true', default=True, help='Recursively read through the specified directory, searching for Starcraft II Replay files [default on]')
     parser.add_argument('--outpath', type=str, help='Specify the path for the output files. [default is same location as replay folder]')
     parser.add_argument('--gametype', type=str, help='Specify a game type to filter the replays upon.')
-    parser.add_argument('--ladder-only', action='store_true', default=False, help='Filters out all replays that are not ladder games.')
+    parser.add_argument('--ladderonly', action='store_true', default=False, help='Filters out all replays that are not ladder games.')
     parser.add_argument('--overwrite', action='store_true', default=False, help='Overwrites output files when run. If not set, will append to any output files found.')
     parser.add_argument('--auto', action='store_true', default=False, help='Runs in the background and will automatically update output files when new replays appear.')
     args = parser.parse_args()
@@ -178,23 +178,36 @@ if __name__ == '__main__':
 #        for name in files:
 #            replay_files.append(os.path.join(root, name))
 
+    # Handle the arguments
     raw_filepath = ''
     if not args.outpath:
         raw_filepath = os.path.join(args.path, raw_filename)
     else:
         raw_filepath = os.path.join(args.outpath, raw_filename)
-        
 
+    write_mode = ''
+    if args.overwrite:
+        write_mode = 'w'
+    else:
+        write_mode = 'a'
+
+        
+    # Find all possible replay files
     for path in sc2reader.utils.get_files(args.path, extension='SC2Replay'):
         replay_files.append(path)
 
+
+    # parse replay files
     raw_data = []
     for rep_file in replay_files:
-        if (matches_filter(rep_file, args)):
-            pid = get_player_id(rep_file, args.player_name)
-            data = get_replay_metadata(rep_file, pid, args)
+        rep_lvl2 = sc2reader.load_replay(rep_file, load_level=2)
+        if (matches_filter(rep_lvl2, args)):
+            pid = get_player_id(rep_lvl2, args.player_name)
+            data = get_replay_metadata(rep_lvl2, pid, args)
             data.update(get_replay_raw_metrics(rep_file, pid, args))
             raw_data.append(data)
 
 
+    # write the raw output file
+    write_raw_output(raw_filepath, raw_data, write_mode)
     

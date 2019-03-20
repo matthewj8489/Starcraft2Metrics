@@ -2,7 +2,7 @@ import sys
 import os
 import argparse
 import sc2reader
-import benchmark
+from sc2metric import Sc2MetricAnalyzer
 import csv
 
 #replays_directory = "C:\\Users\\matthew\\Documents\\StarCraft II\\Accounts\\62997088\\1-S2-1-440880\\Replays\\Multiplayer"
@@ -86,7 +86,7 @@ def get_replay_metadata(rep_lvl2, player_id, args):
 
 
 def get_replay_raw_metrics(rep_file, player_id, args):
-    return benchmark.Benchmark(rep_file, player_id).benchmarks()
+    return Sc2MetricAnalyzer(rep_file, player_id).benchmarks()
 
 
 def write_raw_output(outfilepath, metric_data, write_mode):

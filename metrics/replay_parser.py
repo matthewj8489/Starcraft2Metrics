@@ -12,8 +12,8 @@ import csv
 #player_name = "NULL"
 
 
-raw_filename = 'metrics.csv'
-trend_filename = 'trends.csv'
+RAW_FILENAME = 'metrics.csv'
+TREND_FILENAME = 'trends.csv'
 
 
 
@@ -195,9 +195,9 @@ if __name__ == '__main__':
 
     # Handle the arguments
     if not args.outpath:
-        raw_filepath = os.path.join(args.path, raw_filename)
+        raw_filepath = os.path.join(args.path, RAW_FILENAME)
     else:
-        raw_filepath = os.path.join(args.outpath, raw_filename)
+        raw_filepath = os.path.join(args.outpath, RAW_FILENAME)
 
     if args.overwrite:
         write_mode = 'w'

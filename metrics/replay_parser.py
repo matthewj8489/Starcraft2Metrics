@@ -86,7 +86,7 @@ def get_replay_metadata(rep_lvl2, player_id, args):
 
 
 def get_replay_raw_metrics(rep_file, player_id, args):
-    return Sc2MetricAnalyzer(rep_file, player_id).benchmarks()
+    return Sc2MetricAnalyzer(rep_file, player_id).metrics()
 
 
 def write_raw_output(outfilepath, metric_data, write_mode):

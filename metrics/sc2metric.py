@@ -7,7 +7,7 @@ from sc2reader.engine.plugins import APMTracker
 sc2reader.engine.register_plugin(APMTracker())
 
 
-class Benchmark(object):
+class Sc2MetricAnalyzer(object):
     '''
     Find benchmark metrics for the given replay file at the given real time.
     (Benchmarks include 'Total Supply Created', 'Workers Created', 'Army Created')
@@ -65,7 +65,7 @@ class Benchmark(object):
         self._player_id = player_id
 
 
-    def benchmarks(self):
+    def metrics(self):
         return {'TimeToMax' : self.time_to_supply_count_created_excluding_extra_workers(198, 75),
                 'TimeTo3Bases' : self.time_to_total_bases(3),
                 'TimeTo4Bases' : self.time_to_total_bases(4),
@@ -338,4 +338,4 @@ class Benchmark(object):
 ########## Testing ###########
 if __name__ == '__main__':
 
-    bc = Benchmark("..\\test\\test_replays\\Year Zero LE (9).SC2Replay", 1)
+    ma = Sc2MetricAnalyzer("..\\test\\test_replays\\Year Zero LE (9).SC2Replay", 1)

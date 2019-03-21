@@ -7,23 +7,27 @@ class SupplyTracker(object):
 
     def add_to_units_alive(self,event,replay):
         self.units_alive[event.control_pid] += event.unit.supply
-        replay.player[event.control_pid].current_food_used[event.second] = self.units_alive[event.control_pid]
+        #replay.player[event.control_pid].current_food_used[event.second] = self.units_alive[event.control_pid]
+        replay.player[event.control_pid].current_food_used.append({"second": event.second, "supply": self.units_alive[event.control_pid]})
 
 
     def add_to_supply_gen(self,event,replay):
-        print("here")
-        self.supply_gen[event.control_pid] += self.supply_gen_unit[event.unit.name] #math.fabs(event.unit.supply)
-        replay.player[event.control_pid].current_food_made[event.second] = self.supply_gen[event.control_pid]
+        if event.unit.name in self.supply_gen_unit:
+            self.supply_gen[event.unit.owner.pid] += self.supply_gen_unit[event.unit.name] #math.fabs(event.unit.supply)
+            #replay.player[event.control_pid].current_food_made[event.second] = self.supply_gen[event.control_pid]
+            replay.player[event.unit.owner.pid].current_food_made.append({"second": event.second, "supply": self.supply_gen[event.unit.owner.pid]})
         
 
     def remove_from_units_alive(self,event,replay):
         self.units_alive[event.unit.owner.pid] -= event.unit.supply
-        replay.player[event.unit.owner.pid].current_food_used[event.second] = self.units_alive[event.unit.owner.pid]
+        #replay.player[event.unit.owner.pid].current_food_used[event.second] = self.units_alive[event.unit.owner.pid]
+        replay.player[event.unit.owner.pid].current_food_used.append({"second": event.second, "supply": self.units_alive[event.unit.owner.pid]})
         
 
     def remove_from_supply_gen(self,event,replay):
         self.supply_gen[event.unit.owner.pid] -= self.supply_gen_unit[event.unit.name] #math.fabs(event.unit.supply)
-        replay.player[event.unit.owner.pid].current_food_made[event.second] = self.supply_gen[event.unit.owner.pid]
+        #replay.player[event.unit.owner.pid].current_food_made[event.second] = self.supply_gen[event.unit.owner.pid]
+        replay.player[event.unit.owner.pid].current_food_made.append({"second": event.second, "supply": self.supply_gen[event.unit.owner.pid]})
         
 
     def handleInitGame(self, event, replay):
@@ -35,23 +39,25 @@ class SupplyTracker(object):
             'Pylon' : 8,
             'Nexus' : 10
         }
-        self.units_alive = dict()
-        self.supply_gen = dict()
+        self.units_alive = defaultdict(int)
+        self.supply_gen = defaultdict(int)
 
         for player in replay.players:
             self.units_alive[player.pid] = 0
             self.supply_gen[player.pid] = 0
-            player.current_food_used = defaultdict(int)
-            player.current_food_made = defaultdict(int)                    
+            player.units_alive = 0
+            player.supply_gen = 0
+            player.current_food_used = []
+            player.current_food_made = []
 
 
     def handleUnitInitEvent(self,event,replay):
-        if event.unit.is_worker or event.unit.is_army and not self._isHallucinated(event.unit):
+        if event.unit.is_worker or (event.unit.is_army and not self._isHallucinated(event.unit)):
             self.add_to_units_alive(event,replay)
 
 
     def handleUnitBornEvent(self,event,replay):
-        if event.unit.is_worker or event.unit.is_army and not self._isHallucinated(event.unit):
+        if event.unit.is_worker or (event.unit.is_army and not self._isHallucinated(event.unit)):
             self.add_to_units_alive(event,replay)
 
 
@@ -61,19 +67,21 @@ class SupplyTracker(object):
 
 
     def handleUnitDiedEvent(self,event,replay):
-        if event.unit.is_worker or event.unit.is_army and not self._isHallucinated(event.unit):
+        if event.unit.is_worker or (event.unit.is_army and not self._isHallucinated(event.unit)):
             self.remove_from_units_alive(event,replay)
         elif event.unit.is_building and (event.unit.name in self.supply_gen_unit): #and event.unit.supply != 0:
             self.remove_from_supply_gen(event,replay)
 
 
-    def handleEndGame(self, event, replay):
-        for player in replay.players:
-            player.current_food_used = sorted(player.current_food_used.items(), key=lambda x:x[0])
-            player.current_food_made = sorted(player.current_food_made.items(), key=lambda x:x[0])
+##    def handleEndGame(self, event, replay):
+##        for player in replay.players:
+##            player.units_alive = self.units_alive[player.pid]
+##            player.supply_gen = self.supply_gen[player.pid]
+##            #player.current_food_used = sorted(player.current_food_used.items(), key=lambda x:x[0])
+##            #player.current_food_made = sorted(player.current_food_made.items(), key=lambda x:x[0])
 
 
     def _isHallucinated(self, unit):
         ################ bug : for whatever reason hallucinated attribute does not return correctly, it seems flags == 0 indicates hallucination (but only applies for army ########################
-        #return unit.hallucinated
-        return not ((unit.is_army and unit.flags != 0) or unit.is_worker)
+        return unit.hallucinated
+        #return not ((unit.is_army and unit.flags != 0) or unit.is_worker)

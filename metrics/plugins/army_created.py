@@ -20,7 +20,7 @@ class ArmyCreatedTracker(object):
     def _add_to_army(self,event,replay):
         self._army_created[event.unit.owner.pid] += event.unit.supply
         replay.player[event.unit.owner.pid].army_created.append(
-            ArmyCount(event.second, self._army_created[event.unit.owner.pid])
+            ArmyCount(event.second, self._army_created[event.unit.owner.pid]))
 
 
     def handleInitGame(self,event,replay):

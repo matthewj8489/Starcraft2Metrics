@@ -6,7 +6,7 @@ class Worker(object):
     
 class WorkersCreatedTracker(object):
 
-    name = 'WorkersTracker'
+    name = 'WorkersCreatedTracker'
 
 
     def handleInitGame(self,event,replay):

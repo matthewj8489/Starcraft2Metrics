@@ -94,7 +94,7 @@ def write_raw_output(outfilepath, metric_data, write_mode):
         if len(metric_data) > 0:
             writer = csv.DictWriter(csvfile, fieldnames=metric_data[0].keys())
             # write the header if this is a new file (not appended file)
-            if write_mode == 'w':
+            if write_mode == 'w+':
                 writer.writeheader()
             for rd in metric_data:
                 writer.writerow(rd)
@@ -199,8 +199,16 @@ if __name__ == '__main__':
     else:
         raw_filepath = os.path.join(args.outpath, RAW_FILENAME)
 
+    # create any necessary directories
+    if not os.path.exists(os.path.dirname(raw_filepath)):
+        try:
+            os.makedirs(os.path.dirname(raw_filepath))
+        except OSError as exc: # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise
+
     if args.overwrite:
-        write_mode = 'w'
+        write_mode = 'w+'
     else:
         if os.path.isfile(raw_filepath):
             write_mode = 'a'
@@ -209,7 +217,7 @@ if __name__ == '__main__':
                 for row in rep_rdr:
                     parsed_rep_filenames.append(row['ReplayName'])
         else:
-            write_mode = 'w'
+            write_mode = 'w+'
 
         
     # Find all possible replay files

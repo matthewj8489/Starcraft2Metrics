@@ -4,7 +4,9 @@ import math
 
 import sc2reader
 from sc2reader.engine.plugins import APMTracker
+from supply import SupplyTracker
 sc2reader.engine.register_plugin(APMTracker())
+sc2reader.engine.register_plugin(SupplyTracker())
 
 
 class Sc2MetricAnalyzer(object):
@@ -206,6 +208,19 @@ class Sc2MetricAnalyzer(object):
 
         return self.avg_collection_rate(pse_premax)
 
+
+    def supply_capped(self):
+        fd_made = self._replay.player[self._player_id].current_food_made
+        fd_used = self._replay.player[self._player_id].current_food_used
+
+        sc = 0
+        for used in fd_used:
+            made = list(filter(lambda md: md.second <= used.second, fd_made))
+            if used.supply == made[len(made)-1].supply and made[len(made)-1].supply <= 200:
+                sc += (used.second - made[len(made)-1].second)
+
+        return sc
+            
 
     def workers_created(self, real_time_s):
         units = list(filter(lambda ut: ut.owner.pid == self._player_id and ut.is_worker and (self._isHallucinated(ut) == False), self._replay.player[self._player_id].units))

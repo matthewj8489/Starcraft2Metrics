@@ -1,6 +1,14 @@
 from collections import defaultdict
 import math
 
+
+class FoodCount(object):
+
+    def __init__(self, second, supply):
+        self.second = second
+        self.supply = supply
+
+        
 class SupplyTracker(object):
 
     name = 'SupplyTracker'
@@ -8,36 +16,40 @@ class SupplyTracker(object):
     def add_to_units_alive(self,event,replay):
         self.units_alive[event.control_pid] += event.unit.supply
         #replay.player[event.control_pid].current_food_used[event.second] = self.units_alive[event.control_pid]
-        replay.player[event.control_pid].current_food_used.append({"second": event.second, "supply": self.units_alive[event.control_pid]})
+        replay.player[event.control_pid].current_food_used.append(
+            FoodCount(event.second, self.units_alive[event.control_pid]))
 
 
     def add_to_supply_gen(self,event,replay):
         if event.unit.name in self.supply_gen_unit:
             self.supply_gen[event.unit.owner.pid] += self.supply_gen_unit[event.unit.name] #math.fabs(event.unit.supply)
             #replay.player[event.control_pid].current_food_made[event.second] = self.supply_gen[event.control_pid]
-            replay.player[event.unit.owner.pid].current_food_made.append({"second": event.second, "supply": self.supply_gen[event.unit.owner.pid]})
+            replay.player[event.unit.owner.pid].current_food_made.append(
+                FoodCount(event.second, self.supply_gen[event.unit.owner.pid]))
         
 
     def remove_from_units_alive(self,event,replay):
         self.units_alive[event.unit.owner.pid] -= event.unit.supply
         #replay.player[event.unit.owner.pid].current_food_used[event.second] = self.units_alive[event.unit.owner.pid]
-        replay.player[event.unit.owner.pid].current_food_used.append({"second": event.second, "supply": self.units_alive[event.unit.owner.pid]})
+        replay.player[event.unit.owner.pid].current_food_used.append(
+            FoodCount(event.second, self.units_alive[event.unit.owner.pid]))
         
 
     def remove_from_supply_gen(self,event,replay):
         self.supply_gen[event.unit.owner.pid] -= self.supply_gen_unit[event.unit.name] #math.fabs(event.unit.supply)
         #replay.player[event.unit.owner.pid].current_food_made[event.second] = self.supply_gen[event.unit.owner.pid]
-        replay.player[event.unit.owner.pid].current_food_made.append({"second": event.second, "supply": self.supply_gen[event.unit.owner.pid]})
+        replay.player[event.unit.owner.pid].current_food_made.append(
+            FoodCount(event.second, self.supply_gen[event.unit.owner.pid]))
         
 
     def handleInitGame(self, event, replay):
         self.supply_gen_unit = {
-            'Overloard' : 8,
-            'Hatchery' : 2,
-            'SupplyDepot' : 8,
-            'CommandCenter' : 11,
+            #'Overloard' : 8,
+            #'Hatchery' : 2,
+            #'SupplyDepot' : 8,
+            #'CommandCenter' : 11,
             'Pylon' : 8,
-            'Nexus' : 10
+            'Nexus' : 15
         }
         self.units_alive = defaultdict(int)
         self.supply_gen = defaultdict(int)
@@ -59,6 +71,8 @@ class SupplyTracker(object):
     def handleUnitBornEvent(self,event,replay):
         if event.unit.is_worker or (event.unit.is_army and not self._isHallucinated(event.unit)):
             self.add_to_units_alive(event,replay)
+        elif event.unit.is_building and (event.unit.name in self.supply_gen_unit):
+            self.add_to_supply_gen(event,replay)
 
 
     def handleUnitDoneEvent(self,event,replay):

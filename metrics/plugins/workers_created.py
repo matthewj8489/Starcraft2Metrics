@@ -1,9 +1,7 @@
-class Worker(object):
+from .. import sc2metric
+from .. import metric_containers
 
-    def __init__(self, second):
-        self.second = second
 
-    
 class WorkersCreatedTracker(object):
 
     name = 'WorkersCreatedTracker'
@@ -11,12 +9,12 @@ class WorkersCreatedTracker(object):
 
     def handleInitGame(self,event,replay):
         for player in replay.players:
-            player.workers_created = []
+            player.metrics = Sc2MetricAnalyzer()
 
 
     def handleUnitBornEvent(self,event,replay):
         if event.unit.is_worker:
-            replay.player[event.unit.owner.pid].workers_created.append(
+            replay.player[event.unit.owner.pid].metrics.workers_created.append(
                 Worker(event.second))
             
             

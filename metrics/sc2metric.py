@@ -5,8 +5,15 @@ import math
 import sc2reader
 from sc2reader.engine.plugins import APMTracker
 from plugins.supply import SupplyTracker
+from plugins.workers_created import WorkersCreatedTracker
+from plugins.army_created import ArmyCreatedTracker
+from plugins.bases_created import BasesCreatedTracker
+
 sc2reader.engine.register_plugin(APMTracker())
 sc2reader.engine.register_plugin(SupplyTracker())
+sc2reader.engine.register_plugin(WorkersCreatedTracker())
+sc2reader.engine.register_plugin(ArmyCreatedTracker())
+sc2reader.engine.register_plugin(BasesCreatedTracker())
 
 
 class Sc2MetricAnalyzer(object):
@@ -66,6 +73,14 @@ class Sc2MetricAnalyzer(object):
         #: The ID of the player for whom to parse benchmark data
         self._player_id = player_id
 
+
+    def __init__(self):
+        self.army_created = []
+        self.workers_created = []
+        self.bases_created = []
+        self.current_food_used = []
+        self.current_food_made = []
+        
 
     def metrics(self):
         return {'TimeToMax' : self.time_to_supply_count_created_excluding_extra_workers(198, 75),

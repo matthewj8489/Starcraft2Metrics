@@ -1,7 +1,5 @@
-class Base(object):
-
-    def __init__(self, second):
-        self.second = second
+from .. import sc2metric
+from .. import metric_container
 
 
 class BasesCreatedTracker(object):
@@ -19,10 +17,10 @@ class BasesCreatedTracker(object):
 
     def handleInitGame(self,event,replay):
         for player in replay.players:
-            player.bases_created = []
+            player.metrics = Sc2MetricAnalyzer()
 
 
     def handleUnitDoneEvent(self,event,replay):
         if event.unit.is_building and (event.unit.name in self._base_names):
-            replay.player[event.unit.owner.pid].bases_created.append(
+            replay.player[event.unit.owner.pid].metrics.bases_created.append(
                 Base(event.second))

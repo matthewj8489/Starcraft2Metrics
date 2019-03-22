@@ -79,7 +79,8 @@ class Sc2MetricAnalyzer(object):
                 'AvgUnspent' : self.avg_unspent(),
                 'AvgUnspentPreMax' : self.avg_unspent_pre_max(),
                 'AvgColRate' : self.avg_col_rate(),
-                'AvgColRatePreMax' : self.avg_col_rate_pre_max()
+                'AvgColRatePreMax' : self.avg_col_rate_pre_max(),
+                'SupplyCapped' : self.supply_capped()
                }             
         
 

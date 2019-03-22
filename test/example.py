@@ -156,9 +156,27 @@ for x in p1_army_uie:
 #print("Total Adepts Init ({})".format(total_adepts_init))
 #print("Total Adepts Done ({})".format(total_adepts_done))        
 
+
+# test that food used and food made are coherent
+
+for fd in replay.player[1].current_food_made:
+    idx = 0
+    supp = 0
+    while (idx < len(replay.player[1].current_food_used)) and replay.player[1].current_food_used[idx].second < fd.second:
+        idx += 1
+
+    supp = replay.player[1].current_food_used[idx-1].supply
+
+    if supp > fd.supply:
+        print('ERROR:', supp, '/', fd.supply, fd.second)
+    else:
+        print(supp, '/', fd.supply, fd.second)
+        
+
 replay.is_ladder
 replay.map_name
 replay.humans
 replay.computers
 total_players = len(replay.humans) + len(replay.computers)
 total_players
+

@@ -1,7 +1,7 @@
 from collections import defaultdict
 
-from .. import sc2metric
-from .. import metric_container
+import sc2metric
+import metric_containers
 
 
 class ArmyCreatedTracker(object):

@@ -1,5 +1,5 @@
-from .. import sc2metric
-from .. import metric_container
+import sc2metric
+import metric_containers
 
 
 class BasesCreatedTracker(object):

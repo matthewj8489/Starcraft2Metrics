@@ -3,17 +3,17 @@ import math
 
 
 import sc2reader
-from sc2reader.engine.plugins import APMTracker
-from plugins.supply import SupplyTracker
-from plugins.workers_created import WorkersCreatedTracker
-from plugins.army_created import ArmyCreatedTracker
-from plugins.bases_created import BasesCreatedTracker
-
-sc2reader.engine.register_plugin(APMTracker())
-sc2reader.engine.register_plugin(SupplyTracker())
-sc2reader.engine.register_plugin(WorkersCreatedTracker())
-sc2reader.engine.register_plugin(ArmyCreatedTracker())
-sc2reader.engine.register_plugin(BasesCreatedTracker())
+##from sc2reader.engine.plugins import APMTracker
+##from plugins.supply import SupplyTracker
+##from plugins.workers_created import WorkersCreatedTracker
+##from plugins.army_created import ArmyCreatedTracker
+##from plugins.bases_created import BasesCreatedTracker
+##
+##sc2reader.engine.register_plugin(APMTracker())
+##sc2reader.engine.register_plugin(SupplyTracker())
+##sc2reader.engine.register_plugin(WorkersCreatedTracker())
+##sc2reader.engine.register_plugin(ArmyCreatedTracker())
+##sc2reader.engine.register_plugin(BasesCreatedTracker())
 
 
 class Sc2MetricAnalyzer(object):

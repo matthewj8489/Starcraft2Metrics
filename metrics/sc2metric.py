@@ -227,22 +227,41 @@ class Sc2MetricAnalyzer(object):
 ###################################################################
 
     def supply_capped(self):
+        """
+        Determines the amount of time the player was supply capped this game.
+        Supply capped is acknowledged when supply of units = supply created when supply created < 200.
+
+        Returns:
+            int: The amount of time spent supply capped.
+            
+        """
         fd_made = self.current_food_made
         fd_used = self.current_food_used
 
         sc = 0
         for used in fd_used:
             made = list(filter(lambda md: md.second <= used.second, fd_made))
-            if used.supply == made[len(made)-1].supply and made[len(made)-1].supply <= 200:
+            if used.supply == made[len(made)-1].supply and made[len(made)-1].supply < 200:
                 sc += (used.second - made[len(made)-1].second)
 
         return sc
             
 
-    def workers_created_at_time(self, game_time_s):
+    def workers_created_at_time(self, time_s):
+        """
+        Determines the total number of workers created at the specified time.
+        This function is accumulative and does not handle workers lost.
+
+        Args:
+            time_s (int): The time (in seconds) of the replay to count workers.
+
+        Returns:
+            int: The number of workers created.
+            
+        """
         workers = 0
         idx = 0
-        while len(self.workers_created) > idx and self.workers_created[idx].second < game_time_s:
+        while len(self.workers_created) > idx and self.workers_created[idx].second < time_s:
             workers += 1
             idx += 1
 

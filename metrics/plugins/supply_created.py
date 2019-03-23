@@ -15,8 +15,15 @@ class SupplyCreatedTracker(object):
 
     def _add_to_supply(self,event,replay):
         self._supply_created[event.unit.owner.pid] += event.unit.supply
-        replay.player[event.unit.owner.pid].metrics.supply_created.append(
-            SupplyCount(event.second, self._supply_created[event.unit.owner.pid], event.unit.supply, event.unit.is_worker))
+        supp = SupplyCount(event.second,
+                           self._supply_created[event.unit.owner.pid],
+                           event.unit.supply,
+                           event.unit.is_worker)
+        replay.player[event.unit.owner.pid].metrics.supply_created.append(supp)
+        if event.unit.is_worker:
+            replay.player[event.unit.owner.pid].metrics.workers_created.append(supp)
+        elif event.unit.is_army:
+            replay.player[event.unit.owner.pid].metrics.army_created.append(supp)
 
 
     def handleInitGame(self,event,replay):
@@ -26,7 +33,9 @@ class SupplyCreatedTracker(object):
 
 
     def handleUnitBornEvent(self,event,replay):
-        if event.unit.is_worker or (event.unit.is_army and not util.is_hallucinated(event.unit) and event.unit.name != "Archon"):
+        if event.unit.is_worker or (event.unit.is_army
+                                    and not util.is_hallucinated(event.unit)
+                                    and event.unit.name != "Archon"):
             self._add_to_supply(event,replay)
 
 

@@ -50,7 +50,7 @@ class SupplyTracker(object):
             self.supply_gen[player.pid] = 0
             player.units_alive = 0
             player.supply_gen = 0
-            player.metrics = Sc2MetricAnalyzer
+            player.metrics = Sc2MetricAnalyzer()
 
 
     def handleUnitInitEvent(self,event,replay):

@@ -1,9 +1,3 @@
-class Worker(object):
-
-    def __init__(self, second):
-        self.second = second
-
-
 class FoodCount(object):
 
     def __init__(self, second, supply):
@@ -11,19 +5,12 @@ class FoodCount(object):
         self.supply = supply
 
 
-class Base(object):
+class BaseCount(object):
 
     def __init__(self, second):
         self.second = second
 
         
-class ArmyCount(object):
-
-    def __init__(self, second, supply):
-        self.second = second
-        self.supply = supply
-
-
 class SupplyCount(object):
 
     def __init__(self, second, total_supply, unit_supply, is_worker):

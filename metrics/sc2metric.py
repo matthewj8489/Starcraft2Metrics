@@ -226,8 +226,8 @@ class Sc2MetricAnalyzer(object):
 
 
     def supply_capped(self):
-        fd_made = self._replay.player[self._player_id].current_food_made
-        fd_used = self._replay.player[self._player_id].current_food_used
+        fd_made = self.current_food_made
+        fd_used = self.current_food_used
 
         sc = 0
         for used in fd_used:
@@ -238,42 +238,47 @@ class Sc2MetricAnalyzer(object):
         return sc
             
 
-    def workers_created(self, real_time_s):
-        units = list(filter(lambda ut: ut.owner.pid == self._player_id and ut.is_worker and (self._isHallucinated(ut) == False), self._replay.player[self._player_id].units))
-        game_time_s = util.convert_realtime_to_gametime_r(self._replay, real_time_s)
-        units_r = sorted(units, key=lambda ut: ut.finished_at)
+    def workers_created_at_time(self, game_time_s):
+        workers = 0
+        idx = 0
+        while len(self.workers_created) > idx and self.workers_created[idx].second < game_time_s:
+            workers += 1
+            idx += 1
 
-        worker_count = 0
-        for ut in units_r:
-            if util.convert_frame_to_gametime_r(self._replay, ut.finished_at) <= game_time_s:
-                worker_count += 1
-
-        return worker_count
+        return workers
 
 
-    def army_created(self, real_time_s):
-        if not 'UnitBornEvent' in self._events or not 'UnitInitEvent' in self._events:
-            return 0
-        unit_born_events = self._events['UnitBornEvent']
-        unit_init_events = self._events['UnitInitEvent']   
-        army_supply_count = 0
-        game_time_s = util.convert_realtime_to_gametime_r(self._replay, real_time_s)
+    def army_created_at_time(self, game_time_s):
+        idx = 0
+        while len(self.army_created) > idx and self.army_created[idx].second < game_time_s:
+            idx += 1
 
-        player_ube = list(filter(lambda ube: ube.control_pid == self._player_id, unit_born_events))
-        player_army_ube = list(filter(lambda ube: ube.unit.is_army, player_ube))
+        return self.army_created[idx-1].supply
 
-        for ube in player_army_ube:
-            if (ube.second <= game_time_s) and (ube.unit.name != "Archon") and (not self._isHallucinated(ube.unit)):
-                army_supply_count += ube.unit.supply
 
-        player_uie = list(filter(lambda uie: uie.control_pid == self._player_id, unit_init_events))
-        player_army_uie = list(filter(lambda uie: uie.unit.is_army, player_uie))
-
-        for uie in player_army_uie:
-            if (uie.second <= game_time_s) and (uie.unit.name != "Archon") and (not self._isHallucinated(uie.unit)):
-                army_supply_count += uie.unit.supply
-
-        return army_supply_count
+##    def army_created(self, real_time_s):
+##        if not 'UnitBornEvent' in self._events or not 'UnitInitEvent' in self._events:
+##            return 0
+##        unit_born_events = self._events['UnitBornEvent']
+##        unit_init_events = self._events['UnitInitEvent']   
+##        army_supply_count = 0
+##        game_time_s = util.convert_realtime_to_gametime_r(self._replay, real_time_s)
+##
+##        player_ube = list(filter(lambda ube: ube.control_pid == self._player_id, unit_born_events))
+##        player_army_ube = list(filter(lambda ube: ube.unit.is_army, player_ube))
+##
+##        for ube in player_army_ube:
+##            if (ube.second <= game_time_s) and (ube.unit.name != "Archon") and (not self._isHallucinated(ube.unit)):
+##                army_supply_count += ube.unit.supply
+##
+##        player_uie = list(filter(lambda uie: uie.control_pid == self._player_id, unit_init_events))
+##        player_army_uie = list(filter(lambda uie: uie.unit.is_army, player_uie))
+##
+##        for uie in player_army_uie:
+##            if (uie.second <= game_time_s) and (uie.unit.name != "Archon") and (not self._isHallucinated(uie.unit)):
+##                army_supply_count += uie.unit.supply
+##
+##        return army_supply_count
 
 
     def total_supply_created(self, real_time_s):

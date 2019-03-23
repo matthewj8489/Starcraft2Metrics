@@ -60,23 +60,24 @@ class Sc2MetricAnalyzer(object):
     '''   
 
     
-    def __init__(self, replay_file, player_id):       
-        #: Replay structure
-        self._replay = sc2reader.load_replay(replay_file)
-
-        #: An events dictionary from the replay
-        event_names = set([event.name for event in self._replay.events])
-        self._events = {name: [] for name in event_names}
-        for event in self._replay.events:
-            self._events[event.name].append(event)
-         
-        #: The ID of the player for whom to parse benchmark data
-        self._player_id = player_id
+##    def __init__(self, replay_file, player_id):       
+##        #: Replay structure
+##        self._replay = sc2reader.load_replay(replay_file)
+##
+##        #: An events dictionary from the replay
+##        event_names = set([event.name for event in self._replay.events])
+##        self._events = {name: [] for name in event_names}
+##        for event in self._replay.events:
+##            self._events[event.name].append(event)
+##         
+##        #: The ID of the player for whom to parse benchmark data
+##        self._player_id = player_id
 
 
     def __init__(self):
         self.army_created = []
         self.workers_created = []
+        self.supply_created = []
         self.bases_created = []
         self.current_food_used = []
         self.current_food_made = []
@@ -223,7 +224,7 @@ class Sc2MetricAnalyzer(object):
             idx += 1
 
         return self.avg_collection_rate(pse_premax)
-
+###################################################################
 
     def supply_capped(self):
         fd_made = self.current_food_made
@@ -250,38 +251,13 @@ class Sc2MetricAnalyzer(object):
 
     def army_created_at_time(self, game_time_s):
         idx = 0
-        while len(self.army_created) > idx and self.army_created[idx].second < game_time_s:
+        while len(self.army_created) > idx and self.army_created[idx].second <= game_time_s:
             idx += 1
 
         return self.army_created[idx-1].supply
 
 
-##    def army_created(self, real_time_s):
-##        if not 'UnitBornEvent' in self._events or not 'UnitInitEvent' in self._events:
-##            return 0
-##        unit_born_events = self._events['UnitBornEvent']
-##        unit_init_events = self._events['UnitInitEvent']   
-##        army_supply_count = 0
-##        game_time_s = util.convert_realtime_to_gametime_r(self._replay, real_time_s)
-##
-##        player_ube = list(filter(lambda ube: ube.control_pid == self._player_id, unit_born_events))
-##        player_army_ube = list(filter(lambda ube: ube.unit.is_army, player_ube))
-##
-##        for ube in player_army_ube:
-##            if (ube.second <= game_time_s) and (ube.unit.name != "Archon") and (not self._isHallucinated(ube.unit)):
-##                army_supply_count += ube.unit.supply
-##
-##        player_uie = list(filter(lambda uie: uie.control_pid == self._player_id, unit_init_events))
-##        player_army_uie = list(filter(lambda uie: uie.unit.is_army, player_uie))
-##
-##        for uie in player_army_uie:
-##            if (uie.second <= game_time_s) and (uie.unit.name != "Archon") and (not self._isHallucinated(uie.unit)):
-##                army_supply_count += uie.unit.supply
-##
-##        return army_supply_count
-
-
-    def total_supply_created(self, real_time_s):
+    def supply_created_at_time(self, real_time_s):
         supply = 0
         supply += self.workers_created(real_time_s)
         supply += self.army_created(real_time_s)
@@ -289,86 +265,72 @@ class Sc2MetricAnalyzer(object):
         return supply
 
 
-    def time_to_worker_count(self, worker_count):
-        units = list(filter(lambda ut: ut.owner.pid == self._player_id and ut.is_worker and (not self._isHallucinated(ut)), self._replay.player[self._player_id].units))
-
-        if worker_count <= len(units):
-            return util.convert_frame_to_realtime_r(self._replay, units[worker_count - 1].finished_at)
+    def time_to_workers_created(self, worker_count):
+        if worker_count <= len(self.workers_created):
+            return self.workers_created[worker_count-1].second
         else:
-            return -1
+            return None
 
 
-    def time_to_supply_count_created(self, supply_count):
-        # filter all of the player units into just the workers + army that were not hallucinated
-        units = list(filter(lambda ut: ut.owner.pid == self._player_id and (ut.is_army or ut.is_worker) and (not self._isHallucinated(ut)), self._replay.player[self._player_id].units))
+    def time_to_supply_created(self, supply_count):
+        supp = list(filter(lambda sp: sp.supply <= supply_count, self.supply_created))
 
-        # filter out special cases, such as Archons that were morphed from templars
-        units_r = list(filter(lambda ut: ut.name != "Archon", units))
-              
-        supp = 0
-        for ut in units_r:
-            supp += ut.supply
-            if supp >= supply_count:
-                return util.convert_frame_to_realtime_r(self._replay, ut.finished_at)
-
-        return -1
-
-
-    def time_to_supply_count_created_excluding_extra_workers(self, supply_count, max_workers_counted):
-        units = list(filter(lambda ut: ut.owner.pid == self._player_id and (ut.is_army or ut.is_worker) and (not self._isHallucinated(ut)), self._replay.player[self._player_id].units))
-        units_r = list(filter(lambda ut: ut.name != "Archon", units))
+        if len(supp) > 0:
+            return supp[len(supp)-1].second
+        else:
+            return None
         
+
+    def time_to_supply_created_max_workers(self, supply_count, max_workers_counted):
         supp = 0
         workers = 0
-        for ut in units_r:
-            if not ut.is_worker or workers < max_workers_counted:
-                supp += ut.supply
+        for sc in self.supply_created:
+            if not sc.is_worker or workers < max_workers_counted:
+                supp += sc.unit_supply
                 if supp >= supply_count:
-                    return util.convert_frame_to_realtime_r(self._replay, ut.finished_at)
-                if ut.is_worker:
+                    return sc.second
+                if sc.is_worker:
                     workers += 1
 
-        return -1
+        return None
 
-    def time_to_total_bases(self, total_bases):
-        bases = list(filter(lambda ut: ut.name == 'Nexus' and ut.finished_at is not None, self._replay.player[self._player_id].units))
-        bases_r = sorted(bases, key=lambda ut: ut.finished_at)
 
-        if total_bases <= len(bases_r):
-            return util.convert_frame_to_realtime_r(self._replay, bases_r[total_bases - 1].finished_at)
+    def time_to_bases_created(self, base_count):
+        if base_count <= len(self.bases_created):
+            return self.bases_created[base_count-1].second
         else:
-            return -1       
+            return None   
         
 
-    def units_created(self, real_time_s):
-        if not 'UnitBornEvent' in self._events or not 'UnitInitEvent' in self._events:
-            return 0
-        units_created = {"Probe": 0, "Zealot": 0, "Sentry": 0, "Stalker": 0, "Adept": 0, "HighTemplar": 0,
-                         "DarkTemplar": 0, "Archon": 0, "Observer": 0, "Immortal": 0, "Colossus": 0,
-                         "Disruptor": 0, "Phoenix": 0, "Oracle": 0, "VoidRay": 0, "Carrier": 0, "Tempest": 0}
-
-        unit_born_events = self._events['UnitBornEvent']
-        unit_init_events = self._events['UnitInitEvent']
-        game_time_s = util.convert_realtime_to_gametime_r(self._replay, real_time_s)
-        
-        player_ube = list(filter(lambda ube: ube.control_pid == self._player_id, unit_born_events))
-        player_uie = list(filter(lambda uie: uie.control_pid == self._player_id, unit_init_events))
-
-        for ube in player_ube:
-            if (ube.second <= game_time_s) and (ube.unit.name in units_created) and (not self._isHallucinated(ube.unit)):
-                units_created[ube.unit.name] += 1
-
-        for uie in player_uie:
-            if (uie.second <= game_time_s) and (uie.unit.name in units_created) and (not self._isHallucinated(uie.unit)):
-                units_created[uie.unit.name] += 1
-
-        return units_created
-
-
-    def _isHallucinated(self, unit):
-        ################ bug : for whatever reason hallucinated attribute does not return correctly, it seems flags == 0 indicates hallucination (but only applies for army ########################
-        #return unit.hallucinated
-        return not ((unit.is_army and unit.flags != 0) or unit.is_worker)
+##    def units_created(self, real_time_s):
+##        if not 'UnitBornEvent' in self._events or not 'UnitInitEvent' in self._events:
+##            return 0
+##        units_created = {"Probe": 0, "Zealot": 0, "Sentry": 0, "Stalker": 0, "Adept": 0, "HighTemplar": 0,
+##                         "DarkTemplar": 0, "Archon": 0, "Observer": 0, "Immortal": 0, "Colossus": 0,
+##                         "Disruptor": 0, "Phoenix": 0, "Oracle": 0, "VoidRay": 0, "Carrier": 0, "Tempest": 0}
+##
+##        unit_born_events = self._events['UnitBornEvent']
+##        unit_init_events = self._events['UnitInitEvent']
+##        game_time_s = util.convert_realtime_to_gametime_r(self._replay, real_time_s)
+##        
+##        player_ube = list(filter(lambda ube: ube.control_pid == self._player_id, unit_born_events))
+##        player_uie = list(filter(lambda uie: uie.control_pid == self._player_id, unit_init_events))
+##
+##        for ube in player_ube:
+##            if (ube.second <= game_time_s) and (ube.unit.name in units_created) and (not self._isHallucinated(ube.unit)):
+##                units_created[ube.unit.name] += 1
+##
+##        for uie in player_uie:
+##            if (uie.second <= game_time_s) and (uie.unit.name in units_created) and (not self._isHallucinated(uie.unit)):
+##                units_created[uie.unit.name] += 1
+##
+##        return units_created
+##
+##
+##    def _isHallucinated(self, unit):
+##        ################ bug : for whatever reason hallucinated attribute does not return correctly, it seems flags == 0 indicates hallucination (but only applies for army ########################
+##        #return unit.hallucinated
+##        return not ((unit.is_army and unit.flags != 0) or unit.is_worker)
 
    
 ########## Testing ###########

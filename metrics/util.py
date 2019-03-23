@@ -63,3 +63,9 @@ def convert_frame_to_gametime_r(replay, game_frame):
 def convert_frame_to_realtime_r(replay, game_frame):
     gt = convert_frame_to_gametime_r(replay, game_frame)
     return convert_gametime_to_realtime_r(replay, gt)
+
+
+def is_hallucinated(unit):
+    ################ bug : for whatever reason hallucinated attribute does not return correctly, it seems flags == 0 indicates hallucination (but only applies for army ########################
+    return unit.hallucinated
+    #return not ((unit.is_army and unit.flags != 0) or unit.is_worker)

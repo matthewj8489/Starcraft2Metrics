@@ -20,6 +20,12 @@ class BasesCreatedTracker(object):
             player.metrics = Sc2MetricAnalyzer()
 
 
+    def handleUnitBornEvent(self,event,replay):
+        if event.unit.is_building and (event.unit.name in self._base_names):
+            replay.player[event.unit.owner.pid].metrics.bases_created.append(
+                Base(event.second))
+
+
     def handleUnitDoneEvent(self,event,replay):
         if event.unit.is_building and (event.unit.name in self._base_names):
             replay.player[event.unit.owner.pid].metrics.bases_created.append(

@@ -1,5 +1,5 @@
 from sc2metric import Sc2MetricAnalyzer
-from metric_containers import Worker
+from metric_containers import SupplyCount
 
 
 class WorkersCreatedTracker(object):
@@ -15,6 +15,9 @@ class WorkersCreatedTracker(object):
     def handleUnitBornEvent(self,event,replay):
         if event.unit.is_worker:
             replay.player[event.unit.owner.pid].metrics.workers_created.append(
-                Worker(event.second))
+                SupplyCount(event.second,
+                            len(replay.player[event.unit.owner.pid].metrics.workers_created)+1,
+                            1,
+                            False))
             
             

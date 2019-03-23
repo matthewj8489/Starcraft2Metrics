@@ -1,8 +1,8 @@
 from collections import defaultdict
 
 from sc2metric import Sc2MetricAnalyzer
-from metric_containers import ArmyCount
-
+from metric_containers import SupplyCount
+import util
 
 class ArmyCreatedTracker(object):
 
@@ -16,7 +16,7 @@ class ArmyCreatedTracker(object):
     def _add_to_army(self,event,replay):
         self._army_created[event.unit.owner.pid] += event.unit.supply
         replay.player[event.unit.owner.pid].metrics.army_created.append(
-            ArmyCount(event.second, self._army_created[event.unit.owner.pid]))
+            SupplyCount(event.second, self._army_created[event.unit.owner.pid]), event.unit.supply, False)
 
 
     def handleInitGame(self,event,replay):
@@ -26,10 +26,10 @@ class ArmyCreatedTracker(object):
 
 
     def handleUnitBornEvent(self,event,replay):
-        if event.unit.is_army and not event.unit.hallucinated:
+        if event.unit.is_army and not util.is_hallucinated(event.unit) and event.unit.name != "Archon":
             self._add_to_army(event,replay)
 
 
     def handleUnitInitEvent(self,event,replay):
-        if event.unit.is_army and not event.unit.hallucinated:
+        if event.unit.is_army and not util.is_hallucinated(event.unit) and event.unit.name != "Archon":
             self._add_to_army(event,replay)

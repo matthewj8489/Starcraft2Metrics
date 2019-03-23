@@ -81,6 +81,7 @@ class Sc2MetricAnalyzer(object):
         self.bases_created = []
         self.current_food_used = []
         self.current_food_made = []
+        self.resources = []
         
 
     def metrics(self):
@@ -224,6 +225,36 @@ class Sc2MetricAnalyzer(object):
             idx += 1
 
         return self.avg_collection_rate(pse_premax)
+
+###################################################################
+
+    def _avg_rcr(self, resources):
+        sum_rcr = 0
+        for res in resources:
+            sum_rcr += res.res_col
+
+        return sum_rcr / len(resources)
+
+
+    def avg_rcr(self):
+        return self._avg_rcr(self.resources)
+
+
+    def avg_rcr_at_time(self, time_s):
+        resources = list(filter(lambda res: res.second <= time_s, self.resources))
+
+        return self._avg_rcr(resources)
+
+    def avg_rcr_pre_max(self):
+        max_s = next((fd.second for fd in self.current_food_used if fd.supply >= 200), -1)
+
+        if max_s >= 0:
+            return self.avg_rcr_at_time(max_s)
+        else:
+            return self.avg_rcr()
+            
+        
+    
 ###################################################################
 
     def supply_capped(self):

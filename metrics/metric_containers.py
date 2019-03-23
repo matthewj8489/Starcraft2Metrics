@@ -19,3 +19,10 @@ class SupplyCount(object):
         self.unit_supply = unit_supply
         self.is_worker = is_worker
     
+
+class ResourceCount(object):
+
+    def __init__(self, second, res_col, res_unspent):
+        self.second = second
+        self.res_col = res_col
+        self.res_unspent = res_unspent

@@ -85,18 +85,18 @@ class Sc2MetricAnalyzer(object):
         
 
     def metrics(self):
-        return {'TimeToMax' : self.time_to_supply_count_created_excluding_extra_workers(198, 75),
-                'TimeTo3Bases' : self.time_to_total_bases(3),
-                'TimeTo4Bases' : self.time_to_total_bases(4),
-                'TimeTo66Workers' : self.time_to_worker_count(66),
-                'TimeTo75Workers' : self.time_to_worker_count(75),
+        return {'TimeToMax' : self.time_to_supply_created_max_workers(198, 75),
+                'TimeTo3Bases' : self.time_to_bases_created(3),
+                'TimeTo4Bases' : self.time_to_bases_created(4),
+                'TimeTo66Workers' : self.time_to_workers_created(66),
+                'TimeTo75Workers' : self.time_to_workers_created(75),
                 'AvgAPM' : self.avg_apm(),
-                'AvgSQ' : self.avg_sq(),
+                'AvgSQ' : self.sq(),
                 'AvgSQPreMax' : self.avg_sq_pre_max(),
-                'AvgUnspent' : self.avg_unspent(),
-                'AvgUnspentPreMax' : self.avg_unspent_pre_max(),
-                'AvgColRate' : self.avg_col_rate(),
-                'AvgColRatePreMax' : self.avg_col_rate_pre_max(),
+                'AvgUnspent' : self.aur(),
+                'AvgUnspentPreMax' : self.aur_pre_max(),
+                'AvgColRate' : self.avg_rcr(),
+                'AvgColRatePreMax' : self.avg_rcr_pre_max(),
                 'SupplyCapped' : self.supply_capped()
                }             
         
@@ -105,106 +105,44 @@ class Sc2MetricAnalyzer(object):
         return self._replay.player[self._player_id].avg_apm / util.gametime_to_realtime_constant_r(self._replay)
 
 
-##    def sq(self, player_stats_events):
-##        sum_res_col_rate = 0
-##        sum_unspent_res = 0
-##        for pse in player_stats_events:
-##            sum_res_col_rate += (pse.minerals_collection_rate + pse.vespene_collection_rate)
-##            sum_unspent_res += (pse.minerals_current + pse.vespene_current)
-##
-##        avg_col_rate = sum_res_col_rate / len(player_stats_events)
-##        avg_unspent = sum_unspent_res / len(player_stats_events)
-##
-##        # SQ(i,u)=35(0.00137i-ln(u))+240, where i=resource collection rate, u=average unspent resources
-##        sq = 35 * (0.00137 * avg_col_rate - math.log(avg_unspent)) + 240
-##                
-##        return sq
+    def first_max(self):
+        return next((fd.second for fd in self.current_food_used if fd.supply >= 200), -1)
 
 
-    def sq(self):
+    def _sq(self, resources):
         sum_res_col_rate = 0
         sum_unspent_res = 0
-        for res in self.resources:
+        for res in resources:
             sum_res_col_rate += res.res_col
             sum_unspent_res += res.res_unspent
 
-        avg_col_rate = sum_res_col_rate / len(self.resources)
-        avg_unspent = sum_unspent_res / len(self.resources)
+        avg_col_rate = sum_res_col_rate / len(resources)
+        avg_unspent = sum_unspent_res / len(resources)
 
         # SQ(i,u)=35(0.00137i-ln(u))+240, where i=resource collection rate, u=average unspent resources
         sq = 35 * (0.00137 * avg_col_rate - math.log(avg_unspent)) + 240
                 
         return sq
-    
 
-##    def avg_sq_at_time(self, time_s):
-##        player_stats_events = list(filter(lambda pse: pse.pid == self._player_id, self._events['PlayerStatsEvent']))
-##        pse_at_time = list()
-##
-##        idx = 0
-##        while (idx < len(player_stats_events) and player_stats_events[idx].second <= time_s):
-##            pse_at_time.append(player_stats_events[idx])
-##            idx += 1
-##            
-##        return self.sq(pse_at_time)
-##
-##
-##    def avg_sq(self):
-##        player_stats_events = list(filter(lambda pse: pse.pid == self._player_id, self._events['PlayerStatsEvent']))
-##                       
-##        return self.sq(player_stats_events)
-##
-##
-##    def avg_sq_pre_max(self):
-##        player_stats_events = list(filter(lambda pse: pse.pid == self._player_id, self._events['PlayerStatsEvent']))
-##        pse_premax = list()
-##
-##        idx = 0
-##        while (idx < len(player_stats_events) and player_stats_events[idx].food_used <= 198):
-##            pse_premax.append(player_stats_events[idx])
-##            idx += 1
-##        
-##        return self.sq(pse_premax)
-##
-##
-##    def avg_unspent_resources(self, player_stats_events):
-##        sum_unspent_res = 0
-##        for pse in player_stats_events:
-##            sum_unspent_res += (pse.minerals_current + pse.vespene_current)
-##
-##        return sum_unspent_res / len(player_stats_events)
-##
-##
-##    def avg_unspent(self):
-##        player_stats_events = list(filter(lambda pse: pse.pid == self._player_id, self._events['PlayerStatsEvent']))
-##
-##        return self.avg_unspent_resources(player_stats_events)
-##
-##
-##    def avg_unspent_at_time(self, time_s):
-##        player_stats_events = list(filter(lambda pse: pse.pid == self._player_id, self._events['PlayerStatsEvent']))
-##        pse_at_time = list()
-##
-##        idx = 0
-##        while (idx < len(player_stats_events) and player_stats_events[idx].second <= time_s):
-##            pse_at_time.append(player_stats_events[idx])
-##            idx += 1
-##
-##        return self.avg_unspent_resources(pse_at_time)
-##
-##
-##    def avg_unspent_pre_max(self):
-##        player_stats_events = list(filter(lambda pse: pse.pid == self._player_id, self._events['PlayerStatsEvent']))
-##        pse_premax = list()
-##
-##        idx = 0
-##        while (idx < len(player_stats_events) and player_stats_events[idx].food_used <= 198):
-##            pse_premax.append(player_stats_events[idx])
-##            idx += 1
-##
-##        return self.avg_unspent_resources(pse_premax)
 
-###############################################################################
+    def avg_sq(self):
+        return self._sq(self.resources)
+
+
+    def avg_sq_at_time(self, time_s):
+        resources = list(filter(lambda res: res.second <= time_s, self.resources))
+
+        return self._sq(resources)
+
+
+    def avg_sq_pre_max(self):
+        max_s = self.first_max()
+
+        if max_s >= 0:
+            return self.avg_sq_at_time(max_s)
+        else:
+            return self.avg_sq()
+        
 
     def _aur(self, resources):
         if len(resources) > 0:
@@ -226,52 +164,13 @@ class Sc2MetricAnalyzer(object):
 
 
     def aur_pre_max(self):
-        max_s = next((fd.second for fd in self.current_food_used if fd.supply >= 200), -1)
+        max_s = self.first_max()
 
         if max_s >= 0:
             return self.aur_at_time(max_s)
         else:
             return self.aur()
 
-        
-##    def avg_collection_rate(self, player_stats_events):
-##        sum_res_col_rate = 0
-##        for pse in player_stats_events:
-##            sum_res_col_rate += (pse.minerals_collection_rate + pse.vespene_collection_rate)
-##
-##        return sum_res_col_rate / len(player_stats_events)
-##
-##
-##    def avg_col_rate(self):
-##        player_stats_events = list(filter(lambda pse: pse.pid == self._player_id, self._events['PlayerStatsEvent']))
-##
-##        return self.avg_collection_rate(player_stats_events)
-##
-##
-##    def avg_col_rate_at_time(self, time_s):
-##        player_stats_events = list(filter(lambda pse: pse.pid == self._player_id, self._events['PlayerStatsEvent']))
-##        pse_at_time = list()
-##
-##        idx = 0
-##        while (idx < len(player_stats_events) and player_stats_events[idx].second <= time_s):
-##            pse_at_time.append(player_stats_events[idx])
-##            idx += 1
-##
-##        return self.avg_collection_rate(pse_at_time)
-##
-##
-##    def avg_col_rate_pre_max(self):
-##        player_stats_events = list(filter(lambda pse: pse.pid == self._player_id, self._events['PlayerStatsEvent']))
-##        pse_premax = list()
-##
-##        idx = 0
-##        while (idx < len(player_stats_events) and player_stats_events[idx].food_used <= 198):
-##            pse_premax.append(player_stats_events[idx])
-##            idx += 1
-##
-##        return self.avg_collection_rate(pse_premax)
-
-###################################################################
 
     def _avg_rcr(self, resources):
         if len(resources) > 0:
@@ -291,17 +190,15 @@ class Sc2MetricAnalyzer(object):
 
         return self._avg_rcr(resources)
 
+
     def avg_rcr_pre_max(self):
-        max_s = next((fd.second for fd in self.current_food_used if fd.supply >= 200), -1)
+        max_s = self.first_max()
 
         if max_s >= 0:
             return self.avg_rcr_at_time(max_s)
         else:
             return self.avg_rcr()
             
-        
-    
-###################################################################
 
     def supply_capped(self):
         """

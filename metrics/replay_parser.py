@@ -100,55 +100,55 @@ def write_raw_output(outfilepath, metric_data, write_mode):
                 writer.writerow(rd)
         
 
-def get_replay_data(replay_files, args):
-    replay_data = []
-    for rep in replay_files:       
-        data_dict = {'ReplayName' : '',
-                     'Date' : '',
-                     'Result' : '',
-                     'Map' : '',
-                     'RaceMatchup' : '',
-                     'GameLength' : 0,
-                     'GameType' : '',
-                     'IsLadder' : False,
-                    }
-        player_id = get_player_id(rep, player_name)
-        if player_id >= 0:
-            rep_obj = sc2reader.load_replay(rep, load_level=2)
-
-            #: Make sure that this replay is v2.0.8+, otherwise it won't be possible to pull useful data from it
-            if rep_obj.versions[1] < 2 or (rep_obj.versions[1] == 2 and rep_obj.versions[2] < 0) or (rep_obj.versions[1] == 2 and rep_obj.versions[2] == 0 and rep_obj.versions[3] < 8):
-                continue
-
-            if args.ladder and not rep_obj.is_ladder:
-                continue
-
-            if args.gametype and rep_obj.game_type != args.gametype:
-                continue          
-
-            
-            matchup = ""
-            for team in rep_obj.teams:
-                for player in team:
-                    matchup += player.pick_race[0]
-                if team != rep_obj.teams[len(rep_obj.teams)-1]:
-                    matchup += "v"
-            
-            
-            data_dict['ReplayName'] = os.path.basename(rep_obj.filename)
-            data_dict['Date'] = rep_obj.start_time.strftime("%m/%d/%Y %H:%M:%S")
-            data_dict['Result'] = rep_obj.player[player_id].result
-            data_dict['Map'] = rep_obj.map_name
-            data_dict['RaceMatchup'] = matchup
-            data_dict['GameLength'] = rep_obj.game_length.seconds
-            data_dict['GameType'] = rep_obj.game_type
-            data_dict['IsLadder'] = rep_obj.is_ladder
-            bc = benchmark.Benchmark(rep, player_id)
-            data_dict.update(bc.benchmarks())
-
-            replay_data.append(data_dict)
-
-    return replay_data
+##def get_replay_data(replay_files, args):
+##    replay_data = []
+##    for rep in replay_files:       
+##        data_dict = {'ReplayName' : '',
+##                     'Date' : '',
+##                     'Result' : '',
+##                     'Map' : '',
+##                     'RaceMatchup' : '',
+##                     'GameLength' : 0,
+##                     'GameType' : '',
+##                     'IsLadder' : False,
+##                    }
+##        player_id = get_player_id(rep, player_name)
+##        if player_id >= 0:
+##            rep_obj = sc2reader.load_replay(rep, load_level=2)
+##
+##            #: Make sure that this replay is v2.0.8+, otherwise it won't be possible to pull useful data from it
+##            if rep_obj.versions[1] < 2 or (rep_obj.versions[1] == 2 and rep_obj.versions[2] < 0) or (rep_obj.versions[1] == 2 and rep_obj.versions[2] == 0 and rep_obj.versions[3] < 8):
+##                continue
+##
+##            if args.ladder and not rep_obj.is_ladder:
+##                continue
+##
+##            if args.gametype and rep_obj.game_type != args.gametype:
+##                continue          
+##
+##            
+##            matchup = ""
+##            for team in rep_obj.teams:
+##                for player in team:
+##                    matchup += player.pick_race[0]
+##                if team != rep_obj.teams[len(rep_obj.teams)-1]:
+##                    matchup += "v"
+##            
+##            
+##            data_dict['ReplayName'] = os.path.basename(rep_obj.filename)
+##            data_dict['Date'] = rep_obj.start_time.strftime("%m/%d/%Y %H:%M:%S")
+##            data_dict['Result'] = rep_obj.player[player_id].result
+##            data_dict['Map'] = rep_obj.map_name
+##            data_dict['RaceMatchup'] = matchup
+##            data_dict['GameLength'] = rep_obj.game_length.seconds
+##            data_dict['GameType'] = rep_obj.game_type
+##            data_dict['IsLadder'] = rep_obj.is_ladder
+##            bc = benchmark.Benchmark(rep, player_id)
+##            data_dict.update(bc.benchmarks())
+##
+##            replay_data.append(data_dict)
+##
+##    return replay_data
 
 
 def multi_replay_analysis(bench_data):

@@ -82,6 +82,8 @@ class Sc2MetricAnalyzer(object):
         self.current_food_used = []
         self.current_food_made = []
         self.resources = []
+        self.apm = defaultdict(int)
+        self.aps = defaultdict(int)
         
 
     def metrics(self):

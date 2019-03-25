@@ -89,8 +89,8 @@ class Sc2MetricAnalyzer(object):
                }             
         
 
-    def avg_apm(self):
-        return self._replay.player[self._player_id].avg_apm / util.gametime_to_realtime_constant_r(self._replay)
+##    def avg_apm(self):
+##        return self._replay.player[self._player_id].avg_apm / util.gametime_to_realtime_constant_r(self._replay)
 
 
     def first_max(self):
@@ -114,16 +114,41 @@ class Sc2MetricAnalyzer(object):
 
 
     def avg_sq(self):
+        """
+        Calculates the average Spending Quotient (SQ).
+
+        Returns:
+            int: The average Spending Quotient (SQ).
+            
+        """
         return self._sq(self.resources)
 
 
     def avg_sq_at_time(self, time_s):
+        """
+        Calculates the average Spending Quotient (SQ) up until the specified time.
+
+        Args:
+            time_s (int): The time in the replay to stop calculating spending quotient.
+
+        Returns:
+            int: The average Spending Quotient (SQ) up until the specified time.
+            
+        """
         resources = list(filter(lambda res: res.second <= time_s, self.resources))
 
         return self._sq(resources)
 
 
     def avg_sq_pre_max(self):
+        """
+        Calculates the average Spending Quotient (SQ) up until the player first
+        reaches max supply.
+
+        Returns:
+            int: The average Spending Quotient (SQ) up until the player first maxes.
+            
+        """
         max_s = self.first_max()
 
         if max_s >= 0:

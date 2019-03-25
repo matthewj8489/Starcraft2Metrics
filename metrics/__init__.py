@@ -1,3 +1,5 @@
+import util
+
 import sc2reader
 from plugins.supply import SupplyTracker
 from plugins.bases_created import BasesCreatedTracker

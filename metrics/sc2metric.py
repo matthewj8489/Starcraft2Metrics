@@ -59,20 +59,6 @@ class Sc2MetricAnalyzer(object):
     'GAP' : How long it takes you, after finishing your actions in one PAC to establish a new fixaction. (mean average)
     '''   
 
-    
-##    def __init__(self, replay_file, player_id):       
-##        #: Replay structure
-##        self._replay = sc2reader.load_replay(replay_file)
-##
-##        #: An events dictionary from the replay
-##        event_names = set([event.name for event in self._replay.events])
-##        self._events = {name: [] for name in event_names}
-##        for event in self._replay.events:
-##            self._events[event.name].append(event)
-##         
-##        #: The ID of the player for whom to parse benchmark data
-##        self._player_id = player_id
-
 
     def __init__(self):
         self.army_created = []
@@ -82,8 +68,8 @@ class Sc2MetricAnalyzer(object):
         self.current_food_used = []
         self.current_food_made = []
         self.resources = []
-        self.apm = defaultdict(int)
-        self.aps = defaultdict(int)
+        #self.apm = defaultdict(int)
+        #self.aps = defaultdict(int)
         
 
     def metrics(self):
@@ -92,7 +78,7 @@ class Sc2MetricAnalyzer(object):
                 'TimeTo4Bases' : self.time_to_bases_created(4),
                 'TimeTo66Workers' : self.time_to_workers_created(66),
                 'TimeTo75Workers' : self.time_to_workers_created(75),
-                'AvgAPM' : self.avg_apm(),
+                #'AvgAPM' : self.avg_apm(),
                 'AvgSQ' : self.sq(),
                 'AvgSQPreMax' : self.avg_sq_pre_max(),
                 'AvgUnspent' : self.aur(),
@@ -320,12 +306,6 @@ class Sc2MetricAnalyzer(object):
 ##                units_created[uie.unit.name] += 1
 ##
 ##        return units_created
-##
-##
-##    def _isHallucinated(self, unit):
-##        ################ bug : for whatever reason hallucinated attribute does not return correctly, it seems flags == 0 indicates hallucination (but only applies for army ########################
-##        #return unit.hallucinated
-##        return not ((unit.is_army and unit.flags != 0) or unit.is_worker)
 
    
 ########## Testing ###########

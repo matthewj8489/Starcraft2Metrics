@@ -26,3 +26,9 @@ class ResourceCount(object):
         self.second = second
         self.res_col = res_col
         self.res_unspent = res_unspent
+
+    def to_dict(self):
+        return {"second": self.second,
+                "res_col": self.res_col,
+                "res_unspent": self.res_unspent
+                }

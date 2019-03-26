@@ -2,20 +2,21 @@ import sys
 import os
 import argparse
 import sc2reader
+import metrics
 from sc2metric import Sc2MetricAnalyzer
 import csv
 
-from plugins.supply import SupplyTracker
-from plugins.bases_created import BasesCreatedTracker
-from plugins.supply_created import SupplyCreatedTracker
-from plugins.resources import ResourceTracker
-from plugins.apm import APMTracker
-
-sc2reader.engine.register_plugin(SupplyTracker())
-sc2reader.engine.register_plugin(BasesCreatedTracker())
-sc2reader.engine.register_plugin(SupplyCreatedTracker())
-sc2reader.engine.register_plugin(ResourceTracker())
-sc2reader.engine.register_plugin(APMTracker())
+##from plugins.supply import SupplyTracker
+##from plugins.bases_created import BasesCreatedTracker
+##from plugins.supply_created import SupplyCreatedTracker
+##from plugins.resources import ResourceTracker
+##from plugins.apm import APMTracker
+##
+##sc2reader.engine.register_plugin(SupplyTracker())
+##sc2reader.engine.register_plugin(BasesCreatedTracker())
+##sc2reader.engine.register_plugin(SupplyCreatedTracker())
+##sc2reader.engine.register_plugin(ResourceTracker())
+##sc2reader.engine.register_plugin(APMTracker())
 
 #replays_directory = "C:\\Users\\matthew\\Documents\\StarCraft II\\Accounts\\62997088\\1-S2-1-440880\\Replays\\Multiplayer"
 #replays_directory = "C:\\Users\\matthew\\Documents\\Starcraft2Metrics\\test\\test_replays"

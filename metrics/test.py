@@ -11,6 +11,12 @@
 ##sc2reader.engine.register_plugin(ResourceTracker())
 ##sc2reader.engine.register_plugin(APMTracker())
 
+import sys
+if __name__ == '__main__':
+    sys.path.insert(0,"C:\\Users\\matthew\\Documents\\gitprojects\\Starcraft2Metrics\\")
+
+import sc2reader
+
 import metrics
 
 replay = sc2reader.load_replay("..\\test\\test_replays\\Year Zero LE (9).SC2Replay")

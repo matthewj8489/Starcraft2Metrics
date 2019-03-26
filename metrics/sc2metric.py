@@ -356,6 +356,22 @@ class Sc2MetricAnalyzer(object):
 ##
 ##        return units_created
 
+        def encode_json(self):
+            if isinstance(self, Sc2MetricAnalyzer):
+                return {'__Sc2MetricAnalyzer__': True,
+                        'army_created': self.army_created,
+                        'workers_created': self.workers_created,
+                        'supply_created': self.supply_created,
+                        'bases_created': self.bases_created,
+                        'current_food_used': self.current_food_used,
+                        'current_food_made': self.current_food_made,
+                        'resources': self.resources,
+                        'avg_apm': self.avg_apm
+                        }
+            else:
+                type_name = z.__class__.__name__
+                raise TypeError(f"Object of type '{type_name}' is not JSON serializable")
+
    
 ########## Testing ###########
 if __name__ == '__main__':

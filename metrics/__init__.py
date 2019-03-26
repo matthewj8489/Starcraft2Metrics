@@ -1,11 +1,11 @@
-import util
+__version__ = "0.1.0"
 
 import sc2reader
-from plugins.supply import SupplyTracker
-from plugins.bases_created import BasesCreatedTracker
-from plugins.supply_created import SupplyCreatedTracker
-from plugins.resources import ResourceTracker
-from plugins.apm import APMTracker
+
+import util
+
+from metrics import plugins
+
 
 sc2reader.engine.register_plugin(SupplyTracker())
 sc2reader.engine.register_plugin(BasesCreatedTracker())

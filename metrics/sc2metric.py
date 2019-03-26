@@ -2,7 +2,7 @@ import util
 import math
 
 
-import sc2reader
+##import sc2reader
 ##from sc2reader.engine.plugins import APMTracker
 ##from plugins.supply import SupplyTracker
 ##from plugins.workers_created import WorkersCreatedTracker
@@ -219,16 +219,42 @@ class Sc2MetricAnalyzer(object):
 
 
     def avg_rcr(self):
+        """
+        Calculates the average Resource Collection Rate (RCR) during the game.
+
+        Returns:
+            int: The average Resource Collection Rate (RCR)
+            
+        """
         return self._avg_rcr(self.resources)
 
 
     def avg_rcr_at_time(self, time_s):
+        """
+        Calculates the average Resource Collection Rate (RCR) up until the specified time.
+
+        Args:
+            time_s (int): The time in the replay to stop calculating average resource
+                collection rate.
+
+        Returns:
+            int: The average Resource Collection Rate (RCR) up until the specified time.
+            
+        """
         resources = list(filter(lambda res: res.second <= time_s, self.resources))
 
         return self._avg_rcr(resources)
 
 
     def avg_rcr_pre_max(self):
+        """
+        Calculates the average Resource Collection Rate (RCR) up until the player first
+        reaches max supply.
+
+        Returns:
+            int: The average Resource Collection Rate (RCR) up until the player first maxes.
+            
+        """
         max_s = self.first_max()
 
         if max_s >= 0:

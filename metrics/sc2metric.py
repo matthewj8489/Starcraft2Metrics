@@ -167,16 +167,41 @@ class Sc2MetricAnalyzer(object):
 
 
     def aur(self):
+        """
+        Calculates the Average Unspent Resources (AUR) during the game.
+
+        Returns:
+            int: The Average Unspent Resources (AUR)
+            
+        """
         return self._aur(self.resources)
 
 
     def aur_at_time(self, time_s):
+        """
+        Calculates the Average Unspent Resources (AUR) up until the specified time.
+
+        Args:
+            time_s (int): The time in the replay to stop calculating average unspent resources.
+
+        Returns:
+            int: The Average Unspent Resources (AUR) up until the specified time.
+            
+        """
         resources = list(filter(lambda res: res.second <= time_s, self.resources))
 
         return self._aur(resources)
 
 
     def aur_pre_max(self):
+        """
+        Calculates the Average Unspent Resources (AUR) up until the player first
+        reaches max supply.
+
+        Returns:
+            int: The Average Unspent Resources (AUR) up until the player first maxes.
+            
+        """
         max_s = self.first_max()
 
         if max_s >= 0:

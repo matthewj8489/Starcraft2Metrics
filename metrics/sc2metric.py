@@ -68,8 +68,7 @@ class Sc2MetricAnalyzer(object):
         self.current_food_used = []
         self.current_food_made = []
         self.resources = []
-        #self.apm = defaultdict(int)
-        #self.aps = defaultdict(int)
+        self.avg_apm = 0
         
 
     def metrics(self):
@@ -78,7 +77,7 @@ class Sc2MetricAnalyzer(object):
                 'TimeTo4Bases' : self.time_to_bases_created(4),
                 'TimeTo66Workers' : self.time_to_workers_created(66),
                 'TimeTo75Workers' : self.time_to_workers_created(75),
-                #'AvgAPM' : self.avg_apm(),
+                'AvgAPM' : self.avg_apm,
                 'AvgSQ' : self.sq(),
                 'AvgSQPreMax' : self.avg_sq_pre_max(),
                 'AvgUnspent' : self.aur(),

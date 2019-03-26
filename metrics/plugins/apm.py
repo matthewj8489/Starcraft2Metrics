@@ -14,29 +14,30 @@ class APMTracker(object):
     """
     name = 'APMTracker'
 
+    def __init__(self):
+        self._aps = {}
+        self._seconds_played = defaultdict(int)
+
     def handleInitGame(self, event, replay):
         for player in replay.players:
             player.metrics = Sc2MetricAnalyzer()
-            player.seconds_played = replay.length.seconds
+            self._aps[player.pid] = defaultdict(float)
 
     def handleControlGroupEvent(self, event, replay):
-        event.player.aps[event.second] += 1.4
-        event.player.apm[int(event.second/60)] += 1.4
+        self._aps[event.player.pid][event.second] += 1.4
 
     def handleSelectionEvent(self, event, replay):
-        event.player.aps[event.second] += 1.4
-        event.player.apm[int(event.second/60)] += 1.4
-
+        self._aps[event.player.pid][event.second] += 1.4
+        
     def handleCommandEvent(self, event, replay):
-        event.player.aps[event.second] += 1.4
-        event.player.apm[int(event.second/60)] += 1.4
+        self._aps[event.player.pid][event.second] += 1.4
 
     def handlePlayerLeaveEvent(self, event, replay):
-        event.player.seconds_played = event.second
+        self._seconds_played[event.player.pid] = event.second
 
     def handleEndGame(self, event, replay):
-        for human in replay.humans:
-            if len(human.apm.keys()) > 0:
-                human.avg_apm = sum(human.aps.values())/float(human.seconds_played)*60
+        for player in replay.players:
+            if len(self._aps[player.pid].keys()) > 0:
+                player.metrics.avg_apm = sum(self._aps[player.pid].values())/float(self._seconds_played[player.pid])*60
             else:
-                human.avg_apm = 0
+                player.metrics.avg_apm = 0

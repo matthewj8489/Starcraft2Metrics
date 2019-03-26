@@ -15,7 +15,7 @@ class SupplyCreatedTracker(object):
 
     def _add_to_supply(self,event,replay):
         self._supply_created[event.unit.owner.pid] += event.unit.supply
-        supp = SupplyCount(event.second,
+        supp = SupplyCount(util.convert_gametime_to_realtime_r(replay,event.second),
                            self._supply_created[event.unit.owner.pid],
                            event.unit.supply,
                            event.unit.is_worker)

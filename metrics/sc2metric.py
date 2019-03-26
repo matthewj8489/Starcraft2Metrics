@@ -78,7 +78,7 @@ class Sc2MetricAnalyzer(object):
                 'TimeTo66Workers' : self.time_to_workers_created(66),
                 'TimeTo75Workers' : self.time_to_workers_created(75),
                 'AvgAPM' : self.avg_apm,
-                'AvgSQ' : self.sq(),
+                'AvgSQ' : self.avg_sq(),
                 'AvgSQPreMax' : self.avg_sq_pre_max(),
                 'AvgUnspent' : self.aur(),
                 'AvgUnspentPreMax' : self.aur_pre_max(),

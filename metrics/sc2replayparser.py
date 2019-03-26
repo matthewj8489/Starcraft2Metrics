@@ -5,6 +5,18 @@ import sc2reader
 from sc2metric import Sc2MetricAnalyzer
 import csv
 
+from plugins.supply import SupplyTracker
+from plugins.bases_created import BasesCreatedTracker
+from plugins.supply_created import SupplyCreatedTracker
+from plugins.resources import ResourceTracker
+from plugins.apm import APMTracker
+
+sc2reader.engine.register_plugin(SupplyTracker())
+sc2reader.engine.register_plugin(BasesCreatedTracker())
+sc2reader.engine.register_plugin(SupplyCreatedTracker())
+sc2reader.engine.register_plugin(ResourceTracker())
+sc2reader.engine.register_plugin(APMTracker())
+
 #replays_directory = "C:\\Users\\matthew\\Documents\\StarCraft II\\Accounts\\62997088\\1-S2-1-440880\\Replays\\Multiplayer"
 #replays_directory = "C:\\Users\\matthew\\Documents\\Starcraft2Metrics\\test\\test_replays"
 #replays_directory = "C:\\Users\\matthew\\Documents\\gitprojects\\Starcraft2Metrics\\test\\test_replays"
@@ -85,8 +97,8 @@ def get_replay_metadata(rep_lvl2, player_id, args):
         return meta
 
 
-def get_replay_raw_metrics(rep_file, player_id, args):
-    return Sc2MetricAnalyzer(rep_file, player_id).metrics()
+def get_replay_raw_metrics(player_metrics):
+    return player_metrics.metrics()
 
 
 def write_raw_output(outfilepath, metric_data, write_mode):
@@ -232,7 +244,8 @@ if __name__ == '__main__':
             if (matches_filter(rep_lvl2, args)):
                 pid = get_player_id(rep_lvl2, args.player_name)
                 data = get_replay_metadata(rep_lvl2, pid, args)
-                data.update(get_replay_raw_metrics(rep_file, pid, args))
+                rep_all = sc2reader.load_replay(rep_file)
+                data.update(get_replay_raw_metrics(rep_all.player[pid].metrics))
                 raw_data.append(data)
 
 

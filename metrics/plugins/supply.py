@@ -3,6 +3,7 @@ import math
 
 from sc2metric import Sc2MetricAnalyzer
 from metric_containers import FoodCount
+from util import convert_gametime_to_realtime_r
 
         
 class SupplyTracker(object):
@@ -12,25 +13,29 @@ class SupplyTracker(object):
     def add_to_units_alive(self,event,replay):
         self.units_alive[event.control_pid] += event.unit.supply
         replay.player[event.control_pid].metrics.current_food_used.append(
-            FoodCount(event.second, self.units_alive[event.control_pid]))
+            FoodCount(convert_gametime_to_realtime_r(replay, event.second),
+                      self.units_alive[event.control_pid]))
 
 
     def add_to_supply_gen(self,event,replay):
         self.supply_gen[event.unit.owner.pid] += self.supply_gen_unit[event.unit.name] #math.fabs(event.unit.supply)
         replay.player[event.unit.owner.pid].metrics.current_food_made.append(
-            FoodCount(event.second, self.supply_gen[event.unit.owner.pid]))
+            FoodCount(convert_gametime_to_realtime_r(replay, event.second),
+                      self.supply_gen[event.unit.owner.pid]))
         
 
     def remove_from_units_alive(self,event,replay):
         self.units_alive[event.unit.owner.pid] -= event.unit.supply
         replay.player[event.unit.owner.pid].metrics.current_food_used.append(
-            FoodCount(event.second, self.units_alive[event.unit.owner.pid]))
+            FoodCount(convert_gametime_to_realtime_r(replay, event.second),
+                      self.units_alive[event.unit.owner.pid]))
         
 
     def remove_from_supply_gen(self,event,replay):
         self.supply_gen[event.unit.owner.pid] -= self.supply_gen_unit[event.unit.name] #math.fabs(event.unit.supply)
         replay.player[event.unit.owner.pid].metrics.current_food_made.append(
-            FoodCount(event.second, self.supply_gen[event.unit.owner.pid]))
+            FoodCount(convert_gametime_to_realtime_r(replay, event.second),
+                      self.supply_gen[event.unit.owner.pid]))
         
 
     def handleInitGame(self, event, replay):

@@ -1,6 +1,6 @@
 from sc2metric import Sc2MetricAnalyzer
 from metric_containers import ResourceCount
-
+from util import convert_gametime_to_realtime_r
 
 class ResourceTracker(object):
 
@@ -13,7 +13,7 @@ class ResourceTracker(object):
 
     def handlePlayerStatsEvent(self,event,replay):
         replay.player[event.pid].metrics.resources.append(
-            ResourceCount(event.second,
+            ResourceCount(convert_gametime_to_realtime_r(replay,event.second),
                           (event.minerals_collection_rate + event.vespene_collection_rate),
                           (event.minerals_current + event.vespene_current)))
         

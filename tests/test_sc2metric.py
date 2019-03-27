@@ -39,14 +39,14 @@ class TestMetrics(unittest.TestCase):
             self.assertNotEqual(p1_met.avg_apm, 0)
             
 
-##    def test_time_to_max(self):
-##        replay = sc2reader.load_replay("")
-##        p1_met = replay.player[1].metrics
-##        
-##        self.assertEqual(p1_met.time_to_supply_created(198), ?)
-##        self.assertEqual(p1_met.time_to_supply_created_max_workers(198, 75), ?)
-##        
-##
+    def test_time_to_max(self):
+        replay = sc2reader.load_replay("test_replays\\standard_1v1.SC2Replay")
+        p1_met = replay.player[1].metrics
+        
+        self.assertEqual(p1_met.time_to_supply_created(200), 618)
+        self.assertEqual(p1_met.time_to_supply_created_max_workers(200, 75), 618)
+        
+
 ##    def test_time_to_bases(self):
 ##        replay = sc2reader.load_replay("")
 ##        p1_met = replay.player[1].metrics

@@ -3,8 +3,6 @@ __version__ = "0.1.0"
 
 import sc2reader
 
-import util
-
 from metrics import plugins
 
 

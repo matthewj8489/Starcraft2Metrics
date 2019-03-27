@@ -1,5 +1,6 @@
-import util
 import math
+
+import metrics.util
 
 
 class Sc2MetricAnalyzer(object):

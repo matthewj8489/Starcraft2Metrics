@@ -2,64 +2,64 @@ import util
 import math
 
 
-##import sc2reader
-##from sc2reader.engine.plugins import APMTracker
-##from plugins.supply import SupplyTracker
-##from plugins.workers_created import WorkersCreatedTracker
-##from plugins.army_created import ArmyCreatedTracker
-##from plugins.bases_created import BasesCreatedTracker
-##
-##sc2reader.engine.register_plugin(APMTracker())
-##sc2reader.engine.register_plugin(SupplyTracker())
-##sc2reader.engine.register_plugin(WorkersCreatedTracker())
-##sc2reader.engine.register_plugin(ArmyCreatedTracker())
-##sc2reader.engine.register_plugin(BasesCreatedTracker())
-
-
 class Sc2MetricAnalyzer(object):
-    '''
-    Find benchmark metrics for the given replay file at the given real time.
-    (Benchmarks include 'Total Supply Created', 'Workers Created', 'Army Created')
+    """A class that derives useful metrics from replay files
 
-    Keyword arguments:
-    replay_file -- the location of the replay to parse.
-    player_id -- the id number of the player to monitor in the replay
-    benchmark_time_s -- the real time of when to take the benchmark measurement
+    This class is an extension to the :mod:'sc2reader'. It is meant to be used
+    to offer useful metric data to each player in a Starcraft II replay. The
+    class contains raw data gathered from each replay to derive its metrics.
+    The raw data is filled from the :mod:'plugins' associated with this package.
 
-    Output:
-    Dictionary containing the following keys:
-    'TotalSupply' : Total supply created by the player. (This is NOT current supply at given time)
-    'Workers' : Total number of workers created by the player.
-    'Army' : Total army supply created by the player.
-    'Upgrades' : Total count of upgrades. (+1/2/3 weapons, psionic storm, charge, etc.)
-    'TimeTo66Workers' : Time at which the user created 66 workers (3-base saturation).
-    'TimeTo75Workers' : Time at which the user created 75 workers.
-    'TimeTo3Bases' : Time at which the 3 bases are finished.
-    'TimeTo4Bases' : Time at which the 4 bases are finished.
-    'TimeToMax' : Time at which the total supply created is 199 or above (stops counting workers above 75)
-    'SupplyBlocked' : Time spent supply blocked.
-    'SupplyCreateRate' : Average rate at which supply buildings are created until 200 supply
-    'AvgAPM' : Average APM
-    'AvgEPM' : Average EPM
-    'AvgSPM' : Average SPM
-    'AvgMacroCycleTime : Average time spent issuing macro commands (vs army commands) (or maybe the avg time between giving a worker a command and issuing another command not to the worker)
-    'AvgHarassDeflection' : A score that rates the player's ability to deflect and minimize damage incurred from harassment attacks. (works off of minerals/probes/tech/mining time lost?)
-    'IdleBaseTime66' : Total time town halls are idle (not making workers) before 66 workers
-    'IdleBaseTime75' : Total time town halls are idle (not making workers) before 75 workers
-    'AvgSQ' : Spending Quotient. SQ(i,u)=35(0.00137i-ln(u))+240, where i=resource collection rate, u=average unspent resources
-    'AvgSQPreMax' : Spending Quotient before maxed out.
-    'AvgUnspent' : Average unspent resources during the game.
-    'AvgUnspentPreMax' : Average unspent resources before maxed out.
-    'AvgColRate' : Average resource collection rate during the game.
-    'AvgColRatePreMax' : Average resource collection rate before maxed out.
-    'Units' : Dictionary of all the units created, keyed by the units' names.
-    'PPM' : average(mean) PAC per minute
-    'PAL' : PAC action latency. e.g.: how long it takes you to take your first action after each fixation shift. (mean average)
-    'APP' : Actions per PAC. The average(mean) number of actions you take each PAC
-    'GAP' : How long it takes you, after finishing your actions in one PAC to establish a new fixaction. (mean average)
-    '''   
+    Metrics:
+    ========
+    **_Todo_**
+    - **_'TotalSupply' : Total supply created by the player.
+        (This is NOT current supply at given time)_**
+    - **_'Workers' : Total number of workers created by the player._**
+    - **_'Army' : Total army supply created by the player._**
+    - **_'Upgrades' : Total count of upgrades. (+1/2/3 weapons, psionic storm,
+        charge, etc.)_**
+    - 'TimeTo66Workers' : Time at which the user created 66 workers
+        (3-base saturation).
+    - 'TimeTo75Workers' : Time at which the user created 75 workers.
+    - 'TimeTo3Bases' : Time at which the 3 bases are finished.
+    - 'TimeTo4Bases' : Time at which the 4 bases are finished.
+    - 'TimeToMax' : Time at which the total supply created is 199 or above
+        (stops counting workers above 75)
+    - 'SupplyCapped' : Time spent supply blocked.
+    - **_'SupplyCreateRate' : Average rate at which supply buildings are
+        created until 200 supply_**
+    - 'AvgAPM' : Average APM
+    - **_'AvgEPM' : Average EPM_**
+    - **_'AvgSPM' : Average SPM_**
+    - **_'AvgMacroCycleTime : Average time spent issuing macro commands
+        (vs army commands) (or maybe the avg time between giving a worker a
+        command and issuing another command not to the worker)_**
+    - **_'AvgHarassDeflection' : A score that rates the player's ability
+        to deflect and minimize damage incurred from harassment attacks.
+        (works off of minerals/probes/tech/mining time lost?)_**
+    - **_'IdleBaseTime66' : Total time town halls are idle (not making workers) before 66 workers_**
+    - **_'IdleBaseTime75' : Total time town halls are idle (not making workers) before 75 workers_**
+    - 'AvgSQ' : Spending Quotient. SQ(i,u)=35(0.00137i-ln(u))+240,
+        where i=resource collection rate, u=average unspent resources
+    - 'AvgSQPreMax' : Spending Quotient before maxed out.
+    - 'AvgUnspent' : Average unspent resources during the game.
+    - 'AvgUnspentPreMax' : Average unspent resources before maxed out.
+    - 'AvgColRate' : Average resource collection rate during the game.
+    - 'AvgColRatePreMax' : Average resource collection rate before maxed out.
+    - **_'Units' : Dictionary of all the units created, keyed by the units'
+        names._**
+    - **_'PPM' : average(mean) PAC per minute_**
+    - **_'PAL' : PAC action latency. e.g.: how long it takes you to take your
+        first action after each fixation shift. (mean average)_**
+    - **_'APP' : Actions per PAC. The average(mean) number of actions you
+        take each PAC_**
+    - **_'GAP' : How long it takes you, after finishing your actions in
+        one PAC to establish a new fixaction. (mean average)_**
+    
+    """
 
-
+    
     def __init__(self):
         self.army_created = []
         self.workers_created = []
@@ -88,12 +88,9 @@ class Sc2MetricAnalyzer(object):
                }             
         
 
-##    def avg_apm(self):
-##        return self._replay.player[self._player_id].avg_apm / util.gametime_to_realtime_constant_r(self._replay)
-
-
     def first_max(self):
-        return next((fd.second for fd in self.current_food_used if fd.supply >= 200), -1)
+        return next((fd.second for fd in self.current_food_used
+                     if fd.supply >= 200), -1)
 
 
     def _sq(self, resources):
@@ -106,14 +103,16 @@ class Sc2MetricAnalyzer(object):
         avg_col_rate = sum_res_col_rate / len(resources)
         avg_unspent = sum_unspent_res / len(resources)
 
-        # SQ(i,u)=35(0.00137i-ln(u))+240, where i=resource collection rate, u=average unspent resources
+        # SQ(i,u)=35(0.00137i-ln(u))+240, where i=resource collection rate,
+        #   u=average unspent resources
         sq = 35 * (0.00137 * avg_col_rate - math.log(avg_unspent)) + 240
                 
         return sq
 
 
     def avg_sq(self):
-        """
+        """Average Spending Quotient
+
         Calculates the average Spending Quotient (SQ).
 
         Returns:
@@ -124,28 +123,34 @@ class Sc2MetricAnalyzer(object):
 
 
     def avg_sq_at_time(self, time_s):
-        """
-        Calculates the average Spending Quotient (SQ) up until the specified time.
+        """Average Spending Quotient up to a specified time
+
+        Calculates the average Spending Quotient (SQ) up until the specified
+        time.
 
         Args:
-            time_s (int): The time in the replay to stop calculating spending quotient.
+            time_s (int): The time in the replay to stop calculating spending
+                quotient.
 
         Returns:
             int: The average Spending Quotient (SQ) up until the specified time.
             
         """
-        resources = list(filter(lambda res: res.second <= time_s, self.resources))
+        resources = list(filter(lambda res: res.second <= time_s,
+                                self.resources))
 
         return self._sq(resources)
 
 
     def avg_sq_pre_max(self):
-        """
+        """Average Spending Quotient before max supply
+
         Calculates the average Spending Quotient (SQ) up until the player first
         reaches max supply.
 
         Returns:
-            int: The average Spending Quotient (SQ) up until the player first maxes.
+            int: The average Spending Quotient (SQ) up until the player first
+                maxes.
             
         """
         max_s = self.first_max()
@@ -166,7 +171,8 @@ class Sc2MetricAnalyzer(object):
 
 
     def aur(self):
-        """
+        """Average Unspent Resources
+
         Calculates the Average Unspent Resources (AUR) during the game.
 
         Returns:
@@ -177,28 +183,35 @@ class Sc2MetricAnalyzer(object):
 
 
     def aur_at_time(self, time_s):
-        """
-        Calculates the Average Unspent Resources (AUR) up until the specified time.
+        """Averague Unspent Resources up to a specified time
+
+        Calculates the Average Unspent Resources (AUR) up until the specified
+        time.
 
         Args:
-            time_s (int): The time in the replay to stop calculating average unspent resources.
+            time_s (int): The time in the replay to stop calculating average
+                unspent resources.
 
         Returns:
-            int: The Average Unspent Resources (AUR) up until the specified time.
+            int: The Average Unspent Resources (AUR) up until the specified
+                time.
             
         """
-        resources = list(filter(lambda res: res.second <= time_s, self.resources))
+        resources = list(filter(lambda res: res.second <= time_s,
+                                self.resources))
 
         return self._aur(resources)
 
 
     def aur_pre_max(self):
-        """
+        """Average Unspent Resources before max supply
+
         Calculates the Average Unspent Resources (AUR) up until the player first
         reaches max supply.
 
         Returns:
-            int: The Average Unspent Resources (AUR) up until the player first maxes.
+            int: The Average Unspent Resources (AUR) up until the player first
+                maxes.
             
         """
         max_s = self.first_max()
@@ -219,7 +232,8 @@ class Sc2MetricAnalyzer(object):
 
 
     def avg_rcr(self):
-        """
+        """Average Resource Collection Rate
+
         Calculates the average Resource Collection Rate (RCR) during the game.
 
         Returns:
@@ -230,29 +244,35 @@ class Sc2MetricAnalyzer(object):
 
 
     def avg_rcr_at_time(self, time_s):
-        """
-        Calculates the average Resource Collection Rate (RCR) up until the specified time.
+        """Average Resource Collection Rate up to a specified time
+
+        Calculates the average Resource Collection Rate (RCR) up until the
+        specified time.
 
         Args:
-            time_s (int): The time in the replay to stop calculating average resource
-                collection rate.
+            time_s (int): The time in the replay to stop calculating average
+                resource collection rate.
 
         Returns:
-            int: The average Resource Collection Rate (RCR) up until the specified time.
+            int: The average Resource Collection Rate (RCR) up until the
+                specified time.
             
         """
-        resources = list(filter(lambda res: res.second <= time_s, self.resources))
+        resources = list(filter(lambda res: res.second <= time_s,
+                                self.resources))
 
         return self._avg_rcr(resources)
 
 
     def avg_rcr_pre_max(self):
-        """
-        Calculates the average Resource Collection Rate (RCR) up until the player first
-        reaches max supply.
+        """Average Resource Collection Rate before max supply
+
+        Calculates the average Resource Collection Rate (RCR) up until the
+        player first reaches max supply.
 
         Returns:
-            int: The average Resource Collection Rate (RCR) up until the player first maxes.
+            int: The average Resource Collection Rate (RCR) up until the player
+                first maxes.
             
         """
         max_s = self.first_max()
@@ -264,9 +284,11 @@ class Sc2MetricAnalyzer(object):
             
 
     def supply_capped(self):
-        """
+        """Time spent supply capped
+
         Determines the amount of time the player was supply capped this game.
-        Supply capped is acknowledged when supply of units = supply created when supply created < 200.
+        Supply capped is acknowledged when supply of units = supply created
+        when supply created < 200.
 
         Returns:
             int: The amount of time spent supply capped.
@@ -278,14 +300,16 @@ class Sc2MetricAnalyzer(object):
         sc = 0
         for used in fd_used:
             made = list(filter(lambda md: md.second <= used.second, fd_made))
-            if used.supply == made[len(made)-1].supply and made[len(made)-1].supply < 200:
+            if (used.supply == made[len(made)-1].supply
+                and made[len(made)-1].supply < 200):
                 sc += (used.second - made[len(made)-1].second)
 
         return sc
             
 
     def workers_created_at_time(self, time_s):
-        """
+        """Number of workers created up to the specified time
+
         Determines the total number of workers created at the specified time.
         This function is accumulative and does not handle workers lost.
 
@@ -298,7 +322,8 @@ class Sc2MetricAnalyzer(object):
         """
         workers = 0
         idx = 0
-        while len(self.workers_created) > idx and self.workers_created[idx].second < time_s:
+        while (len(self.workers_created) > idx
+               and self.workers_created[idx].second < time_s):
             workers += 1
             idx += 1
 
@@ -306,29 +331,34 @@ class Sc2MetricAnalyzer(object):
 
 
     def army_created_at_time(self, game_time_s):
-        """
+        """The army supply created up to a specified time
+
         Calculate the total army supply created at the specified time.
 
         Args:
-            game_time_s (int): The time (in seconds) of the replay to count army supply.
+            game_time_s (int): The time (in seconds) of the replay to count army
+                supply.
 
         Returns:
             int: The amount of army supply created in the given time.
             
         """
         idx = 0
-        while len(self.army_created) > idx and self.army_created[idx].second <= game_time_s:
+        while (len(self.army_created) > idx
+               and self.army_created[idx].second <= game_time_s):
             idx += 1
 
         return self.army_created[idx-1].supply
 
 
     def supply_created_at_time(self, real_time_s):
-        """
+        """The total supply created up to a specified time
+
         Calculate the total supply created at the specified time.
 
         Args:
-            real_time_s (int): The time (in seconds) of the replay to count supply.
+            real_time_s (int): The time (in seconds) of the replay to count
+                supply.
 
         Returns:
             int: The amount of supply created in the given time.
@@ -342,9 +372,10 @@ class Sc2MetricAnalyzer(object):
 
 
     def time_to_workers_created(self, worker_count):
-        """
+        """The time at which the number of workers had been created
+
         Finds the time that the specified number of workers have been created.
-        This does not account for loss of workers, it is cumulative.
+        This does not account for loss of workers.
 
         Args:
             worker_count (int): The number of workers to find the time created.
@@ -360,7 +391,20 @@ class Sc2MetricAnalyzer(object):
 
 
     def time_to_supply_created(self, supply_count):
-        supp = list(filter(lambda sp: sp.supply <= supply_count, self.supply_created))
+        """The time at which the specified supply had been created
+
+        Finds the time when the specified supply was created. This does not
+        take into account supply lost.
+        
+        Args:
+            supply_count (int): The supply desired.
+
+        Returns:
+            int: The time when the supply was created in the replay.
+            
+        """
+        supp = list(filter(lambda sp: sp.supply <= supply_count,
+                           self.supply_created))
 
         if len(supp) > 0:
             return supp[len(supp)-1].second
@@ -368,7 +412,23 @@ class Sc2MetricAnalyzer(object):
             return None
         
 
-    def time_to_supply_created_max_workers(self, supply_count, max_workers_counted):
+    def time_to_supply_created_max_workers(self, supply_count,
+                                           max_workers_counted):
+        """The time at which the specified supply had been created
+
+        Finds the time when the specified supply was reached, but only counts a specified
+        number of workers towards that supply created count. This does not take into
+        account supply lost.
+
+        Args:
+            supply_count (int): The supply desired.
+            max_workers_counted (int): The maximum number of workers to count
+                towards the supply created.
+
+        Returns:
+            int: The time when the supply was created in the replay.
+            
+        """
         supp = 0
         workers = 0
         for sc in self.supply_created:
@@ -383,6 +443,18 @@ class Sc2MetricAnalyzer(object):
 
 
     def time_to_bases_created(self, base_count):
+        """The time at which the number of bases had been created
+
+        Finds the time when the specified number of bases has been reached.
+        This does not take into account any bases lost.
+
+        Args:
+            base_count (int): The number of bases desired.
+
+        Returns:
+            int: The time when the number of bases had been created.
+            
+        """
         if base_count <= len(self.bases_created):
             return self.bases_created[base_count-1].second
         else:
@@ -441,4 +513,5 @@ class Sc2MetricAnalyzer(object):
 ########## Testing ###########
 if __name__ == '__main__':
 
-    ma = Sc2MetricAnalyzer("..\\test\\test_replays\\Year Zero LE (9).SC2Replay", 1)
+    ma = Sc2MetricAnalyzer("..\\test\\test_replays\\Year Zero LE (9).SC2Replay",
+                           1)

@@ -1,10 +1,15 @@
 import sys
 import os
 import argparse
-import sc2reader
-import metrics
-from sc2metric import Sc2MetricAnalyzer
 import csv
+
+import sys
+if __name__ == '__main__':
+    sys.path.insert(0,"..\\")
+import metrics
+
+import sc2reader
+from sc2metric import Sc2MetricAnalyzer
 
 ##from plugins.supply import SupplyTracker
 ##from plugins.bases_created import BasesCreatedTracker

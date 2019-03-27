@@ -1,9 +1,9 @@
 from collections import defaultdict
 import math
 
-from sc2metric import Sc2MetricAnalyzer
-from metric_containers import FoodCount
-from util import convert_gametime_to_realtime_r
+from metrics.sc2metric import Sc2MetricAnalyzer
+from metrics.metric_containers import FoodCount
+from metrics.util import convert_gametime_to_realtime_r
 
         
 class SupplyTracker(object):

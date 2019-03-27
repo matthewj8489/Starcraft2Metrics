@@ -1,6 +1,6 @@
-from sc2metric import Sc2MetricAnalyzer
-from metric_containers import BaseCount
-from util import convert_gametime_to_realtime_r
+from metrics.sc2metric import Sc2MetricAnalyzer
+from metrics.metric_containers import BaseCount
+from metrics.util import convert_gametime_to_realtime_r
 
 class BasesCreatedTracker(object):
 

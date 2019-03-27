@@ -1,5 +1,5 @@
-from sc2metric import Sc2MetricAnalyzer
-from metric_containers import SupplyCount
+from metrics.sc2metric import Sc2MetricAnalyzer
+from metrics.metric_containers import SupplyCount
 
 
 class WorkersCreatedTracker(object):

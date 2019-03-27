@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from sc2metric import Sc2MetricAnalyzer
+from metrics.sc2metric import Sc2MetricAnalyzer
 
 
 class APMTracker(object):

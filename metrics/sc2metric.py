@@ -306,6 +306,16 @@ class Sc2MetricAnalyzer(object):
 
 
     def army_created_at_time(self, game_time_s):
+        """
+        Calculate the total army supply created at the specified time.
+
+        Args:
+            game_time_s (int): The time (in seconds) of the replay to count army supply.
+
+        Returns:
+            int: The amount of army supply created in the given time.
+            
+        """
         idx = 0
         while len(self.army_created) > idx and self.army_created[idx].second <= game_time_s:
             idx += 1
@@ -314,6 +324,16 @@ class Sc2MetricAnalyzer(object):
 
 
     def supply_created_at_time(self, real_time_s):
+        """
+        Calculate the total supply created at the specified time.
+
+        Args:
+            real_time_s (int): The time (in seconds) of the replay to count supply.
+
+        Returns:
+            int: The amount of supply created in the given time.
+            
+        """
         supply = 0
         supply += self.workers_created(real_time_s)
         supply += self.army_created(real_time_s)
@@ -322,6 +342,17 @@ class Sc2MetricAnalyzer(object):
 
 
     def time_to_workers_created(self, worker_count):
+        """
+        Finds the time that the specified number of workers have been created.
+        This does not account for loss of workers, it is cumulative.
+
+        Args:
+            worker_count (int): The number of workers to find the time created.
+
+        Returns:
+            int: The time at which the total number of workers were created.
+            
+        """
         if worker_count <= len(self.workers_created):
             return self.workers_created[worker_count-1].second
         else:

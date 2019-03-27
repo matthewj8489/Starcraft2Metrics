@@ -13,7 +13,7 @@
 
 import sys
 if __name__ == '__main__':
-    sys.path.insert(0,"C:\\Users\\matthew\\Documents\\gitprojects\\Starcraft2Metrics\\")
+    sys.path.insert(0,"..\\")
 
 import sc2reader
 

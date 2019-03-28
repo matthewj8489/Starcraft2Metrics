@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from metrics.sc2metric import Sc2MetricAnalyzer
 from metrics.metric_containers import SupplyCount
-import metrics.util
+from metrics import util
 
 class SupplyCreatedTracker(object):
 

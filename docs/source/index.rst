@@ -6,6 +6,30 @@
 Welcome to Starcraft2Metrics's documentation!
 =============================================
 
+Starcraft2Metrics offers metrics calculated from replay files using the **sc2reader** parser.
+
+The end goal of Starcraft2Metrics is to offer the user a visualization of the trend of 
+each metric that is calculated in order for the user to see if there has been improvement 
+over a period of time. This information can be used to locate weak points in a player's
+skill and improve that area.
+
+
+Articles
+========
+Articles related to Starcraft2Metrics or the libraries it references.
+
+* :doc:'articles/A tutorial on sc2reader'
+
+Sc2Reader
+=========
+
+Sc2Reader is a Starcraft II Replay parser that is hosted publicly on Github ['source'_].
+
+.. _source: http://github.com/GralinKim/sc2reader
+
+Reference Pages
+===============
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:

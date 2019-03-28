@@ -27,9 +27,9 @@ copyright = '2019, Matthew Johnson'
 author = 'Matthew Johnson'
 
 # The short X.Y version
-version = ''
+version = metrics.__version__
 # The full version, including alpha/beta/rc tags
-release = '0.1.0'
+release = metrics.__version__
 
 
 # -- General configuration ---------------------------------------------------

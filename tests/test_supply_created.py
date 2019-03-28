@@ -83,6 +83,45 @@ class TestSupplyCreatedTracked(unittest.TestCase):
         
         self.assertNotEqual(len(replay.player[1].metrics.supply_created), 0)
         self.assertNotEqual(len(replay.player[1].metrics.workers_created), 0)
+
+
+    def test_supply_created_tracker(self):
+        #:TODO
+        rep = sc2reader.load_replay("test_replays\\standard_1v1.SC2Replay")
+        sup = rep.player[1].metrics.supply_created
+        wor = rep.player[1].metrics.workers_created
+        arm = rep.player[1].metrics.army_created
+
+        # check that the correct supply counts were counted
+        self.assertEqual(len(sup), 120)
+        self.assertEqual(len(wor), 75)
+        self.assertEqual(len(arm), 45)
+
+        # check that individual units data is correct
+        self.assertEqual(wor[0].unit_supply, 1)
+        self.assertEqual(wor[0].supply, 1)
+        self.assertEqual(wor[0].second, 0)
+        self.assertTrue(wor[0].is_worker)
+        self.assertEqual(wor[25].unit_supply, 1)
+        self.assertEqual(wor[50].unit_supply, 1)
+        self.assertEqual(wor[74].unit_supply, 1)
+
+        self.assertEqual(arm[0].unit_supply, 2)
+        self.assertEqual(arm[0].supply, 40)
+        self.assertEqual(arm[0].second, 300)
+        self.assertFalse(arm[0].is_worker)
+
+        self.assertEqual(sup[0].unit_supply, 1)
+        self.assertEqual(sup[0].supply, 1)
+        self.assertEqual(sup[0].second, 0)
+        self.assertTrue(sup[0].is_worker)
+        
+        
+
+
+        
+
+        
         
 
 if __name__ == '__main__':

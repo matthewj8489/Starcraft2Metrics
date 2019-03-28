@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<!-- saved from url=(0110)https://miguelgondu.github.io/python/ai/video%20games/2018/09/04/a-tutorial-on-sc2reader-events-and-units.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>A tutorial on sc2reader: events and units | MGD’s blog</title>
+<meta name="generator" content="Jekyll v3.7.4">
+<meta property="og:title" content="A tutorial on sc2reader: events and units">
+<meta property="og:locale" content="en_US">
+<meta name="description" content="I want to construct a database for macro learning in StarCraft 2. One way to study replays and mine information from them is using pysc2, an API developed by DeepMind that is specially designed for Reinforced Learning. Nahren and Justesen developed a tool for mining replays using this API, but unfortunately the DeepMind’s API can only play replays that match the binary version of the game, and StarCraft 2 is being patched regularly, thus many “old” replays render unparsable. The other way to do it is using sc2reader, an API developed by 26 contributors including David Joerg, Graylin Kim and Kevin Leung.">
+<meta property="og:description" content="I want to construct a database for macro learning in StarCraft 2. One way to study replays and mine information from them is using pysc2, an API developed by DeepMind that is specially designed for Reinforced Learning. Nahren and Justesen developed a tool for mining replays using this API, but unfortunately the DeepMind’s API can only play replays that match the binary version of the game, and StarCraft 2 is being patched regularly, thus many “old” replays render unparsable. The other way to do it is using sc2reader, an API developed by 26 contributors including David Joerg, Graylin Kim and Kevin Leung.">
+<link rel="canonical" href="https://miguelgondu.github.io/python/ai/video%20games/2018/09/04/a-tutorial-on-sc2reader-events-and-units.html">
+<meta property="og:url" content="/python/ai/video%20games/2018/09/04/a-tutorial-on-sc2reader-events-and-units.html">
+<meta property="og:site_name" content="MGD’s blog">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2018-09-04T00:00:00+00:00">
+<script type="application/ld+json">
+{"mainEntityOfPage":{"@type":"WebPage","@id":"/python/ai/video%20games/2018/09/04/a-tutorial-on-sc2reader-events-and-units.html"},"@type":"BlogPosting","url":"/python/ai/video%20games/2018/09/04/a-tutorial-on-sc2reader-events-and-units.html","headline":"A tutorial on sc2reader: events and units","dateModified":"2018-09-04T00:00:00+00:00","datePublished":"2018-09-04T00:00:00+00:00","description":"I want to construct a database for macro learning in StarCraft 2. One way to study replays and mine information from them is using pysc2, an API developed by DeepMind that is specially designed for Reinforced Learning. Nahren and Justesen developed a tool for mining replays using this API, but unfortunately the DeepMind’s API can only play replays that match the binary version of the game, and StarCraft 2 is being patched regularly, thus many “old” replays render unparsable. The other way to do it is using sc2reader, an API developed by 26 contributors including David Joerg, Graylin Kim and Kevin Leung.","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="./A tutorial on sc2reader_files/main.css"><link type="application/atom+xml" rel="alternate" href="https://miguelgondu.github.io/feed.xml" title="MGD&#39;s blog"><style id="dark-reader-style" type="text/css">@media screen {
+
+/* Leading rule */
+html {
+  -webkit-filter: invert(100%) hue-rotate(180deg) brightness(110%) contrast(90%) grayscale(20%) sepia(10%) !important;
+  filter: invert(100%) hue-rotate(180deg) brightness(110%) contrast(90%) grayscale(20%) sepia(10%) !important;
+}
+
+/* Reverse rule */
+img,
+video,
+:not(object):not(body)>embed,
+object,
+svg image,
+[style*="background:url"],
+[style*="background-image:url"],
+[style*="background: url"],
+[style*="background-image: url"],
+[background],
+twitterwidget {
+  -webkit-filter: invert(100%) hue-rotate(180deg) !important;
+  filter: invert(100%) hue-rotate(180deg) !important;
+}
+[style*="background:url"] *,
+[style*="background-image:url"] *,
+[style*="background: url"] *,
+[style*="background-image: url"] *,
+input,
+[background] *,
+img[src^="https://s0.wp.com/latex.php"],
+twitterwidget .NaturalImage-image {
+  -webkit-filter: none !important;
+  filter: none !important;
+}
+.compatibility-with-darkreader-below-4-3-3 {
+  background: white !important;
+}
+
+/* Text contrast */
+html {
+  text-shadow: 0 0 0 !important;
+}
+
+/* Full screen */
+:-webkit-full-screen, :-webkit-full-screen * {
+  -webkit-filter: none !important;
+  filter: none !important;
+}
+:-moz-full-screen, :-moz-full-screen * {
+  -webkit-filter: none !important;
+  filter: none !important;
+}
+:fullscreen, :fullscreen * {
+  -webkit-filter: none !important;
+  filter: none !important;
+}
+
+/* Page background */
+html {
+  background: rgb(13,13,12) !important;
+}
+
+/* Custom rules */
+.compatibility-with-darkreader-below-4-3-3 {
+    background: white !important;
+}
+
+}</style><style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Menu_Button .MathJax_Hover_Arrow {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; -khtml-border-radius: 4px; font-family: 'Courier New',Courier; font-size: 9px; color: #F0F0F0}
+.MathJax_Menu_Button .MathJax_Hover_Arrow span {display: block; background-color: #AAA; border: 1px solid; border-radius: 3px; line-height: 0; padding: 4px}
+.MathJax_Hover_Arrow:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_Hover_Arrow:hover span {background-color: #CCC!important}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_About.MathJax_MousePost {outline: none}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; padding-top: .25em; color: #666666; font-size: .75em}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_MenuDisabled:focus, .MathJax_MenuLabel:focus {background-color: #E8E8E8}
+.MathJax_ContextMenu:focus {outline: none}
+.MathJax_ContextMenu .MathJax_MenuItem:focus {outline: none}
+#MathJax_AboutClose {top: .2em; right: .2em}
+.MathJax_Menu .MathJax_MenuClose {top: -10px; left: -10px}
+.MathJax_MenuClose {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; font-family: 'Courier New',Courier; font-size: 24px; color: #F0F0F0}
+.MathJax_MenuClose span {display: block; background-color: #AAA; border: 1.5px solid; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; line-height: 0; padding: 8px 0 6px}
+.MathJax_MenuClose:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_MenuClose:hover span {background-color: #CCC!important}
+.MathJax_MenuClose:hover:focus {outline: none}
+</style><style type="text/css">.MathJax_Preview .MJXf-math {color: inherit!important}
+</style><style type="text/css">.MJX_Assistive_MathML {position: absolute!important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0!important; border: 0!important; height: 1px!important; width: 1px!important; overflow: hidden!important; display: block!important; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none}
+.MJX_Assistive_MathML.MJX_Assistive_MathML_Block {width: 100%!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; -webkit-box-sizing: content-box; -moz-box-sizing: content-box; box-sizing: content-box; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXp-script {font-size: .8em}
+.MJXp-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXp-bold {font-weight: bold}
+.MJXp-italic {font-style: italic}
+.MJXp-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-largeop {font-size: 150%}
+.MJXp-largeop.MJXp-int {vertical-align: -.2em}
+.MJXp-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXp-display {display: block; text-align: center; margin: 1em 0}
+.MJXp-math span {display: inline-block}
+.MJXp-box {display: block!important; text-align: center}
+.MJXp-box:after {content: " "}
+.MJXp-rule {display: block!important; margin-top: .1em}
+.MJXp-char {display: block!important}
+.MJXp-mo {margin: 0 .15em}
+.MJXp-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXp-denom {display: inline-table!important; width: 100%}
+.MJXp-denom > * {display: table-row!important}
+.MJXp-surd {vertical-align: top}
+.MJXp-surd > * {display: block!important}
+.MJXp-script-box > *  {display: table!important; height: 50%}
+.MJXp-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXp-script-box > *:last-child > * {vertical-align: bottom}
+.MJXp-script-box > * > * > * {display: block!important}
+.MJXp-mphantom {visibility: hidden}
+.MJXp-munderover {display: inline-table!important}
+.MJXp-over {display: inline-block!important; text-align: center}
+.MJXp-over > * {display: block!important}
+.MJXp-munderover > * {display: table-row!important}
+.MJXp-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXp-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXp-mtr {display: table-row!important}
+.MJXp-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXp-mtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-mlabeledtr {display: table-row!important}
+.MJXp-mlabeledtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mlabeledtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXp-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXp-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXp-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXp-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXp-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXp-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXp-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXp-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXp-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXp-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_PHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+<body><div id="StayFocusd-infobar" style="display: none; top: 0px;">
+    <img src="chrome-extension://laankejkbhbdhmipfmgcngdelahlfoji/common/img/eye_19x19_red.png">
+    <span id="StayFocusd-infobar-msg"></span>
+    <span id="StayFocusd-infobar-links">
+        <a id="StayFocusd-infobar-never-show">hide forever</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+        <a id="StayFocusd-infobar-hide">hide once</a>
+    </span>
+</div><div id="MathJax_Message" style="display: none;"></div>
+  <script type="text/x-mathjax-config;executed=true">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/javascript" async="" src="./A tutorial on sc2reader_files/MathJax.js.download">
+</script>
+
+
+
+<header class="site-header" role="banner">
+  <div class="wrapper">
+    
+    
+    <a class="site-title" rel="author" href="https://miguelgondu.github.io/">MGD's blog</a>
+
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger">
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"></path>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"></path>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"></path>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+          
+            
+            
+            <a class="page-link" href="https://miguelgondu.github.io/about/">About</a>
+            
+          
+            
+            
+          
+            
+            
+          
+            
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope="" itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">A tutorial on sc2reader: events and units</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2018-09-04T00:00:00+00:00" itemprop="datePublished">Sep 4, 2018
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>I want to construct a database for macro learning in StarCraft 2. One way to study replays and mine information from them is using <code class="highlighter-rouge">pysc2</code>, an API developed by DeepMind that is specially designed for Reinforced Learning. Nahren and Justesen <a href="https://github.com/njustesen/pysc2-replay">developed a tool for mining replays using this API</a>, but unfortunately the DeepMind’s API can only play replays that match the binary version of the game, and StarCraft 2 is being patched regularly, thus many “old” replays render unparsable. The other way to do it is using <a href="https://github.com/ggtracker/sc2reader"><code class="highlighter-rouge">sc2reader</code></a>, an API developed by 26 contributors including David Joerg, Graylin Kim and  Kevin Leung.</p>
+
+<p>In this blogpost I’ll start talking about <code class="highlighter-rouge">sc2reader</code> and the information that can be mined using it. We will focus for now on the events regarding units and postpone the discussion about <em>spatial</em> and <em>command</em> related events for later posts. Feel free to follow all the code that is presented in this blogpost <a href="https://gist.github.com/miguelgondu/5feec8dd3f19f5bb0a9f35b6f554945b">in this gist notebook</a> (I commented out the print statements).</p>
+
+<h1 id="the-replay-object">The replay object</h1>
+
+<p>After installing <code class="highlighter-rouge">sc2reader</code> using <code class="highlighter-rouge">pip install sc2reader</code>, we can import the API and a replay like this:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">sc2reader</span>
+
+<span class="n">replay</span> <span class="o">=</span> <span class="n">sc2reader</span><span class="o">.</span><span class="n">load_replay</span><span class="p">(</span><span class="s">"path/to/replay.SC2Replay"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>If you’re using Windows, you can find your own replays buried deep at <code class="highlighter-rouge">Documents\StarCraft II\Accounts\...</code>, if you want replays from professional players you can look at <a href="https://lotv.spawningtool.com/replays/?pro_only=on">Spawning Tool</a>, a website which uses <code class="highlighter-rouge">sc2reader</code>. Copy some of them in your working directory.</p>
+
+<p>This replay object stores all the information about the file, including for example the participants and <em>rules</em> of the game at <code class="highlighter-rouge">replay.attributes</code>, the players at <code class="highlighter-rouge">replay.players</code> and the winner at <code class="highlighter-rouge">replay.winner</code>. Remember that all these methods and attributes can be listed using <code class="highlighter-rouge">dir(replay)</code>.</p>
+
+<p>We will focus on <code class="highlighter-rouge">replay.events</code>.</p>
+
+<h1 id="events-in-a-replay">Events in a replay</h1>
+
+<p><code class="highlighter-rouge">replay.events</code> is a list storing all the events of the game. Among these are UnitBornEvents, UnitInitEvents, UnitDoneEvents, UnitDeadEvents, CameraEvents and many, many more. You could for example figure out all event types in your replay running</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">event_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">event</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">replay</span><span class="o">.</span><span class="n">events</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>that is, all events have an attribute called <code class="highlighter-rouge">name</code>, which stores the type of the event. Let’s separate events with regard to their types (or names):</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">events_of_type</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">event_names</span><span class="p">}</span>
+<span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">replay</span><span class="o">.</span><span class="n">events</span><span class="p">:</span>
+    <span class="n">events_of_type</span><span class="p">[</span><span class="n">event</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">events_of_type</code> is a python dictionary in which the keys are event names in strings (e.g. <code class="highlighter-rouge">"UnitBornEvent"</code>), and the keys are lists of all the events of said type, so <code class="highlighter-rouge">events_of_type["CameraEvent"]</code> returns the list of all CameraEvents.</p>
+
+<p>Let’s go more in depth in some of these events:</p>
+
+<h2 id="unitbornevents">UnitBornEvents</h2>
+
+<p>Say one of the players is a Terran and created a Marine, then a <code class="highlighter-rouge">UnitBornEvent</code> was issued, storing the location, time, unit type and unit controller, among other things. UnitBornEvents are generated, according to the documentation, <em>every time a unit is created in a finished state</em>. This doesn’t include then warpgate units and buildings (except perhaps the initial ones).</p>
+
+<p>The most important attributes for our purposes are:</p>
+<ul>
+  <li><code class="highlighter-rouge">frame</code> and <code class="highlighter-rouge">second</code>, which store the frame in which the unit was created.</li>
+  <li><code class="highlighter-rouge">unit</code>, <code class="highlighter-rouge">unit_controller</code> which store the actual unit (e.g. Zergling) and the player which created it respectively. You can quickly access which player created that unit with <code class="highlighter-rouge">control_pid</code> which is either a 1 or a 2 (i.e. either player 1 or 2).</li>
+  <li><code class="highlighter-rouge">x</code> and <code class="highlighter-rouge">y</code>, which store the location in which this event took place.</li>
+</ul>
+
+<p>For example, try printing all these events using a for loop:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">unit_born_events</span> <span class="o">=</span> <span class="n">events_of_type</span><span class="p">[</span><span class="s">"UnitBornEvent"</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">ube</span> <span class="ow">in</span> <span class="n">unit_born_events</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"{} created {} at second {}"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ube</span><span class="o">.</span><span class="n">unit_controller</span><span class="p">,</span>
+                                              <span class="n">ube</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span>
+                                              <span class="n">ube</span><span class="o">.</span><span class="n">second</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>If you do so, you’ll notice that the first events have <code class="highlighter-rouge">None</code> as the unit controller. These are precisely the events that track the creation of the map: mineral patches and Vespene gas geysers.</p>
+
+<h2 id="unitinitevents-and-unitdoneevents">UnitInitEvents and UnitDoneEvents</h2>
+
+<p>If you start building a Supply Depot, a <code class="highlighter-rouge">UnitInitEvent</code> is issued holding about the same information of UnitBornEvents. It tracks time, location and type of unit created. This event is helpful when tracking buildings.</p>
+
+<p>Try printing these events with</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">unit_init_events</span> <span class="o">=</span> <span class="n">events_of_type</span><span class="p">[</span><span class="s">"UnitInitEvent"</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">uie</span> <span class="ow">in</span> <span class="n">unit_init_events</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"{} started creating {} at second {}"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uie</span><span class="o">.</span><span class="n">unit_controller</span><span class="p">,</span>
+                                                       <span class="n">uie</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span>
+                                                       <span class="n">uie</span><span class="o">.</span><span class="n">second</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>Once these units finish, a <code class="highlighter-rouge">UnitDoneEvent</code> is created. One must be careful, because this <code class="highlighter-rouge">UnitDoneEvent</code> doesn’t track the unit controller. Thankfully, every unit has a unique ID, so one could maintain a list of the units that were being created and then just test for pertenence. Let’s print the units as they finish:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">unit_done_events</span> <span class="o">=</span> <span class="n">events_of_type</span><span class="p">[</span><span class="s">"UnitDoneEvent"</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">ude</span> <span class="ow">in</span> <span class="n">unit_done_events</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"{} finished"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ude</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h2 id="unitdiedevents">UnitDiedEvents</h2>
+
+<p>Once a unit dies, a <code class="highlighter-rouge">UnitDiedEvent</code> is generated. It stores the unit that died, the killer player and killing unit, and also location and time.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">unit_died_events</span> <span class="o">=</span> <span class="n">events_of_type</span><span class="p">[</span><span class="s">"UnitDiedEvent"</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">udiede</span> <span class="ow">in</span> <span class="n">unit_died_events</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"{} was killed by {} using {} at ({}, {})"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">udiede</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span>
+                                                            <span class="n">udiede</span><span class="o">.</span><span class="n">killer</span><span class="p">,</span>
+                                                            <span class="n">udiede</span><span class="o">.</span><span class="n">killing_unit</span><span class="p">,</span>
+                                                            <span class="n">udiede</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+                                                            <span class="n">udiede</span><span class="o">.</span><span class="n">y</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h1 id="a-bit-more-about-units">A bit more about units</h1>
+
+<p>In all these events, we have considered objects of type <code class="highlighter-rouge">Unit</code> (which are stored in <code class="highlighter-rouge">event.unit</code> for each of these events). Let’s talk a little bit more about this object and its atributtes:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">name</code>, which is literally a string with the name of the unit.</li>
+  <li>the flags <code class="highlighter-rouge">is_army</code>, <code class="highlighter-rouge">is_building</code> and <code class="highlighter-rouge">is_worker</code>, which hold a boolean stating whether the unit is of that type.</li>
+  <li><code class="highlighter-rouge">minerals</code> and <code class="highlighter-rouge">vespene</code>, holding the cost of producing that unit.</li>
+  <li>killing-related attributes such as <code class="highlighter-rouge">killed_by</code>, <code class="highlighter-rouge">killing_unit</code>, <code class="highlighter-rouge">killing_player</code>, <code class="highlighter-rouge">killed_units</code>.</li>
+  <li><code class="highlighter-rouge">location</code>.</li>
+  <li><code class="highlighter-rouge">owner</code> and <code class="highlighter-rouge">race</code>.</li>
+</ul>
+
+<h1 id="writing-a-worker-counter">Writing a worker counter</h1>
+
+<p>Let’s handle these events and create a worker counter. To do so, note that we only need to consider UnitBornEvents and UnitDiedEvents, because workers always enter the game in a finished state. We will write a function that takes a replay, a second and a player id and returns the amount of workers said player had up to that second. To do so, the function will maintain a list holding the workers that have been created and that haven’t died yet.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">worker_counter</span><span class="p">(</span><span class="n">replay</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">player_id</span><span class="p">):</span>
+    <span class="n">workers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">replay</span><span class="o">.</span><span class="n">events</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">"UnitBornEvent"</span> <span class="ow">and</span> <span class="n">event</span><span class="o">.</span><span class="n">control_pid</span> <span class="o">==</span> <span class="n">player_id</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">is_worker</span><span class="p">:</span>
+                <span class="n">workers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+    
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">"UnitDiedEvent"</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">unit</span> <span class="ow">in</span> <span class="n">workers</span><span class="p">:</span>
+                <span class="n">workers</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">second</span> <span class="o">&gt;</span> <span class="n">second</span><span class="p">:</span>
+            <span class="k">break</span>
+    
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">workers</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>And, why not, let’s use this function to plot a graph of seconds vs. amount of workers:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">length_of_game</span> <span class="o">=</span> <span class="n">replay</span><span class="o">.</span><span class="n">frames</span> <span class="o">//</span> <span class="mi">24</span>
+<span class="n">workers_1</span> <span class="o">=</span> <span class="p">[</span><span class="n">worker_counter</span><span class="p">(</span><span class="n">replay</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">length_of_game</span><span class="p">)]</span>
+<span class="n">workers_2</span> <span class="o">=</span> <span class="p">[</span><span class="n">worker_counter</span><span class="p">(</span><span class="n">replay</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">length_of_game</span><span class="p">)]</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">workers_1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">replay</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">workers_2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">replay</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>We first get the total amount of seconds by dividing the total amount of frames (i.e. <code class="highlighter-rouge">replay.frames</code>) by the framerate (24), then we create a list with workers at each second and then we plot it using matplotlib.</p>
+
+<h1 id="conclusions">Conclusions</h1>
+
+<p>We discussed some of the events that are tracked by <code class="highlighter-rouge">sc2reader</code> in a replay. Namely, we considered the attributes of events that track unit creation and death: <code class="highlighter-rouge">UnitBornEvent</code>, <code class="highlighter-rouge">UnitInitEvent</code>, <code class="highlighter-rouge">UnitDoneEvent</code> and <code class="highlighter-rouge">UnitDiedEvent</code>. Moreover, we presented the <code class="highlighter-rouge">Unit</code> object and the information it holds. The possibilities are endless. With this information one could easily track important data such as army spending, worker count, army count, build order and much more.</p>
+
+  </div><a class="u-url" href="https://miguelgondu.github.io/python/ai/video%20games/2018/09/04/a-tutorial-on-sc2reader-events-and-units.html" hidden=""></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">MGD's blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">MGD's blog</li><li><a class="u-email" href="mailto:miguelgondu@gmail.com">miguelgondu@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/miguelgondu"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">miguelgondu</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>The blog of Miguel González, a mathematician with interest in  videogames and statistical learning.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+
+</body></html>

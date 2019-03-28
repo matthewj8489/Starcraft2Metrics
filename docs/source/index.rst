@@ -18,14 +18,16 @@ Articles
 ========
 Articles related to Starcraft2Metrics or the libraries it references.
 
-* :doc:'articles/A tutorial on sc2reader'
+* sc2reader tutorial [`art1`_]
+
+.. _art1: `articles/A tutorial on sc2reader.html`
 
 Sc2Reader
 =========
 
-Sc2Reader is a Starcraft II Replay parser that is hosted publicly on Github ['source'_].
+Sc2Reader is a Starcraft II Replay parser that is hosted publicly on Github [`source`_].
 
-.. _source: http://github.com/GralinKim/sc2reader
+.. _source: https://github.com/ggtracker/sc2reader
 
 Reference Pages
 ===============

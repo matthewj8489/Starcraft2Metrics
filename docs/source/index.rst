@@ -37,6 +37,7 @@ Reference Pages
    :caption: Contents:
    
    sc2metric
+   plugins
 
 
 

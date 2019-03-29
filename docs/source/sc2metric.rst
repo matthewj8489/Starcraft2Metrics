@@ -1,5 +1,5 @@
-Starcraft 2 Metrics
-=========================
+sc2metric
+=========
 
 Metrics gathered from Starcraft 2 replay data.
 

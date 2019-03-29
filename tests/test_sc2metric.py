@@ -1,7 +1,9 @@
+import os
 import sys
+import json
 
 if __name__ == '__main__':
-    sys.path.insert(0,"..\\")
+    sys.path.insert(0, os.path.abspath("..\\"))
     
 if sys.version_info[:2] < (2, 7):
     import unittest2 as unittest
@@ -42,7 +44,7 @@ class TestMetrics(unittest.TestCase):
     def test_time_to_max(self):
         replay = sc2reader.load_replay("test_replays\\standard_1v1.SC2Replay")
         p1_met = replay.player[1].metrics
-        
+                                
         self.assertEqual(p1_met.time_to_supply_created(200), 618)
         self.assertEqual(p1_met.time_to_supply_created_max_workers(200, 75), 618)
 
@@ -56,6 +58,46 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual(p1_met.time_to_workers_created(75), 612)
 
 
+    def test_avg_sq(self):
+        #: TODO
+        replay = sc2reader.load_replay("test_replays\\standard_1v1.SC2Replay")
+        p1_met = replay.player[1].metrics
+        
+        stats = None
+        with open("test_replays\\replay_info.json", "r") as fl:
+            stats = json.load(fl)       
+        
+        if stats is None:
+            self.fail("could not open replay_info json file.")
+            
+            
+    def test_current_food(self):    
+        replay = sc2reader.load_replay("test_replays\\standard_1v1.SC2Replay")
+        p1_met = replay.player[1].metrics
+        
+        stats = None
+        with open("test_replays\\replay_info.json", "r") as fl:
+            stats = json.load(fl)       
+        
+        if stats is None:
+            self.fail("could not open replay_info json file.")
+            
+        for st in stats['stats']:
+            for idx in range(0, len(st['players'])):
+                fd_md_lt = list(filter(lambda x: x.second <= st['time'], replay.players[idx].metrics.current_food_made))
+                fd_us_lt = list(filter(lambda x: x.second <= st['time'], replay.players[idx].metrics.current_food_used))
+                
+                fd_md = max(fd_md_lt, key=lambda x: x.second)
+                fd_us = max(fd_us_lt, key=lambda x: x.second)
+                
+                self.assertTrue(fd_md.second <= st['time'])
+                self.assertTrue(fd_us.second <= st['time'])
+                
+                self.assertEqual(st['players'][idx]['supp_made'], fd_md.supply)
+                self.assertEqual(st['players'][idx]['supp_used'], fd_us.supply)
+                
+                
+        
 ##    def test_time_to_bases(self):
 ##        replay = sc2reader.load_replay("")
 ##        p1_met = replay.player[1].metrics

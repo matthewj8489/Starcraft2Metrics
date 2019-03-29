@@ -11,62 +11,69 @@ class Sc2MetricAnalyzer(object):
     class contains raw data gathered from each replay to derive its metrics.
     The raw data is filled from the :mod:'plugins' associated with this package.
 
-    Metrics (**Todo**):
-    ===================
-    - **TotalSupply : Total supply created by the player.**
-        **(This is NOT current supply at given time)**
-    - **Workers : Total number of workers created by the player.**
-    - **Army : Total army supply created by the player.**
-    - **Upgrades : Total count of upgrades. (+1/2/3 weapons, psionic storm,**
-        **charge, etc.)**
-    - TimeTo66Workers : Time at which the user created 66 workers
-        (3-base saturation).
-    - TimeTo75Workers : Time at which the user created 75 workers.
-    - TimeTo3Bases : Time at which the 3 bases are finished.
-    - TimeTo4Bases : Time at which the 4 bases are finished.
-    - TimeToMax : Time at which the total supply created is 199 or above
-        (stops counting workers above 75)
-    - SupplyCapped : Time spent supply blocked.
-    - **SupplyCreateRate : Average rate at which supply buildings are**
-        **created until 200 supply**
-    - AvgAPM : Average APM
-    - **AvgEPM : Average EPM**
-    - **AvgSPM : Average SPM**
-    - **AvgMacroCycleTime : Average time spent issuing macro commands**
-        **(vs army commands) (or maybe the avg time between giving a worker a**
-        **command and issuing another command not to the worker)**
-    - **AvgHarassDeflection : A score that rates the player's ability**
-        **to deflect and minimize damage incurred from harassment attacks.**
-        **(works off of minerals/probes/tech/mining time lost?)**
-    - **IdleBaseTime66 : Total time town halls are idle (not making workers) before 66 workers**
-    - **IdleBaseTime75 : Total time town halls are idle (not making workers) before 75 workers**
-    - AvgSQ : Spending Quotient. SQ(i,u)=35(0.00137i-ln(u))+240,
-        where i=resource collection rate, u=average unspent resources
-    - AvgSQPreMax : Spending Quotient before maxed out.
-    - AvgUnspent : Average unspent resources during the game.
-    - AvgUnspentPreMax : Average unspent resources before maxed out.
-    - AvgColRate : Average resource collection rate during the game.
-    - AvgColRatePreMax : Average resource collection rate before maxed out.
-    - **Units : Dictionary of all the units created, keyed by the units'**
-        **names.**
-    - **PPM : average(mean) PAC per minute**
-    - **PAL : PAC action latency. e.g.: how long it takes you to take your**
-        **first action after each fixation shift. (mean average)**
-    - **APP : Actions per PAC. The average(mean) number of actions you**
-        **take each PAC**
-    - **GAP : How long it takes you, after finishing your actions in**
-        **one PAC to establish a new fixaction. (mean average)**
+    Todo:
+        - **TotalSupply : Total supply created by the player.
+            (This is NOT current supply at given time)
+        - **Workers : Total number of workers created by the player.
+        - **Army : Total army supply created by the player.
+        - **Upgrades : Total count of upgrades. (+1/2/3 weapons, psionic storm,
+            charge, etc.)
+        - TimeTo66Workers : Time at which the user created 66 workers
+            (3-base saturation).
+        - TimeTo75Workers : Time at which the user created 75 workers.
+        - TimeTo3Bases : Time at which the 3 bases are finished.
+        - TimeTo4Bases : Time at which the 4 bases are finished.
+        - TimeToMax : Time at which the total supply created is 199 or above
+            (stops counting workers above 75)
+        - SupplyCapped : Time spent supply blocked.
+        - **SupplyCreateRate : Average rate at which supply buildings are
+            created until 200 supply
+        - AvgAPM : Average APM
+        - **AvgEPM : Average EPM
+        - **AvgSPM : Average SPM
+        - **AvgMacroCycleTime : Average time spent issuing macro commands
+            (vs army commands) (or maybe the avg time between giving a worker a
+            command and issuing another command not to the worker)
+        - **AvgHarassDeflection : A score that rates the player's ability
+            to deflect and minimize damage incurred from harassment attacks.
+            (works off of minerals/probes/tech/mining time lost?)
+        - **IdleBaseTime66 : Total time town halls are idle (not making workers) before 66 workers
+        - **IdleBaseTime75 : Total time town halls are idle (not making workers) before 75 workers
+        - AvgSQ : Spending Quotient. SQ(i,u)=35(0.00137i-ln(u))+240,
+            where i=resource collection rate, u=average unspent resources
+        - AvgSQPreMax : Spending Quotient before maxed out.
+        - AvgUnspent : Average unspent resources during the game.
+        - AvgUnspentPreMax : Average unspent resources before maxed out.
+        - AvgColRate : Average resource collection rate during the game.
+        - AvgColRatePreMax : Average resource collection rate before maxed out.
+        - **Units : Dictionary of all the units created, keyed by the units'
+            names.
+        - **PPM : average(mean) PAC per minute
+        - **PAL : PAC action latency. e.g.: how long it takes you to take your
+            first action after each fixation shift. (mean average)
+        - **APP : Actions per PAC. The average(mean) number of actions you
+            take each PAC
+        - **GAP : How long it takes you, after finishing your actions in
+            one PAC to establish a new fixaction. (mean average)
     
     """
 
     
     def __init__(self):
-        #: A list of :class:SupplyCount for each army supply created.
-        self.army_created = []
+        """Initialization of the class"""
         
+        #: list(:class:SupplyCount): A list of :class:SupplyCount for each army supply created.
+        self.army_created = []
+
+        #: A list of :class:SupplyCount for each worker created.
         self.workers_created = []
+
+        #: A list of :class:SupplyCount for each unit created.
         self.supply_created = []
+
+        #: A list of :class:BaseCount for each base created.
         self.bases_created = []
+
         self.current_food_used = []
         self.current_food_made = []
         self.resources = []

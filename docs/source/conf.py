@@ -17,7 +17,7 @@
 # sys.path.insert(0, os.path.abspath('.'))
 
 import sys, os
-sys.path.insert(0, "..\\..\\")
+sys.path.insert(0, os.path.abspath("..\\..\\"))
 import metrics
 
 # -- Project information -----------------------------------------------------

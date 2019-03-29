@@ -6,7 +6,7 @@ import metrics.util
 class Sc2MetricAnalyzer(object):
     """A class that derives useful metrics from replay files
 
-    This class is an extension to the :mod:'sc2reader'. It is meant to be used
+    This class is an extension to the ``sc2reader``. It is meant to be used
     to offer useful metric data to each player in a Starcraft II replay. The
     class contains raw data gathered from each replay to derive its metrics.
     The raw data is filled from the :mod:'plugins' associated with this package.
@@ -62,7 +62,7 @@ class Sc2MetricAnalyzer(object):
     def __init__(self):
         """Initialization of the class"""
         
-        #: list(:class:SupplyCount): A list of :class:SupplyCount for each army supply created.
+        #: list(:class:`metrics.metric_containers.SupplyCount`): A list of :class:`~metrics.metric_containers.SupplyCount` for each army supply created.
         self.army_created = []
 
         #: A list of :class:SupplyCount for each worker created.

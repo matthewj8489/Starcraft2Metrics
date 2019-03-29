@@ -7,6 +7,12 @@ from metrics.util import convert_gametime_to_realtime_r
 
         
 class SupplyTracker(object):
+    """
+    Builds ``player.metrics.current_food_used`` and ``player.metrics.current_food_made``
+    arrays made of :class:`~metrics.metric_containers.FoodCount`. The ``metrics`` being of the type 
+    :class:`~metrics.sc2metric.Sc2MetricAnalyzer`. The food is tracked every time a new supply unit or 
+    supply building is made or dies/is destroyed.
+    """
 
     name = 'SupplyTracker'
 

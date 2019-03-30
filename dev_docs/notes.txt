@@ -1,0 +1,49 @@
+purposed json format:
+
+{"pvt_macro1.SC2Replay": 
+	{"NULL":
+		{"stats": {
+			"time": 160,
+			"workers": 24,
+			"army_count": 0,
+			"army_supp": 0,
+			"worker_queue": 1,
+			"army_queue": 1,
+			"army_supp_queue": 2,
+			"min_unspent": 120,
+			"ves_unspent": 32,
+			"supp_used": 27,
+			"supp_made": 31,
+			"min_inc": 895,
+			"ves_inc": 313,
+			"bases": 1,
+			"supp_bldg": 2,
+			"apm_avg": 74,
+			"apm": 67,
+			"epm_avg": 44,
+			"epm": 50
+			},
+		"bases_created": [
+			0,
+			162,
+			415,
+			654,
+			869
+			]
+		},
+	"ChaosEnergy": 
+		{"stats": {},
+		"bases_created": []
+		}
+	},
+"pvt_macro2.SC2Replay":
+	{"NULL":
+		{"stats": {},
+		"bases_created": []
+		},
+	"Supernova":
+		{"stats": {},
+		"bases_created": []
+		}
+	}
+}

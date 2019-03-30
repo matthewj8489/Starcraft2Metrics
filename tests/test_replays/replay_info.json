@@ -1,5 +1,5 @@
-{
-"replay": "pvt_macro2.SC2Replay",
+[{
+"replay": "pvt_macro1.SC2Replay",
 "stats": [{
 	"time": 160,
 	"players": [{
@@ -95,22 +95,27 @@
 		"name": "NULL",
 		"bases_created": [
 			0,
-			163,
-			408,
-			652,
-			862
+			162,
+			415,
+			654,
+			869
 		]
 	},
 	{
 		"name": "ChaosEnergy",
 		"bases_created": [
 			0,
-			187,
-			350,
-			675,
-			850,
-			907
+			189,
+			352,
+			673,
+			852,
+			905
 		]
 	}]
 }]	
-}
+},
+{
+"replay": "pv1_macro2.SC2Replay",
+"stats": [],
+"bases": []
+}]

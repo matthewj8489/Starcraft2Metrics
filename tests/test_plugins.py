@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 
 if __name__ == '__main__':
     sys.path.insert(0, os.path.abspath("..\\"))
@@ -31,7 +32,7 @@ class TestPlugins(unittest.TestCase):
                     self.assertEqual(pse[idx].minerals_current + pse[idx].vespene_current, mets[idx].res_unspent)
     
     
-    def test_bases_created_tracker(self):
+    def test_bases_created_tracker_against_sc2reader(self):
         base_names = ['Nexus', 'CommandCenter', 'Hatchery']
         reps = sc2reader.load_replays("test_replays")
         for rep in reps:
@@ -51,6 +52,28 @@ class TestPlugins(unittest.TestCase):
                 for idx in range(0, len(mets)):
                     self.assertEqual(convert_gametime_to_realtime_r(rep,evts[idx].second), mets[idx].second)
 
+       
+    def test_bases_created_tracker_against_json_data(self):
+        #reps = sc2reader.load_replays("test_replays")
+        
+        rep_stats = None
+        with open("test_replays\\replay_info.json", "r") as fl:
+            rep_stats = json.load(fl)
+        
+        if rep_stats is None:
+            self.fail("could not open replay_info json file.")
+            
+        for rs in rep_stats:
+            replay = sc2reader.load_replay("test_replays\\"+rs['replay'])
+            
+            for bs in rs['bases']:
+                for idx in range(0, len(bs['players'])):
+                    met = replay.players[idx].metrics
+                    bc = bs['players'][idx]['bases_created']
+                    self.assertEqual(len(met.bases_created), len(bc))
+                    for bdx in range(0, len(bc)):
+                        self.assertEqual(met.bases_created[bdx].second, bc[bdx])
+                        
         
 if __name__ == '__main__':
     unittest.main()

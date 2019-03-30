@@ -73,7 +73,7 @@ class TestMetrics(unittest.TestCase):
             
             
     def test_current_food(self):    
-        replay = sc2reader.load_replay("test_replays\\pvt_macro2.SC2Replay")
+        replay = sc2reader.load_replay("test_replays\\pvt_macro1.SC2Replay")
         p1_met = replay.player[1].metrics
         
         stats = None
@@ -83,7 +83,7 @@ class TestMetrics(unittest.TestCase):
         if stats is None:
             self.fail("could not open replay_info json file.")
             
-        for st in stats['stats']:
+        for st in stats[0]['stats']:
             for idx in range(0, len(st['players'])):
                 fd_md_lt = list(filter(lambda x: x.second <= st['time'], replay.players[idx].metrics.current_food_made))
                 fd_us_lt = list(filter(lambda x: x.second <= st['time'], replay.players[idx].metrics.current_food_used))
@@ -97,25 +97,18 @@ class TestMetrics(unittest.TestCase):
                 self.assertEqual(st['players'][idx]['supp_made'], fd_md.supply)
                 self.assertEqual(st['players'][idx]['supp_used'], fd_us.supply)
                 
-                
-        
+                    
     def test_time_to_bases(self):
-        replay = sc2reader.load_replay("test_replays\\pvt_macro2.SC2Replay")
-
-        stats = None
-        with open("test_replays\\replay_info.json", "r") as fl:
-            stats = json.load(fl)       
+        replay = sc2reader.load_replay("test_replays\\pvt_macro1.SC2Replay")
+        p1_met = replay.player[1].metrics
+        p2_met = replay.player[2].metrics
         
-        if stats is None:
-            self.fail("could not open replay_info json file.")
-            
-        for bs in stats['bases']:
-            for idx in range(0, len(bs['players'])):
-                met = replay.players[idx].metrics
-                bc = bs['players'][idx]['bases_created']
-                
-                for bdx in range(0, len(bc)):
-                    self.assertEqual(met.time_to_bases_created(bdx+1), bc[bdx])
+        self.assertIsNone(p1_met.time_to_bases_created(6))
+        self.assertIsNone(p1_met.time_to_bases_created(0))
+        
+        self.assertEqual(p1_met.time_to_bases_created(1), 0)
+        self.assertEqual(p1_met.time_to_bases_created(2), 162)
+        self.assertEqual(p1_met.time_to_bases_created(3), 415)
                                              
 
 if __name__ == '__main__':

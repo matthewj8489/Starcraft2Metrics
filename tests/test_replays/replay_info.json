@@ -89,5 +89,28 @@
 		"epm_avg": 72,
 		"epm": 89
 		}]
+	}],
+"bases": [{
+	"players": [{
+		"name": "NULL",
+		"bases_created": [
+			0,
+			163,
+			408,
+			652,
+			862
+		]
+	},
+	{
+		"name": "ChaosEnergy",
+		"bases_created": [
+			0,
+			187,
+			350,
+			675,
+			850,
+			907
+		]
 	}]
+}]	
 }

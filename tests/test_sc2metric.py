@@ -13,6 +13,7 @@ else:
 
 import metrics
 import sc2reader
+from metrics.util import convert_gametime_to_realtime_r
 
 class TestMetrics(unittest.TestCase):
 
@@ -60,7 +61,7 @@ class TestMetrics(unittest.TestCase):
 
     def test_avg_sq(self):
         #: TODO
-        replay = sc2reader.load_replay("test_replays\\standard_1v1.SC2Replay")
+        replay = sc2reader.load_replay("test_replays\\pvt_macro2.SC2Replay")
         p1_met = replay.player[1].metrics
         
         stats = None
@@ -72,7 +73,7 @@ class TestMetrics(unittest.TestCase):
             
             
     def test_current_food(self):    
-        replay = sc2reader.load_replay("test_replays\\standard_1v1.SC2Replay")
+        replay = sc2reader.load_replay("test_replays\\pvt_macro2.SC2Replay")
         p1_met = replay.player[1].metrics
         
         stats = None
@@ -98,13 +99,24 @@ class TestMetrics(unittest.TestCase):
                 
                 
         
-##    def test_time_to_bases(self):
-##        replay = sc2reader.load_replay("")
-##        p1_met = replay.player[1].metrics
-##
-##        self.assertEqual(p1_met.time_to_bases_created(3), ?)
-##        self.assertEqual(p1_met.time_to_bases_created(4), ?)
-                         
+    def test_time_to_bases(self):
+        replay = sc2reader.load_replay("test_replays\\pvt_macro2.SC2Replay")
+
+        stats = None
+        with open("test_replays\\replay_info.json", "r") as fl:
+            stats = json.load(fl)       
+        
+        if stats is None:
+            self.fail("could not open replay_info json file.")
+            
+        for bs in stats['bases']:
+            for idx in range(0, len(bs['players'])):
+                met = replay.players[idx].metrics
+                bc = bs['players'][idx]['bases_created']
+                
+                for bdx in range(0, len(bc)):
+                    self.assertEqual(met.time_to_bases_created(bdx+1), bc[bdx])
+                                             
 
 if __name__ == '__main__':
     unittest.main()

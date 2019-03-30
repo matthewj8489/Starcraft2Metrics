@@ -466,7 +466,7 @@ class Sc2MetricAnalyzer(object):
             int: The time when the number of bases had been created.
             
         """
-        if base_count <= len(self.bases_created):
+        if base_count <= len(self.bases_created) and base_count > 0:
             return self.bases_created[base_count-1].second
         else:
             return None   

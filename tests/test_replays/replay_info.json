@@ -119,3 +119,31 @@
 "stats": [],
 "bases": []
 }]
+{
+"pvt_macro1.SC2Replay": {
+	"NULL": {
+		"bases_created": [
+			0,
+			162,
+			415,
+			654,
+			869
+			],
+		"supply_capped": 212,
+		"sq": {
+			"312": 101.4,
+			"450": 105.8
+			},
+		"aur": {
+			"312": 1040.0,
+			"450": 1501.1
+			}
+		},
+	"ChaosEnergy": {
+		"bases_created": [],
+		"supply_capped": 0,
+		"sq": {},
+		"aur": {}
+		}
+	}
+}

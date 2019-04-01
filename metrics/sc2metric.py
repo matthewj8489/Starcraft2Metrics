@@ -376,8 +376,8 @@ class Sc2MetricAnalyzer(object):
             
         """
         supply = 0
-        supply += self.workers_created(real_time_s)
-        supply += self.army_created(real_time_s)
+        supply += self.workers_created_at_time(real_time_s)
+        supply += self.army_created_at_time(real_time_s)
 
         return supply
 

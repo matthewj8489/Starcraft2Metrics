@@ -34,6 +34,7 @@ class TestPlugins(unittest.TestCase):
     
     def test_resource_tracker_against_json_data(self):
         #: TODO
+        pass
     
     
     def test_bases_created_tracker_against_sc2reader(self):
@@ -58,6 +59,10 @@ class TestPlugins(unittest.TestCase):
 
        
     def test_bases_created_tracker_against_json_data(self):
+        """
+        1. Test that the number of bases created is equivalent to the json data
+        2. Test that the times the bases were created is equivalent to the json data
+        """
         #reps = sc2reader.load_replays("test_replays")
         
         rep_stats = None
@@ -81,26 +86,32 @@ class TestPlugins(unittest.TestCase):
      
     def test_supply_created_tracker_against_sc2reader(self):
         #: TODO
+        pass
         
         
     def test_supply_created_tracker_against_json_data(self):
         #: TODO
+        pass
         
         
     def test_apm_tracker_against_sc2reader(self):
         #: TODO
+        pass
         
         
     def test_apm_tracker_against_json_data(self):
         #: TODO
+        pass
         
         
     def test_supply_tracker_against_sc2reader(self):
         #: TODO
+        pass
         
         
     def test_supply_tracker_against_json_data(self):
         #: TODO
+        pass
             
         
 if __name__ == '__main__':

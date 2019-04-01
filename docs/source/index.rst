@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Starcraft2Metrics User Manual
-=============================
+Starcraft 2 Metrics User Manual
+===============================
 
 Starcraft2Metrics offers metrics calculated from replay files using the **sc2reader** parser.
 

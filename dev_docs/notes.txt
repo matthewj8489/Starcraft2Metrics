@@ -29,11 +29,13 @@ purposed json format:
 			415,
 			654,
 			869
-			]
+			],
+		"supply_capped": 200
 		},
 	"ChaosEnergy": 
 		{"stats": {},
 		"bases_created": []
+		"supply_capped": 
 		}
 	},
 "pvt_macro2.SC2Replay":
@@ -47,3 +49,31 @@ purposed json format:
 		}
 	}
 }
+
+
+
+tests
+-----
+sc2metrics
+--*avg_sq
+--*avg_sq_at_time
+--*avg_sq_pre_max
+
+--*aur
+--*aur_at_time
+--*aur_pre_max
+
+--*avg_rcr
+--*avg_rcr_at_time
+--*avg_rcr_pre_max
+
+--*supply_capped
+
+--*workers_created_at_time
+--*army_created_at_time
+--*supply_created_at_time
+
+--*time_to_workers_created
+--*time_to_supply_created
+--*time_to_supply_created_max_workers
++--*time_to_bases_created

@@ -6,7 +6,7 @@
 Starcraft 2 Metrics User Manual
 ===============================
 
-Starcraft2Metrics offers metrics calculated from replay files using the **sc2reader** parser.
+Starcraft2Metrics offers metrics calculated from replay files using the :ref:`sc2reader_section` parser.
 
 The end goal of Starcraft2Metrics is to offer the user a visualization of the trend of 
 each metric that is calculated in order for the user to see if there has been improvement 
@@ -60,6 +60,9 @@ Articles related to Starcraft2Metrics or the libraries it references.
 * sc2reader tutorial [`art1`_]
 
 .. _art1: `articles/A tutorial on sc2reader.html`
+
+
+.. _sc2reader_section:
 
 SC2Reader
 =========

@@ -18,7 +18,7 @@ import sc2reader
 
 class TestPlugins(unittest.TestCase):
 
-    def test_resource_tracker(self): 
+    def test_resource_tracker_against_sc2reader(self): 
         reps = sc2reader.load_replays("test_replays")
         for rep in reps:
             for plyr in rep.players:
@@ -30,6 +30,10 @@ class TestPlugins(unittest.TestCase):
                     self.assertEqual(convert_gametime_to_realtime_r(rep, pse[idx].second), mets[idx].second)
                     self.assertEqual(pse[idx].minerals_collection_rate + pse[idx].vespene_collection_rate, mets[idx].res_col)
                     self.assertEqual(pse[idx].minerals_current + pse[idx].vespene_current, mets[idx].res_unspent)
+    
+    
+    def test_resource_tracker_against_json_data(self):
+        #: TODO
     
     
     def test_bases_created_tracker_against_sc2reader(self):
@@ -74,6 +78,30 @@ class TestPlugins(unittest.TestCase):
                     for bdx in range(0, len(bc)):
                         self.assertEqual(met.bases_created[bdx].second, bc[bdx])
                         
+     
+    def test_supply_created_tracker_against_sc2reader(self):
+        #: TODO
+        
+        
+    def test_supply_created_tracker_against_json_data(self):
+        #: TODO
+        
+        
+    def test_apm_tracker_against_sc2reader(self):
+        #: TODO
+        
+        
+    def test_apm_tracker_against_json_data(self):
+        #: TODO
+        
+        
+    def test_supply_tracker_against_sc2reader(self):
+        #: TODO
+        
+        
+    def test_supply_tracker_against_json_data(self):
+        #: TODO
+            
         
 if __name__ == '__main__':
     unittest.main()

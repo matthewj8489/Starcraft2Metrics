@@ -12,11 +12,11 @@ class Sc2MetricAnalyzer(object):
     The raw data is filled from the :mod:'plugins' associated with this package.
 
     Todo:
-        - **TotalSupply : Total supply created by the player.
+        - #TotalSupply : Total supply created by the player.
             (This is NOT current supply at given time)
-        - **Workers : Total number of workers created by the player.
-        - **Army : Total army supply created by the player.
-        - **Upgrades : Total count of upgrades. (+1/2/3 weapons, psionic storm,
+        - #Workers : Total number of workers created by the player.
+        - #Army : Total army supply created by the player.
+        - #Upgrades : Total count of upgrades. (+1/2/3 weapons, psionic storm,
             charge, etc.)
         - TimeTo66Workers : Time at which the user created 66 workers
             (3-base saturation).
@@ -26,19 +26,19 @@ class Sc2MetricAnalyzer(object):
         - TimeToMax : Time at which the total supply created is 199 or above
             (stops counting workers above 75)
         - SupplyCapped : Time spent supply blocked.
-        - **SupplyCreateRate : Average rate at which supply buildings are
+        - #SupplyCreateRate : Average rate at which supply buildings are
             created until 200 supply
         - AvgAPM : Average APM
-        - **AvgEPM : Average EPM
-        - **AvgSPM : Average SPM
-        - **AvgMacroCycleTime : Average time spent issuing macro commands
+        - #AvgEPM : Average EPM
+        - #AvgSPM : Average SPM
+        - #AvgMacroCycleTime : Average time spent issuing macro commands
             (vs army commands) (or maybe the avg time between giving a worker a
             command and issuing another command not to the worker)
-        - **AvgHarassDeflection : A score that rates the player's ability
+        - #AvgHarassDeflection : A score that rates the player's ability
             to deflect and minimize damage incurred from harassment attacks.
             (works off of minerals/probes/tech/mining time lost?)
-        - **IdleBaseTime66 : Total time town halls are idle (not making workers) before 66 workers
-        - **IdleBaseTime75 : Total time town halls are idle (not making workers) before 75 workers
+        - #IdleBaseTime66 : Total time town halls are idle (not making workers) before 66 workers
+        - #IdleBaseTime75 : Total time town halls are idle (not making workers) before 75 workers
         - AvgSQ : Spending Quotient. SQ(i,u)=35(0.00137i-ln(u))+240,
             where i=resource collection rate, u=average unspent resources
         - AvgSQPreMax : Spending Quotient before maxed out.
@@ -46,14 +46,14 @@ class Sc2MetricAnalyzer(object):
         - AvgUnspentPreMax : Average unspent resources before maxed out.
         - AvgColRate : Average resource collection rate during the game.
         - AvgColRatePreMax : Average resource collection rate before maxed out.
-        - **Units : Dictionary of all the units created, keyed by the units'
+        - #Units : Dictionary of all the units created, keyed by the units'
             names.
-        - **PPM : average(mean) PAC per minute
-        - **PAL : PAC action latency. e.g.: how long it takes you to take your
+        - #PPM : average(mean) PAC per minute
+        - #PAL : PAC action latency. e.g.: how long it takes you to take your
             first action after each fixation shift. (mean average)
-        - **APP : Actions per PAC. The average(mean) number of actions you
+        - #APP : Actions per PAC. The average(mean) number of actions you
             take each PAC
-        - **GAP : How long it takes you, after finishing your actions in
+        - #GAP : How long it takes you, after finishing your actions in
             one PAC to establish a new fixaction. (mean average)
     
     """
@@ -62,16 +62,16 @@ class Sc2MetricAnalyzer(object):
     def __init__(self):
         """Initialization of the class"""
         
-        #: list(:class:`metrics.metric_containers.SupplyCount`): A list of :class:`~metrics.metric_containers.SupplyCount` for each army supply created.
+        #: A list of :class:`~metrics.metric_containers.SupplyCount` for each army supply created.
         self.army_created = []
 
-        #: A list of :class:SupplyCount for each worker created.
+        #: A list of :class:`~metrics.metric_containers.SupplyCount` for each worker created.
         self.workers_created = []
 
-        #: A list of :class:SupplyCount for each unit created.
+        #: A list of :class:`~metrics.metric_containers.SupplyCount` for each unit created.
         self.supply_created = []
 
-        #: A list of :class:BaseCount for each base created.
+        #: A list of :class:`~metrics.metric_containers.BaseCount` for each base created.
         self.bases_created = []
 
         self.current_food_used = []

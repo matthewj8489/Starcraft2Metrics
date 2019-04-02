@@ -190,6 +190,8 @@ epub_exclude_files = ['search.html']
 
 # Include special functions docstrings (i.e. __init__)
 napoleon_include_special_with_doc = True
+autodoc_member_order = "bysource"
+#autodoc_member_order = "groupwise"
 
 # -- Options for todo extension ----------------------------------------------
 

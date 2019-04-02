@@ -53,21 +53,13 @@ Metrics offered:
 * Time spent Supply Capped (sc)
 
 
-Articles
-========
-Articles related to Starcraft2Metrics or the libraries it references.
-
-* sc2reader tutorial [`art1`_]
-
-.. _art1: `articles/A tutorial on sc2reader.html`
-
-
 .. _sc2reader_section:
 
 SC2Reader
 =========
 
 SC2Reader is a Starcraft II Replay parser that is hosted publicly on Github [`source`_].
+This module is relied upon to parse the necessary data out of Starcraft II replay files.
 
 .. _source: https://github.com/ggtracker/sc2reader
 
@@ -75,7 +67,7 @@ Reference Pages
 ===============
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 0
    
    sc2metric
    plugins

@@ -52,7 +52,7 @@ class TestMetrics(unittest.TestCase):
 
     def test_time_to_max(self):
         #: GET CORRECT NUMBERS
-        replay = sc2reader.load_replay("test_replays\\standard_1v1.SC2Replay")
+        replay = sc2reader.load_replay("test_replays\\pvt_macro1.SC2Replay")
         p1_met = replay.player[1].metrics
                                 
         self.assertEqual(p1_met.time_to_supply_created(200), 618)
@@ -60,12 +60,11 @@ class TestMetrics(unittest.TestCase):
 
 
     def test_time_to_X_workers(self):
-        #: GET CORRECT NUMBERS
-        replay = sc2reader.load_replay("test_replays\\standard_1v1.SC2Replay")
+        replay = sc2reader.load_replay("test_replays\\pvt_macro1.SC2Replay")
         p1_met = replay.player[1].metrics
 
-        self.assertEqual(p1_met.time_to_workers_created(66), 500)
-        self.assertEqual(p1_met.time_to_workers_created(75), 612)
+        self.assertEqual(p1_met.time_to_workers_created(66), 477)
+        self.assertEqual(p1_met.time_to_workers_created(75), 546)
         
         
     def test_time_to_bases(self):
@@ -95,30 +94,28 @@ class TestMetrics(unittest.TestCase):
 
         
     def test_workers_created_at_time(self):
-        #: GET CORRECT NUMBERS
-        replay = sc2reader.load_replay("test_replays\\standard_1v1.SC2Replay")
+        replay = sc2reader.load_replay("test_replays\\pvt_macro1.SC2Replay")
         p1_met = replay.player[1].metrics
         
-        self.assertEqual(p1_met.workers_created_at_time(500), 66)
-        self.assertEqual(p1_met.workers_created_at_time(612), 75)
+        self.assertEqual(p1_met.workers_created_at_time(443), 60)
+        self.assertEqual(p1_met.workers_created_at_time(478), 67)
+        self.assertEqual(p1_met.workers_created_at_time(547), 76)
 
     
     def test_army_created_at_time(self):
-        #: GET CORRECT NUMBERS
-        replay = sc2reader.load_replay("test_replays\\standard_1v1.SC2Replay")
+        replay = sc2reader.load_replay("test_replays\\pvt_macro1.SC2Replay")
         p1_met = replay.player[1].metrics
         
-        self.assertEqual(p1_met.army_created_at_time(450), 80)
-        self.assertEqual(p1_met.army_created_at_time(612), 125)
+        self.assertEqual(p1_met.army_created_at_time(443), 31)
+        self.assertEqual(p1_met.army_created_at_time(547), 49)
     
     
     def test_supply_created_at_time(self):
-        #: GET CORRECT NUMBERS
-        replay = sc2reader.load_replay("test_replays\\standard_1v1.SC2Replay")
+        replay = sc2reader.load_replay("test_replays\\pvt_macro1.SC2Replay")
         p1_met = replay.player[1].metrics
         
-        self.assertEqual(p1_met.supply_created_at_time(450), 140)
-        self.assertEqual(p1_met.supply_created_at_time(612), 200)
+        self.assertEqual(p1_met.supply_created_at_time(443), 87)
+        self.assertEqual(p1_met.supply_created_at_time(547), 126)
         
     
     def test_avg_sq(self):

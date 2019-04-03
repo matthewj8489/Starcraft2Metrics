@@ -4,7 +4,7 @@ from metrics.util import convert_gametime_to_realtime_r
 
 class BasesCreatedTracker(object):
     """
-    Builds ``player.metrics.bases_created`` array made of :class:`~metric.metric_containers.BaseCount`.
+    Builds ``player.metrics.bases_created`` array made of :class:`~metrics.metric_containers.BaseCount`.
     The ``metrics`` being of the type :class:`~metrics.sc2metric.Sc2MetricAnalyzer`. The bases are
     tracked every time a *Nexus*, *CommandCenter*, or *Hatchery* is completed.
     """

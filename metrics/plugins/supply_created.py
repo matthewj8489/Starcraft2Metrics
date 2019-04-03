@@ -5,6 +5,13 @@ from metrics.metric_containers import SupplyCount
 from metrics import util
 
 class SupplyCreatedTracker(object):
+    """
+    Builds ``player.metrics.army_created``, ``player.metrics.workers_created``, and 
+    ``player.metrics.supply_created`` arrays made of :class:`~metrics.metric_containers.SupplyCount`.
+    The ``metrics`` being of the type :class:`~metrics.sc2metric.Sc2MetricAnalyzer`. The supplies
+    are tracked whenever a unit is created. The unit's supply and a cumulative supply count of the
+    army, workers, and total supply are tracked for the corresponding second.
+    """
 
     name = 'SupplyCreatedTracker'
 

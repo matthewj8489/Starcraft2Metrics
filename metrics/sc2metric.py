@@ -6,10 +6,10 @@ import metrics.util
 class Sc2MetricAnalyzer(object):
     """A class that derives useful metrics from replay files
 
-    This class is an extension to the `sc2reader` player. It is meant to be used
-    to offer useful metric data to each player in a Starcraft II replay. The
-    class contains raw data gathered from each replay to derive its metrics.
-    The raw data is filled from the :mod:'plugins' associated with this package.
+    This class is an extension to the ``sc2reader`` player class. It is meant 
+    to be used to offer useful metric data to each player in a Starcraft II replay. 
+    The class contains raw data gathered from each replay to derive its metrics.
+    The raw data is filled from the ``plugins`` associated with this package.
 
     Todo:
         - #TotalSupply : Total supply created by the player.

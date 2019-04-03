@@ -5,10 +5,9 @@ from metrics.sc2metric import Sc2MetricAnalyzer
 
 class APMTracker(object):
     """
-    Builds ``player.aps`` and ``player.apm`` dictionaries where an action is
-    any Selection, ControlGroup, or Command event.
-    Also provides ``player.avg_apm`` which is defined as the sum of all the
-    above actions divided by the number of seconds played by the player (not
+    Provides ``player.metrics.avg_apm`` which is defined as the sum of 
+    any Selection, ControlGroup, or Command event issued by the player 
+    divided by the number of seconds played by the player (not
     necessarily the whole game) multiplied by 60.
     APM is 0 for games under 1 minute in length.
     """

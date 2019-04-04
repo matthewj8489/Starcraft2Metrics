@@ -72,6 +72,7 @@ Reference Pages
    sc2metric
    plugins
    sc2replayparser
+   util
 
 
 

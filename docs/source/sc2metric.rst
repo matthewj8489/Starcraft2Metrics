@@ -9,7 +9,7 @@ Metrics gathered from Starcraft 2 replay data.
 	:members:
 	
 Containers
-==========
+----------
 	
 .. automodule:: metrics.metric_containers
 	:members:

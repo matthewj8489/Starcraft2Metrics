@@ -67,10 +67,11 @@ Reference Pages
 ===============
 
 .. toctree::
-   :maxdepth: 0
+   :maxdepth: 1
    
    sc2metric
    plugins
+   sc2replayparser
 
 
 

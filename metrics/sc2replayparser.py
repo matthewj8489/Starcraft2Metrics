@@ -9,7 +9,7 @@ if __name__ == '__main__':
 import metrics
 
 import sc2reader
-from sc2metric import Sc2MetricAnalyzer
+from metrics.sc2metric import Sc2MetricAnalyzer
 
 ##from plugins.supply import SupplyTracker
 ##from plugins.bases_created import BasesCreatedTracker
@@ -185,16 +185,8 @@ def multi_replay_analysis(bench_data):
     metric_dict['TimeToMax']['Avg30Games'] = ttm_avg
                    
 
-
-############ MAIN ##############
-if __name__ == '__main__':
-    replay_files = []
-    write_mode = ''
-    raw_filepath = ''
-    raw_data = []
-    parsed_rep_filenames = []
-    
-    parser = argparse.ArgumentParser(description='Parse benchmarks from a set of replays')
+def get_argument_parser():
+    parser = argparse.ArgumentParser(description='A replay parser that outputs useful metrics from a set of replays')
 
     parser.add_argument('path', type=str, help='The folder path containing the replays to be parsed')
     parser.add_argument('player_name', type=str, help='The name of the player to gather the metric data on.')
@@ -204,6 +196,19 @@ if __name__ == '__main__':
     parser.add_argument('--ladderonly', action='store_true', default=False, help='Filters out all replays that are not ladder games.')
     parser.add_argument('--overwrite', action='store_true', default=False, help='Overwrites output files when run. If not set, will append to any output files found.')
     parser.add_argument('--auto', action='store_true', default=False, help='Runs in the background and will automatically update output files when new replays appear.')
+    
+    return parser
+                   
+
+############ MAIN ##############
+if __name__ == '__main__':
+    replay_files = []
+    write_mode = ''
+    raw_filepath = ''
+    raw_data = []
+    parsed_rep_filenames = []
+    
+    parser = get_argument_parser()
     args = parser.parse_args()
     
 

@@ -3,7 +3,13 @@ from metrics.metric_containers import ResourceCount
 from metrics.util import convert_gametime_to_realtime_r
 
 class ResourceTracker(object):
-
+    """
+    Builds ``player.metrics.resources`` array made of :class:`~metrics.metric_containers.ResourceCount`.
+    The ``metrics`` being of the type :class:`~metrics.sc2metric.Sc2MetricAnalyzer`. The resources
+    tracked are the unspent resources (minerals + vespene) and the resource collection rate 
+    (minerals + vespene).
+    """
+    
     name = 'ResourceTracker'
 
     def handleInitGame(self,event,replay):

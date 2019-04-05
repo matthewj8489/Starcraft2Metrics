@@ -65,28 +65,46 @@ class TestPlugins(unittest.TestCase):
         """
         #reps = sc2reader.load_replays("test_replays")
         
-        rep_stats = None
-        with open("test_replays\\replay_info.json", "r") as fl:
-            rep_stats = json.load(fl)
-        
-        if rep_stats is None:
-            self.fail("could not open replay_info json file.")
-            
-        for rs in rep_stats:
-            replay = sc2reader.load_replay("test_replays\\"+rs['replay'])
-            
-            for bs in rs['bases']:
-                for idx in range(0, len(bs['players'])):
-                    met = replay.players[idx].metrics
-                    bc = bs['players'][idx]['bases_created']
-                    self.assertEqual(len(met.bases_created), len(bc))
-                    for bdx in range(0, len(bc)):
-                        self.assertEqual(met.bases_created[bdx].second, bc[bdx])
+##       rep_stats = None
+##        with open("test_replays\\replay_info.json", "r") as fl:
+##            rep_stats = json.load(fl)
+##        
+##        if rep_stats is None:
+##           self.fail("could not open replay_info json file.")
+##            
+##        for rs in rep_stats:
+##            replay = sc2reader.load_replay("test_replays\\"+rs['replay'])
+##            
+##            for bs in rs['bases']:
+##                for idx in range(0, len(bs['players'])):
+##                    met = replay.players[idx].metrics
+##                    bc = bs['players'][idx]['bases_created']
+##                    self.assertEqual(len(met.bases_created), len(bc))
+##                    for bdx in range(0, len(bc)):
+##                        self.assertEqual(met.bases_created[bdx].second, bc[bdx])
+        pass
                         
      
     def test_supply_created_tracker_against_sc2reader(self):
         #: TODO
-        pass
+        reps = sc2reader.load_replays("test_replays")
+        for rep in reps:
+            for plyr in rep.players:
+                ube = list(filter(lambda x: x.name == 'UnitBornEvent' and
+                                            (x.unit.is_worker or x.unit.is_army) and not
+                                            x.unit.hallucinated and
+                                            x.unit.owner.pid == plyr.pid, rep.events))
+                uie = list(filter(lambda x: x.name == 'UnitInitEvent' and 
+                                            (x.unit.is_worker or x.unit.is_army) and not 
+                                            x.unit.hallucinated and
+                                            x.unit.name == 'Archon' and
+                                            x.unit.owner.pid == plyr.pid, rep.events))
+                
+                evts = sorted(ube+uie, key=lambda x: x.second)
+                mets = plyr.metrics.supply_created
+                self.assertEqual(len(evts), len(mets))
+                for idx in range(0, len(mets)):
+                    self.assertEqual(convert_gametime_to_realtime_r(rep,evets[idx].second), mets[idx].second)
         
         
     def test_supply_created_tracker_against_json_data(self):

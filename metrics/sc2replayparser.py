@@ -254,10 +254,13 @@ if __name__ == '__main__':
             rep_lvl2 = sc2reader.load_replay(rep_file, load_level=2)
             if (matches_filter(rep_lvl2, args)):
                 pid = get_player_id(rep_lvl2, args.player_name)
-                data = get_replay_metadata(rep_lvl2, pid, args)
-                rep_all = sc2reader.load_replay(rep_file)
-                data.update(get_replay_raw_metrics(rep_all.player[pid].metrics))
-                raw_data.append(data)
+                if pid >= 0:
+                    data = get_replay_metadata(rep_lvl2, pid, args)
+                    rep_all = sc2reader.load_replay(rep_file)
+                    data.update(get_replay_raw_metrics(rep_all.player[pid].metrics))
+                    raw_data.append(data)
+                else:
+                    print("Could not find player " + args.player_name + " in replay " + os.path.basename(rep_file))
 
 
     # write the raw output file

@@ -51,12 +51,11 @@ class TestMetrics(unittest.TestCase):
             
 
     def test_time_to_max(self):
-        #: GET CORRECT NUMBERS
-        replay = sc2reader.load_replay("test_replays\\pvt_macro1.SC2Replay")
+        replay = sc2reader.load_replay("test_replays\\standard_1v1.SC2Replay")
         p1_met = replay.player[1].metrics
                                 
-        self.assertEqual(p1_met.time_to_supply_created(200), 618)
-        self.assertEqual(p1_met.time_to_supply_created_max_workers(200, 75), 618)
+        self.assertEqual(p1_met.time_to_supply_created(200), 612)
+        self.assertEqual(p1_met.time_to_supply_created_max_workers(200, 75), 612)
 
 
     def test_time_to_X_workers(self):

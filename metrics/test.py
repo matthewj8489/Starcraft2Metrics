@@ -19,7 +19,7 @@ import sc2reader
 
 import metrics
 
-replay = sc2reader.load_replay("..\\test\\test_replays\\Year Zero LE (9).SC2Replay")
+replay = sc2reader.load_replay("..\\tests\\test_replays\\standard_1v1.SC2Replay")
 p1_met = replay.player[1].metrics
 
 import pickle

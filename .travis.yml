@@ -1,0 +1,9 @@
+language: python
+python:
+    - "3.6"
+# command to install dependencies
+install:
+    - pip install sc2reader
+# command to run tests
+script:
+    - python tests/__main__.py

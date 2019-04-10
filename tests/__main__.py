@@ -9,7 +9,7 @@ if sys.version_info[:2] < (2, 7):
 else:
     import unittest
     
-    
+import metrics    
 import test_plugins
 import test_sc2metric
 import test_bases_created_plugin

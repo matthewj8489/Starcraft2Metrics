@@ -1,6 +1,10 @@
 Starcraft2Metrics (WIP)
 =======================
 
+[![Documentation Status](https://readthedocs.org/projects/starcraft2metrics/badge/?version=latest)](https://starcraft2metrics.readthedocs.io/en/latest/?badge=latest)
+
+[![Build Status](https://travis-ci.com/matthewj8489/Starcraft2Metrics.svg?branch=master)](https://travis-ci.com/matthewj8489/Starcraft2Metrics)
+
 Starcraft2Metrics offers metrics calculated from replay files using the [SC2Reader](https://github.com/ggtracker/sc2reader) parser.
 
 The end goal of Starcraft2Metrics is to offer the user a visualization of the trend of 

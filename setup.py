@@ -23,7 +23,7 @@ setuptools.setup(
         ]
     },
     
-    install_requires=['mpyq>=0.2.4', 'sc2reader'],
+    install_requires=['mpyq>=0.2.4', 'sc2reader', 'sphinx-argparse'],
     packages=setuptools.find_packages(),
     include_package_data=True
     

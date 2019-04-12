@@ -1,2 +1,3 @@
 mpyq
 sc2reader
+sphinx-argparse

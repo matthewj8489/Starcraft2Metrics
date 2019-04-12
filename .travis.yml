@@ -4,6 +4,7 @@ python:
 # command to install dependencies
 install:
     - pip install sc2reader
+    - python setup.py develop
 # command to run tests
 script:
     - python tests/__main__.py

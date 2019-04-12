@@ -85,11 +85,10 @@ class TestMetrics(unittest.TestCase):
                                              
 
     def test_supply_capped_time(self):
-        #: GET CORRECT NUMBERS
-        replay = sc2reader.load_replay("test_replays\\pvt_macro1.SC2Replay")
+        replay = sc2reader.load_replay("test_replays\\sc62_aur559.SC2Replay")
         p1_met = replay.player[1].metrics
         
-        self.assertEqual(p1_met.supply_capped(), 250)
+        self.assertEqual(p1_met.supply_capped(), 63)
 
         
     def test_workers_created_at_time(self):
@@ -128,13 +127,12 @@ class TestMetrics(unittest.TestCase):
             
             
     def test_aur(self):
-        #: GET CORRECT NUMBERS
-        replay = sc2reader.load_replay("test_replays\\pvt_macro2.SC2Replay")
+        replay = sc2reader.load_replay("test_replays\\sc62_aur559.SC2Replay")
         p1_met = replay.player[1].metrics
         
-        self.assertEqual(round(p1_met.aur(), 1), 836.0)
-        self.assertEqual(round(p1_met.aur_at_time(500), 1), 928.6)
-        self.assertEqual(round(p1_met.aur_pre_max(), 1), 768.9)
+        self.assertEqual(round(p1_met.aur(), 1), 559)
+        #self.assertEqual(round(p1_met.aur_at_time(500), 1), 928.6)
+        #self.assertEqual(round(p1_met.aur_pre_max(), 1), 768.9)
         
         
     def test_avg_rcr(self):

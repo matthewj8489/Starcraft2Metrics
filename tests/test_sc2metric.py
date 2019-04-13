@@ -89,6 +89,11 @@ class TestMetrics(unittest.TestCase):
         p1_met = replay.player[1].metrics
         
         self.assertEqual(p1_met.supply_capped(), 63)
+        
+        replay = sc2reader.load_replay("test_replays\\pvt_macro1.SC2Replay")
+        p1_met = replay.player[1].metrics
+        
+        self.assertEqual(p1_met.supply_capped(), 64)
 
         
     def test_workers_created_at_time(self):

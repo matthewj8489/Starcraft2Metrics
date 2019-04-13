@@ -117,33 +117,43 @@ class TestMetrics(unittest.TestCase):
         
     
     def test_avg_sq(self):
-        #: GET CORRECT NUMBERS
-        replay = sc2reader.load_replay("test_replays\\pvt_macro2.SC2Replay")
+        replay = sc2reader.load_replay("test_replays\\pvt_macro1.SC2Replay")
         p1_met = replay.player[1].metrics
         
-        self.assertEqual(round(p1_met.avg_sq(), 1), 121.2)
-        self.assertEqual(round(p1_met.avg_sq_at_time(500), 1), 110.5)
-        self.assertEqual(round(p1_met.avg_sq_pre_max(), 1), 122.8)
+        self.assertEqual(round(p1_met.avg_sq()), 105)
+        #self.assertEqual(round(p1_met.avg_sq_at_time(500), 1), 110.5)
+        #self.assertEqual(round(p1_met.avg_sq_pre_max(), 1), 122.8)
             
             
     def test_aur(self):
-        replay = sc2reader.load_replay("test_replays\\sc62_aur559.SC2Replay")
+        #replay = sc2reader.load_replay("test_replays\\sc62_aur559.SC2Replay")
+        #p1_met = replay.player[1].metrics
+        
+        #self.assertEqual(round(p1_met.aur()), 559)
+        #self.assertEqual(round(p1_met.aur_at_time(500)), ???)
+        #self.assertEqual(round(p1_met.aur_pre_max()), ???)
+        
+        replay = sc2reader.load_replay("test_replays\\pvt_macro1.SC2Replay")
         p1_met = replay.player[1].metrics
         
-        self.assertEqual(round(p1_met.aur(), 1), 559)
-        #self.assertEqual(round(p1_met.aur_at_time(500), 1), 928.6)
-        #self.assertEqual(round(p1_met.aur_pre_max(), 1), 768.9)
+        self.assertEqual(round(p1_met.aur()), 1428)
         
         
     def test_avg_rcr(self):
-        #: GET CORRECT NUMBERS
-        replay = sc2reader.load_replay("test_replays\\pvt_macro2.SC2Replay")
+        replay = sc2reader.load_replay("test_replays\\pvt_macro1.SC2Replay")
         p1_met = replay.player[1].metrics
         
-        self.assertEqual(round(p1_met.avg_rcr(), 1), 1001.1)
-        self.assertEqual(round(p1_met.avg_rcr_at_time(500), 1), 1100.5)
-        self.assertEqual(round(p1_met.avg_rcr_pre_max(), 1), 1100.5)
+        self.assertEqual(round(p1_met.avg_rcr()), 2491)
+        #self.assertEqual(round(p1_met.avg_rcr_at_time(500)), ???)
+        #self.assertEqual(round(p1_met.avg_rcr_pre_max()), ???)
             
+            
+    def test_apm(self):
+        replay = sc2reader.load_replay("test_replays\\pvt_macro1.SC2Replay")
+        p1_met = replay.player[1].metrics
+        
+        self.assertEqual(round(p1_met.avg_apm), 114)
+        
             
     # def test_current_food(self):    
         # replay = sc2reader.load_replay("test_replays\\pvt_macro1.SC2Replay")

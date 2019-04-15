@@ -8,6 +8,10 @@ setuptools.setup(
     keywords=["starcraft 2", "sc2", "metrics"],
     description="Library to extract user gameplay metrics from Starcraft II replay files",
     long_description=open("README.md").read()+"\n\n"+open("CHANGELOG.txt").read(),
+
+    author="Matthew Johnson",
+    author_email="matthewj8489@gmail.com",
+    url="https://github.com/matthewj8489/Starcraft2Metrics",
     
     platforms=["any"],
     

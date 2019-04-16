@@ -66,5 +66,6 @@ class TTMTrend(Sc2TrendAnalyzer):
 
     def __init__(self, metric):
         #base.init(metric)
+        pass
 
 

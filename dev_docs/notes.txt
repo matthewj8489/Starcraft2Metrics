@@ -138,3 +138,13 @@ Notes: **_ToDo_**
 	- Raw replay metric data from each replay
 	- **_Multi-replay metric trend data_**
 	- **_Graphs of the metric trends_**
+
+
+
+Coverage Tool
+=============
+pip install coverage
+
+cd Starcraft2Metrics
+coverage run --source metrics tests\__main__.py
+coverage report -m

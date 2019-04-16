@@ -66,12 +66,26 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual(p1_met.time_to_supply_created_max_workers(200, 75), 612) # for some reason i see 613 at earliest in replay
 
 
+    def test_time_to_supply_created_max_workers_with_more_than_total_supply(self):
+        replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "standard_1v1.SC2Replay"))
+        p1_met = replay.player[1].metrics
+        
+        self.assertIsNone(p1_met.time_to_supply_created_max_workers(1000, 75))
+        
+        
     def test_time_to_X_workers(self):
         replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "pvt_macro1.SC2Replay"))
         p1_met = replay.player[1].metrics
 
         self.assertEqual(p1_met.time_to_workers_created(66), 477)
         self.assertEqual(p1_met.time_to_workers_created(75), 546)
+        
+        
+    def test_time_to_workers_created_with_more_than_total_workers_created(self):
+        replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "pvt_macro1.SC2Replay"))
+        p1_met = replay.player[1].metrics
+
+        self.assertIsNone(p1_met.time_to_workers_created(200))
         
         
     def test_time_to_bases(self):
@@ -160,6 +174,15 @@ class TestMetrics(unittest.TestCase):
         ## TODO
         #self.assertEqual(round(p1_met.aur_pre_max()), ???)
         pass
+        
+        
+    def test_aur_pre_max_when_never_maxed(self):
+        ## TODO
+        #replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "pvt_macro1.SC2Replay"))
+        #p1_met = replay.player[1].metrics
+        
+        #self.assertEqual(round(p1_met.aur_pre_max()), 1428)
+        pass
     
         
     def test_avg_rcr(self):
@@ -178,6 +201,15 @@ class TestMetrics(unittest.TestCase):
     def test_avg_rcr_pre_max(self):
         ## TODO
         #self.assertEqual(round(p1_met.avg_rcr_pre_max()), ???)
+        pass
+        
+        
+    def test_avg_rcr_pre_max_when_never_maxed(self):
+        ## TODO
+        #replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "pvt_macro1.SC2Replay"))
+        #p1_met = replay.player[1].metrics
+        
+        #self.assertEqual(round(p1_met.avg_rcr()), 2491)
         pass
             
             

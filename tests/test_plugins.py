@@ -15,11 +15,12 @@ from metrics import plugins
 from metrics.util import convert_gametime_to_realtime_r
 import sc2reader
 
+REPLAY_DIR=os.path.join(os.path.dirname(__file__),"test_replays")
 
 class TestPlugins(unittest.TestCase):
 
     def test_resource_tracker_against_sc2reader(self): 
-        reps = sc2reader.load_replays("test_replays")
+        reps = sc2reader.load_replays(REPLAY_DIR)
         for rep in reps:
             for plyr in rep.players:
                 pse = list(filter(lambda x: x.name == 'PlayerStatsEvent' and x.pid == plyr.pid, rep.events))
@@ -39,7 +40,7 @@ class TestPlugins(unittest.TestCase):
     
     def test_bases_created_tracker_against_sc2reader(self):
         base_names = ['Nexus', 'CommandCenter', 'Hatchery']
-        reps = sc2reader.load_replays("test_replays")
+        reps = sc2reader.load_replays(REPLAY_DIR)
         for rep in reps:
             for plyr in rep.players:
                 ube = list(filter(lambda x: x.name == 'UnitBornEvent' and 
@@ -87,7 +88,7 @@ class TestPlugins(unittest.TestCase):
      
     def test_supply_created_tracker_against_sc2reader(self):
         #: TODO
-        reps = sc2reader.load_replays("test_replays")
+        reps = sc2reader.load_replays(REPLAY_DIR)
         for rep in reps:
             for plyr in rep.players:
                 ube = list(filter(lambda x: x.name == 'UnitBornEvent' and

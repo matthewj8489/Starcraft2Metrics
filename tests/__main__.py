@@ -1,16 +1,18 @@
 import os
 import sys
 
-#if __name__ == '__main__':
-#    sys.path.insert(0, os.path.abspath("..\\"))
-
-import inspect
-
 if __name__ == '__main__':
-    filename = os.path.abspath(inspect.getfile(inspect.currentframe()))
-    thispath = os.path.dirname(filename)
-    normpath = os.path.normpath(os.path.join(thispath, os.pardir))
-    sys.path.insert(0, normpath)
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
+
+#import inspect
+
+#if __name__ == '__main__':
+#   filename = os.path.abspath(inspect.getfile(inspect.currentframe()))
+#    thispath = os.path.dirname(filename)
+#    normpath = os.path.normpath(os.path.join(thispath, os.pardir))
+#    sys.path.insert(0, normpath)
+
+
 
     
 if sys.version_info[:2] < (2, 7):

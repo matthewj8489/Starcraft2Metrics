@@ -2,7 +2,7 @@ import os
 import sys
 
 if __name__ == '__main__':
-    sys.path.insert(0, os.path.abspath("..\\"))
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
     
 if sys.version_info[:2] < (2, 7):
     import unittest2 as unittest

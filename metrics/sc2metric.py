@@ -319,7 +319,8 @@ class Sc2MetricAnalyzer(object):
         sc = 0
         for used in fd_used:
             made = list(filter(lambda md: md.second <= used.second, fd_made))
-            if (used.supply == made[len(made)-1].supply
+            if (len(made) > 0
+                and used.supply == made[len(made)-1].supply
                 and made[len(made)-1].supply < 200):
                 sc += (used.second - made[len(made)-1].second)
 

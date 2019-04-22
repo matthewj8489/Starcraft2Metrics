@@ -18,29 +18,33 @@ class SupplyTracker(object):
 
     def add_to_units_alive(self,event,replay):
         self.units_alive[event.control_pid] += event.unit.supply
-        replay.player[event.control_pid].metrics.current_food_used.append(
+        replay.player[event.control_pid].metrics.supply.append(
             FoodCount(convert_gametime_to_realtime_r(replay, event.second),
-                      self.units_alive[event.control_pid]))
+                      self.units_alive[event.control_pid],
+                      self.supply_gen[event.control_pid]))
 
 
     def add_to_supply_gen(self,event,replay):
         self.supply_gen[event.unit.owner.pid] += self.supply_gen_unit[event.unit.name] #math.fabs(event.unit.supply)
-        replay.player[event.unit.owner.pid].metrics.current_food_made.append(
+        replay.player[event.unit.owner.pid].metrics.supply.append(
             FoodCount(convert_gametime_to_realtime_r(replay, event.second),
+                      self.units_alive[event.unit.owner.pid],
                       self.supply_gen[event.unit.owner.pid]))
         
 
     def remove_from_units_alive(self,event,replay):
         self.units_alive[event.unit.owner.pid] -= event.unit.supply
-        replay.player[event.unit.owner.pid].metrics.current_food_used.append(
+        replay.player[event.unit.owner.pid].metrics.supply.append(
             FoodCount(convert_gametime_to_realtime_r(replay, event.second),
-                      self.units_alive[event.unit.owner.pid]))
+                      self.units_alive[event.unit.owner.pid],
+                      self.supply_gen[event.unit.owner.pid]))
         
 
     def remove_from_supply_gen(self,event,replay):
         self.supply_gen[event.unit.owner.pid] -= self.supply_gen_unit[event.unit.name] #math.fabs(event.unit.supply)
-        replay.player[event.unit.owner.pid].metrics.current_food_made.append(
+        replay.player[event.unit.owner.pid].metrics.supply.append(
             FoodCount(convert_gametime_to_realtime_r(replay, event.second),
+                      self.units_alive[event.unit.owner.pid],
                       self.supply_gen[event.unit.owner.pid]))
         
 
@@ -59,8 +63,6 @@ class SupplyTracker(object):
         for player in replay.players:
             self.units_alive[player.pid] = 0
             self.supply_gen[player.pid] = 0
-            player.units_alive = 0
-            player.supply_gen = 0
             player.metrics = Sc2MetricAnalyzer()
 
 

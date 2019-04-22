@@ -46,8 +46,9 @@ class TestMetrics(unittest.TestCase):
             self.assertNotEqual(len(p1_met.workers_created), 0)
             self.assertNotEqual(len(p1_met.supply_created), 0)
             self.assertNotEqual(len(p1_met.bases_created), 0)
-            self.assertNotEqual(len(p1_met.current_food_used), 0)
-            self.assertNotEqual(len(p1_met.current_food_made), 0)
+            #self.assertNotEqual(len(p1_met.current_food_used), 0)
+            #self.assertNotEqual(len(p1_met.current_food_made), 0)
+            self.assertNotEqual(len(p1_met.supply), 0)
             self.assertNotEqual(len(p1_met.resources), 0)
             self.assertNotEqual(p1_met.avg_apm, 0)
             

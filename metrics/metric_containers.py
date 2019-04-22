@@ -8,9 +8,10 @@ class FoodCount(object):
         
     """
 
-    def __init__(self, second, supply):
+    def __init__(self, second, supply_used, supply_made):
         self.second = second
-        self.supply = supply
+        self.supply_used = supply_used
+        self.supply_made = supply_made
 
 
 class BaseCount(object):

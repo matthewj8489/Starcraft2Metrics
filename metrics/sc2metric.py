@@ -80,6 +80,10 @@ class Sc2MetricAnalyzer(object):
         #: A list of :class:`~metrics.metric_containers.FoodCount` for each supply provider building.
         self.current_food_made = []
         
+        #: A list of :class:`~metrics.metric_containers.FoodCount` for each unit and supply provider
+        #: created.
+        self.supply = []
+        
         #: A list of :class:`~metrics.metric_containers.ResourceCount` for resources collected and 
         #: resources unspent every 10 seconds.
         self.resources = []
@@ -312,18 +316,24 @@ class Sc2MetricAnalyzer(object):
         Returns:
             int: The amount of time spent supply capped.
             
-        """
-        fd_made = self.current_food_made
-        fd_used = self.current_food_used
-
+        """        
+        
+        supply_blocked = False
+        time_of_supply_block = 0
         sc = 0
-        for used in fd_used:
-            made = list(filter(lambda md: md.second <= used.second, fd_made))
-            if (len(made) > 0
-                and used.supply == made[len(made)-1].supply
-                and made[len(made)-1].supply < 200):
-                sc += (used.second - made[len(made)-1].second)
-
+        for sp in self.supply:
+            if (supply_blocked == False and
+                sp.supply_used >= sp.supply_made and
+                sp.supply_made < 200):
+                supply_blocked = True
+                time_of_supply_block = sp.second
+            elif (supply_blocked == True and
+                  (sp.supply_used < sp.supply_made or
+                  sp.supply_made >= 200)):
+                sc += (sp.second - time_of_supply_block)
+                supply_blocked = False
+                time_of_supply_block = 0
+                
         return sc
             
 

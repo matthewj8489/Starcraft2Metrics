@@ -24,6 +24,16 @@ class TestPlugins(unittest.TestCase):
         
         self.assertIsNotNone(rep.game_to_real_time_multiplier)
         self.assertIsNotNone(rep.real_to_game_time_multiplier)
+
+        # check that the multipliers can convert a gametime to a real time and
+        # vice-versa
+
+
+    def test_supply_tracker_correct_supply(self):
+        rep = sc2reader.load_replay(os.path.join(REPLAY_DIR, "pvt_macro1.SC2Replay"))
+
+        # check that the supply made and supply used at a given second is correct to what
+        # is observed in a replay
         
 
     def test_resource_tracker_against_sc2reader(self): 

@@ -6,6 +6,7 @@ import sc2reader
 from metrics import plugins
 
 
+sc2reader.engine.register_plugin(plugins.TimeConverter())
 sc2reader.engine.register_plugin(plugins.SupplyTracker())
 sc2reader.engine.register_plugin(plugins.BasesCreatedTracker())
 sc2reader.engine.register_plugin(plugins.SupplyCreatedTracker())

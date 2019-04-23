@@ -47,7 +47,35 @@ class SupplyTracker(object):
                       self.units_alive[event.unit.owner.pid],
                       self.supply_gen[event.unit.owner.pid]))
         
-
+        
+    def add_to_units_alive(self, metrics, pid, supply, second):
+        self.units_alive[pid] += supply
+        metrics.supply.append(FoodCount(second,
+                                        self.units_alive[pid],
+                                        self.supply_gen[pid]))
+        
+    
+    def add_to_supply_gen(self, metrics, pid, supply, second):
+        self.supply_gen[pid] += supply
+        metrics.supply.append(FoodCount(second,
+                                        self.units_alive[pid],
+                                        self.supply_gen[pid]))
+                                        
+                                        
+    def remove_from_units_alive(self, metrics, pid, supply, second):
+        self.units_alive[pid] -= supply
+        metrics.supply.append(FoodCount(second,
+                                        self.units_alive[pid],
+                                        self.supply_gen[pid]))
+                                        
+                                        
+    def remove_from_supply_gen(self, metrics, pid, supply, second):
+        self.supply_gen[pid] += supply
+        metrics.supply.append(FoodCount(second,
+                                        self.units_alive[pid],
+                                        self.supply_gen[pid]))
+                                        
+                                        
     def handleInitGame(self, event, replay):
         self.supply_gen_unit = {
             #'Overloard' : 8,
@@ -68,7 +96,9 @@ class SupplyTracker(object):
 
     def handleUnitInitEvent(self,event,replay):
         if event.unit.is_worker or (event.unit.is_army and not self._isHallucinated(event.unit)):
-            self.add_to_units_alive(event,replay)
+            #self.add_to_units_alive(event,replay)
+            self.add_to_units_alive(replay.player[event.control_pid].metrics, event.control_pid,
+                                    event.unit.supply, event.second * replay.game_to_real_time_multiplier)
 
 
     def handleUnitBornEvent(self,event,replay):

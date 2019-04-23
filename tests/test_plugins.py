@@ -19,6 +19,13 @@ REPLAY_DIR=os.path.join(os.path.dirname(__file__),"test_replays")
 
 class TestPlugins(unittest.TestCase):
 
+    def test_time_converter(self):
+        rep = sc2reader.load_replay(os.path.join(REPLAY_DIR, "pvt_macro1.SC2Replay"))
+        
+        self.assertIsNotNone(rep.game_to_real_time_multiplier)
+        self.assertIsNotNone(rep.real_to_game_time_multiplier)
+        
+
     def test_resource_tracker_against_sc2reader(self): 
         reps = sc2reader.load_replays(REPLAY_DIR)
         for rep in reps:

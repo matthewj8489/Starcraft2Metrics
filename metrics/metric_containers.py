@@ -4,7 +4,8 @@ class FoodCount(object):
     
     Args:
         second (int): The second in the game.
-        supply (int): The supply amount.
+        supply_used (int): The amount of supply used.
+        supply_made (int): The amount of supply made from supply buildings.
         
     """
 

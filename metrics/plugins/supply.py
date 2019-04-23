@@ -16,64 +16,64 @@ class SupplyTracker(object):
 
     name = 'SupplyTracker'
 
-    def add_to_units_alive(self,event,replay):
+    def _add_to_units_alive(self,event,replay):
         self.units_alive[event.control_pid] += event.unit.supply
         replay.player[event.control_pid].metrics.supply.append(
             FoodCount(convert_gametime_to_realtime_r(replay, event.second),
-                      self.units_alive[event.control_pid],
-                      self.supply_gen[event.control_pid]))
+                      self._units_alive[event.control_pid],
+                      self._supply_gen[event.control_pid]))
 
 
-    def add_to_supply_gen(self,event,replay):
+    def _add_to_supply_gen(self,event,replay):
         self.supply_gen[event.unit.owner.pid] += self.supply_gen_unit[event.unit.name] #math.fabs(event.unit.supply)
         replay.player[event.unit.owner.pid].metrics.supply.append(
             FoodCount(convert_gametime_to_realtime_r(replay, event.second),
-                      self.units_alive[event.unit.owner.pid],
-                      self.supply_gen[event.unit.owner.pid]))
+                      self._units_alive[event.unit.owner.pid],
+                      self._supply_gen[event.unit.owner.pid]))
         
 
-    def remove_from_units_alive(self,event,replay):
+    def _remove_from_units_alive(self,event,replay):
         self.units_alive[event.unit.owner.pid] -= event.unit.supply
         replay.player[event.unit.owner.pid].metrics.supply.append(
             FoodCount(convert_gametime_to_realtime_r(replay, event.second),
-                      self.units_alive[event.unit.owner.pid],
-                      self.supply_gen[event.unit.owner.pid]))
+                      self._units_alive[event.unit.owner.pid],
+                      self._supply_gen[event.unit.owner.pid]))
         
 
-    def remove_from_supply_gen(self,event,replay):
+    def _remove_from_supply_gen(self,event,replay):
         self.supply_gen[event.unit.owner.pid] -= self.supply_gen_unit[event.unit.name] #math.fabs(event.unit.supply)
         replay.player[event.unit.owner.pid].metrics.supply.append(
             FoodCount(convert_gametime_to_realtime_r(replay, event.second),
-                      self.units_alive[event.unit.owner.pid],
-                      self.supply_gen[event.unit.owner.pid]))
+                      self._units_alive[event.unit.owner.pid],
+                      self._supply_gen[event.unit.owner.pid]))
         
         
-    def add_to_units_alive(self, metrics, pid, supply, second):
-        self.units_alive[pid] += supply
-        metrics.supply.append(FoodCount(second,
-                                        self.units_alive[pid],
-                                        self.supply_gen[pid]))
-        
-    
-    def add_to_supply_gen(self, metrics, pid, supply, second):
-        self.supply_gen[pid] += supply
-        metrics.supply.append(FoodCount(second,
-                                        self.units_alive[pid],
-                                        self.supply_gen[pid]))
-                                        
-                                        
-    def remove_from_units_alive(self, metrics, pid, supply, second):
-        self.units_alive[pid] -= supply
-        metrics.supply.append(FoodCount(second,
-                                        self.units_alive[pid],
-                                        self.supply_gen[pid]))
-                                        
-                                        
-    def remove_from_supply_gen(self, metrics, pid, supply, second):
-        self.supply_gen[pid] += supply
-        metrics.supply.append(FoodCount(second,
-                                        self.units_alive[pid],
-                                        self.supply_gen[pid]))
+##    def add_to_units_alive(self, metrics, pid, supply, second):
+##        self.units_alive[pid] += supply
+##        metrics.supply.append(FoodCount(second,
+##                                        self.units_alive[pid],
+##                                        self.supply_gen[pid]))
+##        
+##    
+##    def add_to_supply_gen(self, metrics, pid, supply, second):
+##        self.supply_gen[pid] += supply
+##        metrics.supply.append(FoodCount(second,
+##                                        self.units_alive[pid],
+##                                        self.supply_gen[pid]))
+##                                        
+##                                        
+##    def remove_from_units_alive(self, metrics, pid, supply, second):
+##        self.units_alive[pid] -= supply
+##        metrics.supply.append(FoodCount(second,
+##                                        self.units_alive[pid],
+##                                        self.supply_gen[pid]))
+##                                        
+##                                        
+##    def remove_from_supply_gen(self, metrics, pid, supply, second):
+##        self.supply_gen[pid] += supply
+##        metrics.supply.append(FoodCount(second,
+##                                        self.units_alive[pid],
+##                                        self.supply_gen[pid]))
                                         
                                         
     def handleInitGame(self, event, replay):
@@ -85,39 +85,39 @@ class SupplyTracker(object):
             'Pylon' : 8,
             'Nexus' : 15
         }
-        self.units_alive = defaultdict(int)
-        self.supply_gen = defaultdict(int)
+        self._units_alive = defaultdict(int)
+        self._supply_gen = defaultdict(int)
 
         for player in replay.players:
-            self.units_alive[player.pid] = 0
-            self.supply_gen[player.pid] = 0
+            self._units_alive[player.pid] = 0
+            self._supply_gen[player.pid] = 0
             player.metrics = Sc2MetricAnalyzer()
 
 
     def handleUnitInitEvent(self,event,replay):
         if event.unit.is_worker or (event.unit.is_army and not self._isHallucinated(event.unit)):
-            #self.add_to_units_alive(event,replay)
-            self.add_to_units_alive(replay.player[event.control_pid].metrics, event.control_pid,
-                                    event.unit.supply, event.second * replay.game_to_real_time_multiplier)
+            self._add_to_units_alive(event,replay)
+            #self.add_to_units_alive(replay.player[event.control_pid].metrics, event.control_pid,
+            #                        event.unit.supply, event.second * replay.game_to_real_time_multiplier)
 
 
     def handleUnitBornEvent(self,event,replay):
         if event.unit.is_worker or (event.unit.is_army and not self._isHallucinated(event.unit)):
-            self.add_to_units_alive(event,replay)
+            self._add_to_units_alive(event,replay)
         elif event.unit.is_building and (event.unit.name in self.supply_gen_unit):
-            self.add_to_supply_gen(event,replay)
+            self._add_to_supply_gen(event,replay)
 
 
     def handleUnitDoneEvent(self,event,replay):
         if event.unit.is_building and (event.unit.name in self.supply_gen_unit): #and event.unit.supply != 0:
-            self.add_to_supply_gen(event,replay)
+            self._add_to_supply_gen(event,replay)
 
 
     def handleUnitDiedEvent(self,event,replay):
         if event.unit.is_worker or (event.unit.is_army and not self._isHallucinated(event.unit)):
-            self.remove_from_units_alive(event,replay)
+            self._remove_from_units_alive(event,replay)
         elif event.unit.is_building and (event.unit.name in self.supply_gen_unit): #and event.unit.supply != 0:
-            self.remove_from_supply_gen(event,replay)
+            self._remove_from_supply_gen(event,replay)
 
 
 ##    def handleEndGame(self, event, replay):

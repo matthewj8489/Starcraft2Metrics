@@ -29,7 +29,15 @@ class TestPlugins(unittest.TestCase):
         # vice-versa
         
 
-    def test_supply_tracker_correct_supply(self):
+    def test_supply_tracker_correct_supply_with_no_archons(self):
+        pass
+
+
+    def test_supply_tracker_correct_supply_with_dt_archons(self):
+        pass
+
+
+    def test_supply_tracker_correct_supply_with_ht_archons(self):
         rep = sc2reader.load_replay(os.path.join(REPLAY_DIR, "pvt_macro1.SC2Replay"))
 
         # check that the supply made and supply used at a given second is correct to what
@@ -67,6 +75,11 @@ class TestPlugins(unittest.TestCase):
         sup_check = filt[len(filt)-1]
         self.assertEqual(sup_check.supply_used, 174)#164
         self.assertEqual(sup_check.supply_made, 235)
+        
+
+
+    def test_supply_tracker_correct_supply_with_dt_and_ht_archons(self):
+        pass
         
         
         

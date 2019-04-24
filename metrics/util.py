@@ -19,7 +19,7 @@ def convert_realtime_to_gametime(real_time_s, game_frames,
 
     real_fps = game_frames / game_length_s
     real_game_frame = real_time_s * real_fps
-    game_time = real_game_frame // game_fps
+    game_time = round(real_game_frame / game_fps)
 
     return game_time
 
@@ -49,7 +49,7 @@ def convert_gametime_to_realtime(game_time_s, game_frames,
 
     real_game_frame = game_time_s * game_fps
     real_fps = game_frames / game_length_s
-    real_time = real_game_frame // real_fps
+    real_time = round(real_game_frame / real_fps)
 
     return real_time
 

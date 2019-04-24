@@ -75,6 +75,13 @@ class SupplyTracker(object):
 ##                                        self.supply_gen[pid]))
                                         
                                         
+    def _add_to_archon_debt(self):
+        self._archon_debt += 2
+        
+    def _remove_one_templar_archon_debt(self):
+        if self._archon_debt > 0:
+            self._archon_debt -= 1
+                                        
     def handleInitGame(self, event, replay):
         self.supply_gen_unit = {
             #'Overloard' : 8,
@@ -84,6 +91,7 @@ class SupplyTracker(object):
             'Pylon' : 8,
             'Nexus' : 15
         }
+        self._archon_debt = 0
         self._units_alive = defaultdict(int)
         self._supply_gen = defaultdict(int)
 
@@ -95,7 +103,10 @@ class SupplyTracker(object):
 
     def handleUnitInitEvent(self,event,replay):
         if event.unit.is_worker or (event.unit.is_army and not self._isHallucinated(event.unit)):
-            self._add_to_units_alive(event,replay)
+            if (event.unit.name == 'Archon'):
+                self._add_to_archon_debt()
+            else:
+                self._add_to_units_alive(event,replay)
             #self.add_to_units_alive(replay.player[event.control_pid].metrics, event.control_pid,
             #                        event.unit.supply, event.second * replay.game_to_real_time_multiplier)
 
@@ -114,7 +125,10 @@ class SupplyTracker(object):
 
     def handleUnitDiedEvent(self,event,replay):
         if event.unit.is_worker or (event.unit.is_army and not self._isHallucinated(event.unit)):
-            self._remove_from_units_alive(event,replay)
+            if (event.unit.name == 'HighTemplar' or event.unit.name == 'DarkTemplar') and self._archon_debt > 0:
+                self._remove_one_templar_archon_debt()
+            else:
+                self._remove_from_units_alive(event,replay)
         elif event.unit.is_building and (event.unit.name in self.supply_gen_unit): #and event.unit.supply != 0:
             self._remove_from_supply_gen(event,replay)
 

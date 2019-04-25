@@ -36,6 +36,48 @@ class TestSc2MetricAnalyzer(unittest.TestCase):
         self.assertEqual(met.first_max(), 180)
         
         
+    def test_avg_rcr(self):
+        met = Sc2MetricAnalyzer()
+        met.resources.append(ResourceCount(10, 500, 120))
+        met.resources.append(ResourceCount(20, 750, 300))
+        met.resources.append(ResourceCount(40, 1100, 250))
+    
+        # shouldn't avg rcr care about the time (second) that this value was read when calculating average?    
+        self.assertEqual(round(met.avg_rcr(), 1), 783.3)
+        
+        
+    def test_avg_rcr_at_time(self):
+        met = Sc2MetricAnalyzer()
+        met.resources.append(ResourceCount(10, 500, 120))
+        met.resources.append(ResourceCount(20, 750, 300))
+        met.resources.append(ResourceCount(40, 1100, 250))
+    
+        self.assertIsNone(met.avg_rcr_at_time(5)) # bad input
+        self.assertEqual(round(met.avg_rcr_at_time(50), 1), 783.3) # at a time later than last recorded
+        self.assertEqual(round(met.avg_rcr_at_time(30), 1), 625.0) # in between 2 times
+        
+    
+    def test_avg_rcr_pre_max(self):
+        met = Sc2MetricAnalyzer()
+        met.supply.append(FoodCount(0, 15, 15)) # 0 second initial supply
+        met.supply.append(FoodCount(50, 60, 101)) # nothing special
+        met.supply.append(FoodCount(100, 197, 197)) #near max and near max supply made
+        met.supply.append(FoodCount(130, 197, 200)) #near max
+        met.supply.append(FoodCount(140, 198, 200)) #near max
+        met.supply.append(FoodCount(150, 199, 200)) #near max
+        met.supply.append(FoodCount(180, 200, 200)) #first max
+        met.supply.append(FoodCount(200, 189, 200)) #dipped below max
+        met.supply.append(FoodCount(220, 200, 200)) #got to max again
+        met.resources.append(ResourceCount(10, 500, 120))
+        met.resources.append(ResourceCount(20, 750, 300))
+        met.resources.append(ResourceCount(40, 1100, 250))
+        met.resources.append(ResourceCount(180, 3100, 850))
+        met.resources.append(ResourceCount(200, 3300, 1050))
+        met.resources.append(ResourceCount(220, 3000, 950))
+        
+        self.assertEqual(round(met.avg_rcr_pre_max(), 1), 1362.5)    
+        
+    
     def test_supply_capped(self):
         met = Sc2MetricAnalyzer()
         met.supply.append(FoodCount(0, 12, 15))

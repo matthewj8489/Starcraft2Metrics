@@ -54,12 +54,12 @@ class SupplyCount(object):
 
 class ResourceCount(object):
     """
-    Container for the resources collected and unspent at a specified
+    Container for the resource collection rate and unspent at a specified
     second in the game.
     
     Args:
         second (int): The second in the game.
-        res_col (int): The resources collected at this second in the game.
+        res_col (int): The resource collection rate at this second in the game.
         res_unspent (int): The unspent resources at this second in the game.
         
     """

@@ -57,14 +57,16 @@ class TestMetrics(unittest.TestCase):
         replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "standard_1v1.SC2Replay"))
         p1_met = replay.player[1].metrics
                                 
-        self.assertEqual(p1_met.time_to_supply_created(200), 612) # for some reason i see 613 at earliest in replay
+        # verify by going through replay
+        self.assertEqual(p1_met.time_to_supply_created(200), 613)
 
 
     def test_time_to_max_with_max_workers_created(self):
         replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "standard_1v1.SC2Replay"))
         p1_met = replay.player[1].metrics
         
-        self.assertEqual(p1_met.time_to_supply_created_max_workers(200, 75), 612) # for some reason i see 613 at earliest in replay
+        # verify by going through replay
+        self.assertEqual(p1_met.time_to_supply_created_max_workers(200, 75), 613)
 
 
     def test_time_to_supply_created_max_workers_with_more_than_total_supply(self):
@@ -93,9 +95,10 @@ class TestMetrics(unittest.TestCase):
         replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "pvt_macro1.SC2Replay"))
         p1_met = replay.player[1].metrics
         
+        # verify these numbers with going through the replay
         self.assertEqual(p1_met.time_to_bases_created(1), 0)
-        self.assertEqual(p1_met.time_to_bases_created(2), 162)
-        self.assertEqual(p1_met.time_to_bases_created(3), 415)
+        self.assertEqual(p1_met.time_to_bases_created(2), 163)
+        self.assertEqual(p1_met.time_to_bases_created(3), 416)
         
     
     def test_time_to_bases_out_of_range(self):
@@ -123,8 +126,9 @@ class TestMetrics(unittest.TestCase):
         replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "pvt_macro1.SC2Replay"))
         p1_met = replay.player[1].metrics
         
-        self.assertEqual(p1_met.workers_created_at_time(443), 60)
-        self.assertEqual(p1_met.workers_created_at_time(478), 67)
+        # use sc2replaystats to find values: http://sc2replaystats.com/replay/10178735
+        self.assertEqual(p1_met.workers_created_at_time(441), 60)
+        self.assertEqual(p1_met.workers_created_at_time(504), 70)
         self.assertEqual(p1_met.workers_created_at_time(547), 76)
 
     
@@ -132,16 +136,20 @@ class TestMetrics(unittest.TestCase):
         replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "pvt_macro1.SC2Replay"))
         p1_met = replay.player[1].metrics
         
-        self.assertEqual(p1_met.army_created_at_time(443), 31)
-        self.assertEqual(p1_met.army_created_at_time(547), 49)
+        # use sc2replaystats to find values: http://sc2replaystats.com/replay/10178735
+        # use resources lost tab to figure out total created
+        self.assertEqual(p1_met.army_created_at_time(441), 31)
+        self.assertEqual(p1_met.army_created_at_time(546), 43)
     
     
     def test_supply_created_at_time(self):
         replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "pvt_macro1.SC2Replay"))
         p1_met = replay.player[1].metrics
         
-        self.assertEqual(p1_met.supply_created_at_time(443), 87)
-        self.assertEqual(p1_met.supply_created_at_time(547), 126)
+        # use sc2replaystats to find values: http://sc2replaystats.com/replay/10178735
+        # use resources lost tab to figure out total created
+        self.assertEqual(p1_met.supply_created_at_time(441), 87)
+        self.assertEqual(p1_met.supply_created_at_time(546), 125)
         
     
     def test_avg_sq(self):

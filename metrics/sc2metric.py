@@ -112,8 +112,8 @@ class Sc2MetricAnalyzer(object):
 
     def first_max(self):
         """Returns the time at which the player first reached max supply."""
-        return next((fd.second for fd in self.current_food_used
-                     if fd.supply >= 200), -1)
+        return next((sp.second for sp in self.supply
+                     if sp.supply_used >= 200), -1)
 
 
     def _sq(self, resources):

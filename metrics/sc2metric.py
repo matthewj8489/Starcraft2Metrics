@@ -403,11 +403,15 @@ class Sc2MetricAnalyzer(object):
             int: The amount of supply created in the given time.
             
         """
-        supply = 0
-        supply += self.workers_created_at_time(real_time_s)
-        supply += self.army_created_at_time(real_time_s)
+        idx = 0
+        while (len(self.supply_created) > idx
+               and self.supply_created[idx].second <= real_time_s):
+            idx += 1
 
-        return supply
+        if (len(self.supply_created) > 0 and self.supply_created[0].second <= real_time_s):
+            return self.supply_created[idx-1].supply
+        else:
+            return 0
 
 
     def time_to_workers_created(self, worker_count):

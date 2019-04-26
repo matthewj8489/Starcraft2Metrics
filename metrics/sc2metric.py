@@ -162,7 +162,10 @@ class Sc2MetricAnalyzer(object):
         resources = list(filter(lambda res: res.second <= time_s,
                                 self.resources))
 
-        return self._sq(resources)
+        if len(resources) > 0:
+            return self._sq(resources)
+        else:
+            return 0
 
 
     def avg_sq_pre_max(self):

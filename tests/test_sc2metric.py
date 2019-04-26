@@ -52,6 +52,10 @@ class TestMetrics(unittest.TestCase):
             self.assertNotEqual(len(p1_met.resources), 0)
             self.assertNotEqual(p1_met.avg_apm, 0)
             
+            
+    def test_metrics_are_sorted(self):
+        self.assertTrue(False)
+        
 
     def test_time_to_max(self):
         replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "standard_1v1.SC2Replay"))

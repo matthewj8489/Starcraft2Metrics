@@ -287,7 +287,7 @@ class TestSc2MetricAnalyzer(unittest.TestCase):
         # max workers < total workers tracked
         self.assertEqual(met.time_to_supply_created_max_workers(7, 1), 50) # exact supply
         self.assertEqual(met.time_to_supply_created_max_workers(8, 1), 60) 
-        self.assertEqual(met.time_to_supply_created_max_workers(20, 2), 60) # more supply than what was tracked
+        self.assertIsNone(met.time_to_supply_created_max_workers(20, 2)) # more supply than what was tracked
         
     
     def test_time_to_bases_created(self):

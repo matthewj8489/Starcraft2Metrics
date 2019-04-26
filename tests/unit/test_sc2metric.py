@@ -256,6 +256,9 @@ class TestSc2MetricAnalyzer(unittest.TestCase):
         met.supply_created.append(SupplyCount(60, 11, 2, False))
         met.supply_created.append(SupplyCount(60, 11, 2, False)) # two army supplies tracked at zero seconds
         
+        # bad inputs
+        self.assertIsNone(met.time_to_supply_created_max_workers(0, 1))
+        
         # max workers > total workers tracked
         self.assertEqual(met.time_to_supply_created_max_workers(8, 10), 50) # exact supply
         self.assertEqual(met.time_to_supply_created_max_workers(10, 10), 60) # in between 2 supplies

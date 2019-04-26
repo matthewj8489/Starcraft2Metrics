@@ -193,10 +193,14 @@ class TestSc2MetricAnalyzer(unittest.TestCase):
         
     def test_workers_created_at_time(self):
         met = Sc2MetricAnalyzer()
-        met.workers_created.append(SupplyCount(0, 1, 1, True))
+        
+        self.assertEqual(met.workers_created_at_time(5), 0) # no workers created
+        
+        met.workers_created.append(SupplyCount(1, 1, 1, True))
         met.workers_created.append(SupplyCount(20, 8, 1, True))
         met.workers_created.append(SupplyCount(25, 9, 1, True))
         
+        self.assertEqual(met.workers_created_at_time(5), 0) # before anything tracked
         self.assertEqual(met.workers_created_at_time(20), 2) # exact time
         self.assertEqual(met.workers_created_at_time(15), 1) # in between case
         self.assertEqual(met.workers_created_at_time(30), 3) # longer than last tracked supply time
@@ -204,17 +208,33 @@ class TestSc2MetricAnalyzer(unittest.TestCase):
         
     def test_army_created_at_time(self):
         met = Sc2MetricAnalyzer()
+        
+        self.assertEqual(met.army_created_at_time(5), 0) # no army created
+        
         met.army_created.append(SupplyCount(10, 30, 6, False))
         met.army_created.append(SupplyCount(25, 44, 2, False))
         met.army_created.append(SupplyCount(30, 48, 4, False))
         
+        self.assertEqual(met.army_created_at_time(5), 0) # before anything tracked
         self.assertEqual(met.army_created_at_time(25), 44) # exact time
         self.assertEqual(met.army_created_at_time(20), 30) # in between case
         self.assertEqual(met.army_created_at_time(40), 48) # longer than last tracked supply time        
         
         
     def test_supply_created_at_time(self):
-        self.assertTrue(False)
+        met = Sc2MetricAnalyzer()
+        met.supply_created.append(SupplyCount(0, 1, 1, True)) # worker supply
+        met.supply_created.append(SupplyCount(0, 2, 1, True)) # two worker supplies tracked at zero seconds
+        met.supply_created.append(SupplyCount(20, 4, 2, False)) # army supply
+        met.supply_created.append(SupplyCount(50, 8, 4, False)) 
+        met.supply_created.append(SupplyCount(55, 9, 1, True))
+        met.supply_created.append(SupplyCount(60, 11, 2, False))
+        met.supply_created.append(SupplyCount(60, 11, 2, False)) # two army supplies tracked at zero seconds
+        
+        self.assertEqual(met.supply_created_at_time(0), 1) # 0 seconds
+        self.assertEqual(met.supply_created_at_time(55), 9) # exact time
+        self.assertEqual(met.supply_created_at_time(57), 9) # in between 2 times
+        self.assertEqual(met.supply_created_at_time(70), 11) # greater than greatest time 
         
         
     def test_time_to_workers_created(self):

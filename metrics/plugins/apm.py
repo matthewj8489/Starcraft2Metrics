@@ -21,7 +21,7 @@ class APMTracker(object):
     def handleInitGame(self, event, replay):
         for player in replay.players:
             player.metrics = Sc2MetricAnalyzer()
-            self._aps[player.pid] = defaultdict(float)
+            self._aps[player.pid] = defaultdict(int)
 
     def handleControlGroupEvent(self, event, replay):
         self._aps[event.player.pid][convert_gametime_to_realtime_r(replay, event.second)] += 1

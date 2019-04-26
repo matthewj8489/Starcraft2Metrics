@@ -91,6 +91,9 @@ class Sc2MetricAnalyzer(object):
         #: The player's average apm
         self.avg_apm = 0
         
+        #: The player's average spm
+        self.avg_spm = 0
+        
 
     def metrics(self):
         """A dictionairy of basic metrics."""

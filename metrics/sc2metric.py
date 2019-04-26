@@ -360,7 +360,10 @@ class Sc2MetricAnalyzer(object):
             workers += 1
             idx += 1
 
-        return workers
+        if (len(self.workers_created) > 0 and self.workers_created[0].second <= time_s):
+            return workers
+        else:
+            return 0
 
 
     def army_created_at_time(self, game_time_s):
@@ -381,7 +384,10 @@ class Sc2MetricAnalyzer(object):
                and self.army_created[idx].second <= game_time_s):
             idx += 1
 
-        return self.army_created[idx-1].supply
+        if (len(self.army_created) > 0 and self.army_created[0].second <= game_time_s):
+            return self.army_created[idx-1].supply
+        else:
+            return 0
 
 
     def supply_created_at_time(self, real_time_s):

@@ -24,13 +24,13 @@ class APMTracker(object):
             self._aps[player.pid] = defaultdict(float)
 
     def handleControlGroupEvent(self, event, replay):
-        self._aps[event.player.pid][convert_gametime_to_realtime_r(replay, event.second)] += 1.38
+        self._aps[event.player.pid][convert_gametime_to_realtime_r(replay, event.second)] += 1
 
     def handleSelectionEvent(self, event, replay):
-        self._aps[event.player.pid][convert_gametime_to_realtime_r(replay, event.second)] += 1.38
+        self._aps[event.player.pid][convert_gametime_to_realtime_r(replay, event.second)] += 1
         
     def handleCommandEvent(self, event, replay):
-        self._aps[event.player.pid][convert_gametime_to_realtime_r(replay, event.second)] += 1.38
+        self._aps[event.player.pid][convert_gametime_to_realtime_r(replay, event.second)] += 1
 
     def handlePlayerLeaveEvent(self, event, replay):
         self._seconds_played[event.player.pid] = convert_gametime_to_realtime_r(replay, event.second)
@@ -38,6 +38,6 @@ class APMTracker(object):
     def handleEndGame(self, event, replay):
         for player in replay.players:
             if len(self._aps[player.pid].keys()) > 0:
-                player.metrics.avg_apm = sum(self._aps[player.pid].values())/float(self._seconds_played[player.pid])*60
+                player.metrics.avg_apm = sum(self._aps[player.pid].values())/self._seconds_played[player.pid]*60
             else:
                 player.metrics.avg_apm = 0

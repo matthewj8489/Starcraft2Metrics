@@ -436,9 +436,17 @@ class Sc2MetricAnalyzer(object):
             int: The time when the supply was created in the replay.
             
         """
-        supp = list(filter(lambda sp: sp.supply <= supply_count,
-                           self.supply_created))
+        #supp = list(filter(lambda sp: sp.supply <= supply_count,
+        #                   self.supply_created))
 
+        supp = []           
+        for sp in self.supply_created:
+            if sp.supply < supply_count:
+                supp.append(sp)
+            elif sp.supply >= supply_count and len(supp) > 0:
+                supp.append(sp)
+                break
+                           
         if len(supp) > 0:
             return supp[len(supp)-1].second
         else:

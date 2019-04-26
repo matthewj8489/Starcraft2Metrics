@@ -200,7 +200,7 @@ class TestSc2MetricAnalyzer(unittest.TestCase):
         met.workers_created.append(SupplyCount(20, 8, 1, True))
         met.workers_created.append(SupplyCount(25, 9, 1, True))
         
-        self.assertEqual(met.workers_created_at_time(5), 0) # before anything tracked
+        self.assertEqual(met.workers_created_at_time(0), 0) # before anything tracked
         self.assertEqual(met.workers_created_at_time(20), 2) # exact time
         self.assertEqual(met.workers_created_at_time(15), 1) # in between case
         self.assertEqual(met.workers_created_at_time(30), 3) # longer than last tracked supply time

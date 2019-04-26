@@ -231,7 +231,7 @@ class TestSc2MetricAnalyzer(unittest.TestCase):
         met.supply_created.append(SupplyCount(60, 11, 2, False))
         met.supply_created.append(SupplyCount(60, 11, 2, False)) # two army supplies tracked at zero seconds
         
-        self.assertEqual(met.supply_created_at_time(0), 1) # 0 seconds
+        self.assertEqual(met.supply_created_at_time(0), 2) # 0 seconds
         self.assertEqual(met.supply_created_at_time(55), 9) # exact time
         self.assertEqual(met.supply_created_at_time(57), 9) # in between 2 times
         self.assertEqual(met.supply_created_at_time(70), 11) # greater than greatest time 

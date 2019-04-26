@@ -417,7 +417,7 @@ class Sc2MetricAnalyzer(object):
             int: The time at which the total number of workers were created.
             
         """
-        if worker_count <= len(self.workers_created):
+        if worker_count > 0 and worker_count <= len(self.workers_created):
             return self.workers_created[worker_count-1].second
         else:
             return None

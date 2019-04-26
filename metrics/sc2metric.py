@@ -470,6 +470,10 @@ class Sc2MetricAnalyzer(object):
             int: The time when the supply was created in the replay.
             
         """
+        
+        if supply_count <= 0:
+            return None
+        
         supp = 0
         workers = 0
         for sc in self.supply_created:
@@ -480,7 +484,7 @@ class Sc2MetricAnalyzer(object):
                 if sc.is_worker:
                     workers += 1
 
-        return None
+        return self.supply_created[len(self.supply_created)-1].second
 
 
     def time_to_bases_created(self, base_count):

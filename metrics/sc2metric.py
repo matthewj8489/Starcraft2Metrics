@@ -481,7 +481,9 @@ class Sc2MetricAnalyzer(object):
             
         """
         
-        if supply_count <= 0:
+        if (supply_count <= 0 or
+            (len(self.supply_created) > 0 and
+            self.supply_created[len(self.supply_created)-1].supply < (supply_count - max_workers_counted))):
             return None
         
         supp = 0

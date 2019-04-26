@@ -356,7 +356,7 @@ class Sc2MetricAnalyzer(object):
         workers = 0
         idx = 0
         while (len(self.workers_created) > idx
-               and self.workers_created[idx].second < time_s):
+               and self.workers_created[idx].second <= time_s):
             workers += 1
             idx += 1
 

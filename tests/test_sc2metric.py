@@ -237,6 +237,13 @@ class TestMetrics(unittest.TestCase):
         
         self.assertEqual(round(p1_met.avg_apm), 114)
         
+        
+    def test_spm(self):
+        replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "pvt_macro1.SC2Replay"))
+        p1_met = replay.player[1].metrics
+        
+        self.assertEqual(round(p1_met.avg_spm, 1), 15.3)
+        
             
     # def test_current_food(self):    
         # replay = sc2reader.load_replay("test_replays\\pvt_macro1.SC2Replay")

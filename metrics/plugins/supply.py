@@ -104,11 +104,13 @@ class SupplyTracker(object):
             'Nexus' : 15
         }
         self._archon_debt = 0
-        self._hallucinations = []
+        #self._hallucinations = []
+        self._units_tracked = defaultdict(int)
         self._units_alive = defaultdict(int)
         self._supply_gen = defaultdict(int)
 
         for player in replay.players:
+            self._units_tracked[player.pid] = []
             self._units_alive[player.pid] = 0
             self._supply_gen[player.pid] = 0
             player.metrics = Sc2MetricAnalyzer()
@@ -153,45 +155,125 @@ class SupplyTracker(object):
 ##        #    self._hallucinations.append(event.ability_name)
 ##        pass
         
-        
     class UnitTracker(object):
-        def __init__(self, second, created, died, supply, is_bldg):
+        def __init__(self, second, unit_name, supply, is_created, is_bldg):
             self.second = second
-            self.created = created
-            self.died = died
+            self.unit_name = unit_name
             self.supply = supply
+            self.is_created = is_created
             self.is_building = is_bldg
             
+    #self._archon_debt = 0
+    #self._units_tracked = []
         
+        
+    def handleUnitInitEvent(self,event,replay):
+        if event.unit.is_worker or event.unit.is_army:
+            if event.unit.name == 'Archon':
+                self._archon_debt += 2
+            else:
+                self._units_tracked[event.owner.pid].append(UnitTracker(convert_gametime_to_realtime_r(replay, event.second),
+                                                       event.unit.name,
+                                                       event.unit.supply,
+                                                       True,
+                                                       False))
+                                                       
+        
+    def handleUnitBornEvent(self,event,replay):
+        if event.unit.is_worker or event.unit.is_army or (event.unit.is_building and (event.unit.name in self.supply_gen_unit)):
+            self._units_tracked[event.owner.pid].append(UnitTracker(convert_gametime_to_realtime_r(replay, event.second),
+                                                   event.unit.name,
+                                                   event.unit.supply,
+                                                   True,
+                                                   event.unit.is_building))                
+        
+    
+    def handleUnitDoneEvent(self,event,replay):
+        if event.unit.is_building and (event.unit.name in self.supply_gen_unit):
+            self._units_tracked[event.owner.pid].append(UnitTracker(convert_gametime_to_realtime_r(replay, event.second),
+                                                   event.unit.name,
+                                                   event.unit.supply,
+                                                   True,
+                                                   True))
+                                                   
+        
+    def handleUnitDiedEvent(self,event,replay):
+        if event.unit.is_worker or event.unit.is_army or (event.unit.is_building and (event.unit.name in self.supply_gen_unit)):
+            if self._archon_debt > 0 and (event.unit.name == 'HighTemplar' or event.unit.name == 'DarkTemplar'):
+                self._archon_debt -= 1
+            else:
+                self._units_tracked[event.owner.pid].append(UnitTracker(convert_gametime_to_realtime_r(replay, event.second),
+                                                       event.unit.name,
+                                                       event.unit.supply,
+                                                       False,
+                                                       event.unit.is_building))
+        
+    
+    def handleCommandEvent(self,event,replay):
+        if ('Hallucinate' in event.ability_name):
+            # remove the last unit tracked of that name
+            unit_name = event.ability_name[11:]
+            for i in reversed(range(len(self._units_tracked))):
+                if self._units_tracked[i].unit_name == unit_name:
+                    del self._units_tracked[i]
+                    break
+            
+            
+    
     def handleEndGame(self,event,replay):
+        # process the supplies for the units tracked
         for plyr in replay.players:
-            unit_tracker = []
-            for ut in plyr.units:
-                if (ut.is_worker or (ut.is_army and not ut.hallucinated)):
-                    unit_tracker.append(UnitTracker(convert_frame_to_realtime_r(replay,ut.started_at), True, False, ut.supply, False))
-                    if ut.died_at > 0:
-                        unit_tracker.append(UnitTracker(convert_frame_to_realtime_r(replay,ut.died_at), False, True, ut.supply, False))
-                elif (ut.is_building and (event.unit.name in self.supply_gen_unit)):
-                    unit_tracker.append(UnitTracker(convert_frame_to_realtime_r(replay,ut.started_at), True, False, self.supply_gen_unit[event.unit.name], True)
-                    if ut.died_at > 0:
-                        unit_tracker.append(UnitTracker(convert_frame_to_realtime_r(replay,ut.died_at), False, True, self.supply_gen_unit[event.unit.name], True)
-            
-            unit_tracker.sort(key=lambda x: x.second)
-            
-            for trk in unit_tracker:
-                if trk.created:
-                    if trk.is_building:
-                        self._add_to_supply_gen(plyr.metrics, plyr.pid, trk.supply, trk.second)
+            for ut in self._units_tracked[plyr.pid]:
+                if ut.is_created:
+                    if ut.is_building:
+                        self._add_to_supply_gen(plyr.metrics, plyr.pid, ut.supply, ut.second)
                     else:
-                        self._add_to_units_alive(plyr.metrics, plyr.pid, trk.supply, trk.second)
-                elif trk.died:
-                    if trk.is_building:
-                        self._remove_from_supply_gen(plyr.metrics, plyr.pid, trk.supply, trk.second)
+                        self._add_to_units_alive(plyr.metrics, plyr.pid, ut.supply, ut.second)
+                else:
+                    if ut.is_building:
+                        self._remove_from_supply_gen(plyr.metrics, plyr.pid, ut.supply, ut.second)
                     else:
-                        self._remove_from_units_alive(plyr.metrics, plyr.pid, trk.supply, trk.second)
+                        self._remove_from_units_alive(plyr.metrics, plyr.pid, ut.supply, ut.second)
                         
-
-    def _isHallucinated(self, unit):
-        ################ bug : for whatever reason hallucinated attribute does not return correctly, it seems flags == 0 indicates hallucination (but only applies for army ########################
-        #return unit.hallucinated
-        return not ((unit.is_army and unit.flags != 0) or unit.is_worker)
+        
+##    class UnitTracker(object):
+##        def __init__(self, second, created, died, supply, is_bldg):
+##            self.second = second
+##            self.created = created
+##            self.died = died
+##            self.supply = supply
+##            self.is_building = is_bldg
+##            
+##        
+##    def handleEndGame(self,event,replay):
+##        for plyr in replay.players:
+##            unit_tracker = []
+##            for ut in plyr.units:
+##                if (ut.is_worker or (ut.is_army and not ut.hallucinated)):
+##                    unit_tracker.append(UnitTracker(convert_frame_to_realtime_r(replay,ut.started_at), True, False, ut.supply, False))
+##                    if ut.died_at > 0:
+##                        unit_tracker.append(UnitTracker(convert_frame_to_realtime_r(replay,ut.died_at), False, True, ut.supply, False))
+##                elif (ut.is_building and (event.unit.name in self.supply_gen_unit)):
+##                    unit_tracker.append(UnitTracker(convert_frame_to_realtime_r(replay,ut.started_at), True, False, self.supply_gen_unit[event.unit.name], True)
+##                    if ut.died_at > 0:
+##                        unit_tracker.append(UnitTracker(convert_frame_to_realtime_r(replay,ut.died_at), False, True, self.supply_gen_unit[event.unit.name], True)
+##            
+##            unit_tracker.sort(key=lambda x: x.second)
+##            
+##            for trk in unit_tracker:
+##                if trk.created:
+##                    if trk.is_building:
+##                        self._add_to_supply_gen(plyr.metrics, plyr.pid, trk.supply, trk.second)
+##                    else:
+##                        self._add_to_units_alive(plyr.metrics, plyr.pid, trk.supply, trk.second)
+##                elif trk.died:
+##                    if trk.is_building:
+##                        self._remove_from_supply_gen(plyr.metrics, plyr.pid, trk.supply, trk.second)
+##                    else:
+##                        self._remove_from_units_alive(plyr.metrics, plyr.pid, trk.supply, trk.second)
+##                        
+##
+##    def _isHallucinated(self, unit):
+##        ################ bug : for whatever reason hallucinated attribute does not return correctly, it seems flags == 0 indicates hallucination (but only applies for army ########################
+##        #return unit.hallucinated
+##        return not ((unit.is_army and unit.flags != 0) or unit.is_worker)

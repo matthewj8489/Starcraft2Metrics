@@ -82,6 +82,23 @@ class TestPlugins(unittest.TestCase):
         pass
         
         
+    def test_supply_tracker_with_hallucinated_units(self):
+        # There is a bug with sc2metric where units created during unit born events do not have
+        # the 'hallucinated' member filled out correctly and will always appear as not
+        # hallucinated. 
+        # This replay has only sentries and probes being created, while all other
+        # units are hallucinated.
+        # create 15 sentries then start making all hallucinated units after - no more sentries
+        # supply before hallucinations: 75 : 30 army supply, 45 workers
+        # first hallucinated units are made at 5:38 - 3 probes
+                
+        rep = sc2reader.load_replay(os.path.join(REPLAY_DIR, "sentry_hallucinate.SC2Replay"))
+        
+        met = rep.player[1].metrics
+        sup = rep.player[1].metrics.supply
+                
+        self.assertEqual(met.time_to_supply_created(80), 332) # time of last real unit made
+        self.assertEqual(met.supply_created_at_time(390), 75) # supply should be 75 for the rest of the game
         
 
 ##    def test_resource_tracker_against_sc2reader(self): 

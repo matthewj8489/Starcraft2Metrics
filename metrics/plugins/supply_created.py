@@ -62,13 +62,13 @@ class SupplyCreatedTracker(object):
             self._add_to_supply(event,replay)
             self._add_to_workers(event,replay)
         elif (event.unit.is_army
-              and not util.is_hallucinated(event.unit)
+              and not event.unit.hallucinated
               and event.unit.name != "Archon"):
             self._add_to_supply(event,replay)
             self._add_to_army(event,replay)
             
 
     def handleUnitInitEvent(self,event,replay):
-        if (event.unit.is_army and not util.is_hallucinated(event.unit) and event.unit.name != "Archon"):
+        if (event.unit.is_army and not event.unit.hallucinated and event.unit.name != "Archon"):
             self._add_to_supply(event,replay)
             self._add_to_army(event,replay)

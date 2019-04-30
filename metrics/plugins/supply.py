@@ -48,31 +48,31 @@ class SupplyTracker(object):
         
         
     def _add_to_units_alive(self, metrics, pid, supply, second):
-        self.units_alive[pid] += supply
+        self._units_alive[pid] += supply
         metrics.supply.append(FoodCount(second,
-                                        self.units_alive[pid],
-                                        self.supply_gen[pid]))
+                                        self._units_alive[pid],
+                                        self._supply_gen[pid]))
         
     
     def _add_to_supply_gen(self, metrics, pid, supply, second):
-        self.supply_gen[pid] += supply
+        self._supply_gen[pid] += supply
         metrics.supply.append(FoodCount(second,
-                                        self.units_alive[pid],
-                                        self.supply_gen[pid]))
+                                        self._units_alive[pid],
+                                        self._supply_gen[pid]))
                                         
                                         
     def _remove_from_units_alive(self, metrics, pid, supply, second):
-        self.units_alive[pid] -= supply
+        self._units_alive[pid] -= supply
         metrics.supply.append(FoodCount(second,
-                                        self.units_alive[pid],
-                                        self.supply_gen[pid]))
+                                        self._units_alive[pid],
+                                        self._supply_gen[pid]))
                                         
                                         
     def _remove_from_supply_gen(self, metrics, pid, supply, second):
-        self.supply_gen[pid] += supply
+        self._supply_gen[pid] += supply
         metrics.supply.append(FoodCount(second,
-                                        self.units_alive[pid],
-                                        self.supply_gen[pid]))
+                                        self._units_alive[pid],
+                                        self._supply_gen[pid]))
                                         
                                         
     def _add_to_archon_debt(self):
@@ -172,7 +172,7 @@ class SupplyTracker(object):
             if event.unit.name == 'Archon':
                 self._archon_debt += 2
             else:
-                self._units_tracked[event.owner.pid].append(UnitTracker(convert_gametime_to_realtime_r(replay, event.second),
+                self._units_tracked[event.unit.owner.pid].append(SupplyTracker.UnitTracker(convert_gametime_to_realtime_r(replay, event.second),
                                                        event.unit.name,
                                                        event.unit.supply,
                                                        True,
@@ -181,16 +181,22 @@ class SupplyTracker(object):
         
     def handleUnitBornEvent(self,event,replay):
         if event.unit.is_worker or event.unit.is_army or (event.unit.is_building and (event.unit.name in self.supply_gen_unit)):
-            self._units_tracked[event.owner.pid].append(UnitTracker(convert_gametime_to_realtime_r(replay, event.second),
+            ut = SupplyTracker.UnitTracker(convert_gametime_to_realtime_r(replay, event.second),
                                                    event.unit.name,
                                                    event.unit.supply,
                                                    True,
-                                                   event.unit.is_building))                
+                                                   event.unit.is_building)
+            self._units_tracked[event.unit.owner.pid].append(ut)
+            #self._units_tracked[event.owner.pid].append(UnitTracker(convert_gametime_to_realtime_r(replay, event.second),
+            #                                       event.unit.name,
+            #                                       event.unit.supply,
+            #                                       True,
+            #                                       event.unit.is_building))                
         
     
     def handleUnitDoneEvent(self,event,replay):
         if event.unit.is_building and (event.unit.name in self.supply_gen_unit):
-            self._units_tracked[event.owner.pid].append(UnitTracker(convert_gametime_to_realtime_r(replay, event.second),
+            self._units_tracked[event.unit.owner.pid].append(SupplyTracker.UnitTracker(convert_gametime_to_realtime_r(replay, event.second),
                                                    event.unit.name,
                                                    event.unit.supply,
                                                    True,
@@ -202,7 +208,7 @@ class SupplyTracker(object):
             if self._archon_debt > 0 and (event.unit.name == 'HighTemplar' or event.unit.name == 'DarkTemplar'):
                 self._archon_debt -= 1
             else:
-                self._units_tracked[event.owner.pid].append(UnitTracker(convert_gametime_to_realtime_r(replay, event.second),
+                self._units_tracked[event.unit.owner.pid].append(SupplyTracker.UnitTracker(convert_gametime_to_realtime_r(replay, event.second),
                                                        event.unit.name,
                                                        event.unit.supply,
                                                        False,
@@ -213,9 +219,9 @@ class SupplyTracker(object):
         if ('Hallucinate' in event.ability_name):
             # remove the last unit tracked of that name
             unit_name = event.ability_name[11:]
-            for i in reversed(range(len(self._units_tracked))):
-                if self._units_tracked[i].unit_name == unit_name:
-                    del self._units_tracked[i]
+            for i in reversed(range(len(self._units_tracked[event.player.pid]))):
+                if self._units_tracked[event.player.pid][i].unit_name == unit_name:
+                    del self._units_tracked[event.player.pid][i]
                     break
             
             

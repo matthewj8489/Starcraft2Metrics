@@ -342,7 +342,16 @@ class Sc2MetricAnalyzer(object):
                 
         return sc
             
-
+                
+    def supply_at_time(self, real_time_s):
+        pass
+        
+        
+    def first_time_to_supply(self, supply):
+        return next((sp.second for sp in self.supply
+                     if sp.supply_used >= supply), -1)
+            
+            
     def workers_created_at_time(self, time_s):
         """Number of workers created up to the specified time
 

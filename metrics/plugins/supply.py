@@ -103,6 +103,19 @@ class SupplyTracker(object):
             'Pylon' : 8,
             'Nexus' : 15
         }
+        self.hallucinations = {
+            'Probe' : 3,
+            'Zealot' : 2,
+            'Adept' : 2,
+            'Stalker' : 2,
+            'Immortal' : 1,
+            'HighTemplar' : 2,
+            'Archon' : 1,
+            'VoidRay' : 1,
+            'Phoenix' : 1,
+            'WarpPrism' : 1,
+            'Colossus' : 1
+        }
         self._archon_debt = 0
         #self._hallucinations = []
         self._units_tracked = defaultdict(int)
@@ -181,24 +194,23 @@ class SupplyTracker(object):
         
     def handleUnitBornEvent(self,event,replay):
         if event.unit.is_worker or event.unit.is_army or (event.unit.is_building and (event.unit.name in self.supply_gen_unit)):
-            ut = SupplyTracker.UnitTracker(convert_gametime_to_realtime_r(replay, event.second),
+            supply = 0
+            if event.unit.is_building:
+                supply = self.supply_gen_unit[event.unit.name]
+            else:
+                supply = event.unit.supply
+            self._units_tracked[event.unit.owner.pid].append(SupplyTracker.UnitTracker(convert_gametime_to_realtime_r(replay, event.second),
                                                    event.unit.name,
-                                                   event.unit.supply,
+                                                   supply,
                                                    True,
-                                                   event.unit.is_building)
-            self._units_tracked[event.unit.owner.pid].append(ut)
-            #self._units_tracked[event.owner.pid].append(UnitTracker(convert_gametime_to_realtime_r(replay, event.second),
-            #                                       event.unit.name,
-            #                                       event.unit.supply,
-            #                                       True,
-            #                                       event.unit.is_building))                
+                                                   event.unit.is_building))
         
     
     def handleUnitDoneEvent(self,event,replay):
         if event.unit.is_building and (event.unit.name in self.supply_gen_unit):
             self._units_tracked[event.unit.owner.pid].append(SupplyTracker.UnitTracker(convert_gametime_to_realtime_r(replay, event.second),
                                                    event.unit.name,
-                                                   event.unit.supply,
+                                                   self.supply_gen_unit[event.unit.name],
                                                    True,
                                                    True))
                                                    
@@ -208,9 +220,14 @@ class SupplyTracker(object):
             if self._archon_debt > 0 and (event.unit.name == 'HighTemplar' or event.unit.name == 'DarkTemplar'):
                 self._archon_debt -= 1
             else:
+                supply = 0
+                if event.unit.is_building:
+                    supply = self.supply_gen_unit[event.unit.name]
+                else:
+                    supply = event.unit.supply
                 self._units_tracked[event.unit.owner.pid].append(SupplyTracker.UnitTracker(convert_gametime_to_realtime_r(replay, event.second),
                                                        event.unit.name,
-                                                       event.unit.supply,
+                                                       supply,
                                                        False,
                                                        event.unit.is_building))
         
@@ -219,11 +236,12 @@ class SupplyTracker(object):
         if ('Hallucinate' in event.ability_name):
             # remove the last unit tracked of that name
             unit_name = event.ability_name[11:]
-            for i in reversed(range(len(self._units_tracked[event.player.pid]))):
-                if self._units_tracked[event.player.pid][i].unit_name == unit_name:
-                    del self._units_tracked[event.player.pid][i]
-                    break
-            
+            for j in range(self.hallucinations[unit_name]):
+                for i in reversed(range(len(self._units_tracked[event.player.pid]))):
+                    if self._units_tracked[event.player.pid][i].unit_name == unit_name:
+                        del self._units_tracked[event.player.pid][i]
+                        break
+                
             
     
     def handleEndGame(self,event,replay):

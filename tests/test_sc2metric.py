@@ -57,7 +57,7 @@ class TestMetrics(unittest.TestCase):
         self.assertTrue(False)
         
 
-    def test_time_to_max(self):
+    def test_time_to_max_created(self):
         replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "standard_1v1.SC2Replay"))
         p1_met = replay.player[1].metrics
                                 

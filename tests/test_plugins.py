@@ -96,7 +96,9 @@ class TestPlugins(unittest.TestCase):
         
         met = rep.player[1].metrics
         sup = rep.player[1].metrics.supply
-                
+
+
+        self.assertEqual(met.first_time_to_supply(80), -1) # never get to 80 supply
         self.assertEqual(met.time_to_supply_created(80), 332) # time of last real unit made
         self.assertEqual(met.supply_created_at_time(390), 75) # supply should be 75 for the rest of the game
         

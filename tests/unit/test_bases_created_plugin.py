@@ -9,12 +9,9 @@ if sys.version_info[:2] < (2, 7):
 else:
     import unittest
 from unittest.mock import MagicMock
-    
-import sc2reader
-    
+       
 from metrics.sc2metric import Sc2MetricAnalyzer    
 from metrics.plugins.bases_created import BasesCreatedTracker
-from metrics.util import convert_gametime_to_realtime_r
 
 
 class TestBasesCreatedPlugin(unittest.TestCase):

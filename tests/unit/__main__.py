@@ -14,6 +14,8 @@ import metrics
 import test_sc2metric
 from test_sc2metric import *
 
+import test_bases_created_plugin
+from test_bases_created_plugin import *
 
 if __name__ == '__main__':
     unittest.main()

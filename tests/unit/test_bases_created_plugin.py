@@ -2,14 +2,14 @@ import os
 import sys
 
 if __name__ == '__main__':
-    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir)))
     
 if sys.version_info[:2] < (2, 7):
     import unittest2 as unittest
 else:
     import unittest
 from unittest.mock import MagicMock
-       
+
 from metrics.sc2metric import Sc2MetricAnalyzer    
 from metrics.plugins.bases_created import BasesCreatedTracker
 

@@ -9,13 +9,9 @@ if sys.version_info[:2] < (2, 7):
 else:
     import unittest
     
-import metrics
-
-import test_sc2metric
 from test_sc2metric import *
-
-import test_bases_created_plugin
 from test_bases_created_plugin import *
+from test_resource_tracker_plugin import *
 
 if __name__ == '__main__':
     unittest.main()

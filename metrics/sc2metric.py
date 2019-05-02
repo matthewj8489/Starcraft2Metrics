@@ -344,10 +344,34 @@ class Sc2MetricAnalyzer(object):
             
                 
     def supply_at_time(self, real_time_s):
-        pass
+        """The current supply used at the specified time.
+        
+        Calculates the current supply used at the time.
+        
+        Args:
+            real_time_s (int): The time (in seconds) of the replay to count
+                supply.
+                
+        Returns:
+            int: The current amount of supply used in the given time.
+        
+        """
+        return next((sp.supply_used for sp in self.supply
+                     if sp.second <= real_time_s), 0)
         
         
     def first_time_to_supply(self, supply):
+        """The first time that the specified supply was reached.
+        
+        Finds the time when the specified supply was reached.
+        
+        Args:
+            supply (int): The supply desired.
+            
+        Returns:
+            int: The time when the supply was first reached.
+        
+        """
         return next((sp.second for sp in self.supply
                      if sp.supply_used >= supply), -1)
             

@@ -189,6 +189,30 @@ class TestSc2MetricAnalyzer(unittest.TestCase):
         met.supply.append(FoodCount(161, 198, 200)) # supply resolved by reaching 200 supply buildings made
         
         self.assertEqual(met.supply_capped(), 33)
+        
+        
+    def test_first_time_to_supply(self):
+        met = Sc2MetricAnalyzer()
+        
+        met.supply.append(FoodCount(0, 10, 15))
+        met.supply.append(FoodCount(20, 25, 30))
+        
+        self.assertEqual(met.first_time_to_supply(0), 0) # less than the first supply
+        self.assertEqual(met.first_time_to_supply(20), 20) # in between supplies
+        self.assertEqual(met.first_time_to_supply(25), 20) # exact
+        self.assertEqual(met.first_time_to_supply(26), -1) # more than total supply tracked
+        
+        
+    def test_time_to_supply(self):
+        met = Sc2MetricAnalyzer()
+        
+        met.supply.append(FoodCount(5, 10, 15))
+        met.supply.append(FoodCount(20, 25, 30))
+        
+        self.assertEqual(met.supply_at_time(0), 0) # less than the first supply
+        self.assertEqual(met.supply_at_time(10), 10) # in between
+        self.assertEqual(met.supply_at_time(20), 25) # exact
+        self.assertEqual(met.supply_at_time(21), 25) # past the last time
     
         
     def test_workers_created_at_time(self):

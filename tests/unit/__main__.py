@@ -13,6 +13,7 @@ from test_sc2metric import *
 from test_bases_created_plugin import *
 from test_resource_tracker_plugin import *
 from test_apm_tracker_plugin import *
+from test_util import *
 
 if __name__ == '__main__':
     unittest.main()

@@ -356,7 +356,7 @@ class Sc2MetricAnalyzer(object):
             int: The current amount of supply used in the given time.
         
         """
-        return next((sp.supply_used for sp in self.supply
+        return next((sp.supply_used for sp in reversed(self.supply)
                      if sp.second <= real_time_s), 0)
         
         

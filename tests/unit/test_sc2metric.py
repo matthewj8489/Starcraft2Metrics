@@ -79,6 +79,18 @@ class TestSc2MetricAnalyzer(unittest.TestCase):
         self.assertEqual(round(met.avg_sq_pre_max(), 1), 97.4)
         
         
+    def test_avg_sq_pre_max_when_never_maxed(self):
+        met = Sc2MetricAnalyzer()
+        met.supply.append(FoodCount(0, 15, 15)) # 0 second initial supply
+        met.supply.append(FoodCount(50, 60, 101)) # nothing special
+        met.supply.append(FoodCount(100, 197, 197)) #near max and near max supply made
+        met.resources.append(ResourceCount(10, 500, 120))
+        met.resources.append(ResourceCount(20, 750, 300))
+        met.resources.append(ResourceCount(40, 1100, 250))
+        
+        self.assertEqual(round(met.avg_sq_pre_max(), 1), 88.3)     
+        
+        
     def test_aur(self):
         met = Sc2MetricAnalyzer()
         met.resources.append(ResourceCount(10, 500, 120))
@@ -121,6 +133,18 @@ class TestSc2MetricAnalyzer(unittest.TestCase):
         self.assertEqual(round(met.aur_pre_max(), 1), 380)
         
         
+    def test_aur_pre_max_when_never_maxed(self):
+        met = Sc2MetricAnalyzer()
+        met.supply.append(FoodCount(0, 15, 15)) # 0 second initial supply
+        met.supply.append(FoodCount(50, 60, 101)) # nothing special
+        met.supply.append(FoodCount(100, 197, 197)) #near max and near max supply made
+        met.resources.append(ResourceCount(10, 500, 120))
+        met.resources.append(ResourceCount(20, 750, 300))
+        met.resources.append(ResourceCount(40, 1100, 250))
+        
+        self.assertEqual(round(met.aur_pre_max(), 1), 223.3)
+        
+        
     def test_avg_rcr(self):
         met = Sc2MetricAnalyzer()
         met.resources.append(ResourceCount(10, 500, 120))
@@ -161,6 +185,18 @@ class TestSc2MetricAnalyzer(unittest.TestCase):
         met.resources.append(ResourceCount(220, 3000, 950))
         
         self.assertEqual(round(met.avg_rcr_pre_max(), 1), 1362.5)    
+        
+        
+    def test_avg_rcr_pre_max_when_never_maxed(self):
+        met = Sc2MetricAnalyzer()
+        met.supply.append(FoodCount(0, 15, 15)) # 0 second initial supply
+        met.supply.append(FoodCount(50, 60, 101)) # nothing special
+        met.supply.append(FoodCount(100, 197, 197)) #near max and near max supply made
+        met.resources.append(ResourceCount(10, 500, 120))
+        met.resources.append(ResourceCount(20, 750, 300))
+        met.resources.append(ResourceCount(40, 1100, 250))
+        
+        self.assertEqual(round(met.avg_rcr_pre_max(), 1), 783.3)
         
     
     def test_supply_capped(self):
@@ -259,6 +295,19 @@ class TestSc2MetricAnalyzer(unittest.TestCase):
         self.assertEqual(met.supply_created_at_time(55), 9) # exact time
         self.assertEqual(met.supply_created_at_time(57), 9) # in between 2 times
         self.assertEqual(met.supply_created_at_time(70), 11) # greater than greatest time 
+        
+        
+    def test_supply_created_at_time_when_no_supply_created_tracked(self):
+        met = Sc2MetricAnalyzer()
+        
+        self.assertEqual(met.supply_created_at_time(0), 0)
+        
+        
+    def test_supply_created_at_time_when_first_supply_created_occurred_after_supplied_time(self):
+        met = Sc2MetricAnalyzer()
+        met.supply_created.append(SupplyCount(1, 1, 1, True)) # worker supply
+        
+        self.assertEqual(met.supply_created_at_time(0), 0)
         
         
     def test_time_to_workers_created(self):

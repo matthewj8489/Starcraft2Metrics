@@ -24,21 +24,25 @@ class TestSupplyTrackerPlugin(unittest.TestCase):
         
                
     def _add_unit(self, player, second_created, second_died, supply):
-        player.units.append(MagicMock(hallucinated=False,
-                                      is_building=False,
-                                      supply=supply,
-                                      started_at=second_created,
-                                      died_at=second_died,
-                                      name=''))
+        mock = MagicMock(hallucinated=False,
+                         is_building=False,
+                         supply=supply,
+                         started_at=second_created,
+                         died_at=second_died)
+        mock.name = ''
+        player.units.append(mock)
         
         
     def _add_pylon(self, player, second_created, second_died, supply):
-        player.units.append(MagicMock(hallucinated=False,
+        # mock.name must be setup in this way due to the nature of MagicMock
+        # see here: https://docs.python.org/3/library/unittest.mock.html#mock-names-and-the-name-attribute
+        mock = MagicMock(hallucinated=False,
                                       is_building=True,
                                       supply=supply,
                                       started_at=second_created,
-                                      died_at=second_died,
-                                      name='Pylon'))
+                                      died_at=second_died)
+        mock.name = 'Pylon'
+        player.units.append(mock)
 
     def test_handleInitGame(self):
         rep = MagicMock(players=[MagicMock(), MagicMock()])

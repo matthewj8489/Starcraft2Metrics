@@ -15,7 +15,7 @@ from metrics import plugins
 from metrics.util import convert_gametime_to_realtime_r
 import sc2reader
 
-REPLAY_DIR=os.path.join(os.path.dirname(__file__),"test_replays")
+REPLAY_DIR=os.path.join(os.path.dirname(__file__),"integration\\test_replays")
 
 class TestPlugins(unittest.TestCase):
 

@@ -77,7 +77,7 @@ class SupplyTracker(object):
             sup_bldgs = defaultdict(int)
             
             # traverse units to track created and died
-            filtered_units = list(filter(lambda x: (not x.hallucinated) and (not x.is_building), plyr.units))
+            filtered_units = list(filter(lambda x: (not x.hallucinated) and (x.is_worker or x.is_army), plyr.units))
             for unit in filtered_units:
                 units[convert_frame_to_realtime_r(replay, unit.started_at)] += unit.supply
                 units[convert_frame_to_realtime_r(replay, unit.died_at)] -= unit.supply

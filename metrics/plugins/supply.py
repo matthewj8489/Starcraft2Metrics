@@ -71,7 +71,7 @@ class SupplyTracker(object):
             player.metrics = Sc2MetricAnalyzer()
     
     
-    def handleEndGame(self,event,replay):
+    def handleEndGame(self,event,replay):       
         for plyr in replay.players:
             units = defaultdict(int)
             sup_bldgs = defaultdict(int)
@@ -80,14 +80,16 @@ class SupplyTracker(object):
             filtered_units = list(filter(lambda x: (not x.hallucinated) and (x.is_worker or x.is_army), plyr.units))
             for unit in filtered_units:
                 units[convert_frame_to_realtime_r(replay, unit.started_at)] += unit.supply
-                units[convert_frame_to_realtime_r(replay, unit.died_at)] -= unit.supply
+                if unit.died_at is not None:
+                    units[convert_frame_to_realtime_r(replay, unit.died_at)] -= unit.supply
                 
             # traverse supply buildings to track created and died
             filtered_bldgs = list(filter(lambda x: (x.is_building) and (x.name in self.supply_gen_unit), plyr.units))
             for unit in filtered_bldgs:
                 sup_bldgs[convert_frame_to_realtime_r(replay, unit.started_at)] += self.supply_gen_unit[unit.name]
-                sup_bldgs[convert_frame_to_realtime_r(replay, unit.died_at)] -= self.supply_gen_unit[unit.name]
-    
+                if unit.died_at is not None:
+                    sup_bldgs[convert_frame_to_realtime_r(replay, unit.died_at)] -= self.supply_gen_unit[unit.name]
+
             plyr.metrics.supply = self._generate_accumulated_FoodCount(units, sup_bldgs)
             
             

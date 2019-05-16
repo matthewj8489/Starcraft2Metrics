@@ -323,7 +323,7 @@ class Sc2MetricAnalyzer(object):
             int: The amount of time spent supply capped.
             
         """        
-        breakpoint()
+
         supply_blocked = False
         time_of_supply_block = 0
         sc = 0

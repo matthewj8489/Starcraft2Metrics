@@ -16,6 +16,10 @@ class APMTracker(object):
     For example, APM in Brood War was calculated after the initial
     150 seconds of game time. Therefore, actions before 150 seconds
     were not counted towards actual APM.
+    
+    **Note: These APM calculations include the actions taken before 150
+    seconds, but they do not include that 150 seconds of time, which is
+    standard among most APM calculators.
     """
     name = 'APMTracker'
 
@@ -23,7 +27,7 @@ class APMTracker(object):
         #self._aps = {}
         self._actions = defaultdict(int)
         self._seconds_played = defaultdict(int)
-        self.initial_apm_seconds_skipped = 150
+        self.initial_apm_seconds_skipped = 210 #150
 
     def handleInitGame(self, event, replay):
         for player in replay.players:
@@ -32,21 +36,23 @@ class APMTracker(object):
             self._seconds_played[player.pid] = 0
 
     def handleControlGroupEvent(self, event, replay):
-        if event.second > self.initial_apm_seconds_skipped:
-            self._actions[event.player.pid] += 1
+        #if event.second > self.initial_apm_seconds_skipped:
+        self._actions[event.player.pid] += 1
 
     def handleSelectionEvent(self, event, replay):
-        if event.second > self.initial_apm_seconds_skipped:
-            self._actions[event.player.pid] += 1
+        #if event.second > self.initial_apm_seconds_skipped:
+        self._actions[event.player.pid] += 1
         
     def handleCommandEvent(self, event, replay):
-        if event.second > self.initial_apm_seconds_skipped:
-            self._actions[event.player.pid] += 1
+        #if event.second > self.initial_apm_seconds_skipped:
+        self._actions[event.player.pid] += 1
 
     def handlePlayerLeaveEvent(self, event, replay):
-        self._seconds_played[event.player.pid] = convert_to_realtime_r(replay, event.second) - convert_to_realtime_r(replay, self.initial_apm_seconds_skipped)
+        self._seconds_played[event.player.pid] = convert_to_realtime_r(replay, event.second) - self.initial_apm_seconds_skipped #convert_to_realtime_r(replay, self.initial_apm_seconds_skipped)
 
     def handleEndGame(self, event, replay):
         for player in replay.players:
-            if self._actions[player.pid] > 0:
+            if self._actions[player.pid] > 0 and self._seconds_played[player.pid] > 0:
                 player.metrics.avg_apm = self._actions[player.pid] / self._seconds_played[player.pid] * 60
+            else:
+                player.metrics.avg_apm = 0

@@ -74,7 +74,7 @@ class TestAPMTrackerPlugin(unittest.TestCase):
         apm.handleInitGame(event, replay)
         event.second = 20
         apm.handleControlGroupEvent(event, replay)
-        event.second = 60
+        event.second = 193
         apm.handlePlayerLeaveEvent(event, replay)
         apm.handleEndGame(event, replay)
         

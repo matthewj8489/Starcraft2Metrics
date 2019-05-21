@@ -19,14 +19,19 @@ class SPMTracker(object):
     def __init__(self):
         self._sps = {}
         self._seconds_played = defaultdict(int)
+        self._location = {}
         
     def handleInitGame(self, event, replay):
         for player in replay.players:
             player.metrics = Sc2MetricAnalyzer()
             self._sps[player.pid] = defaultdict(int)
+            self._location[player.pid] = (0, 0)
             
     def handleCameraEvent(self, event, replay):
-        self._sps[event.player.pid][convert_gametime_to_realtime_r(replay, event.second)] += 1
+        loc_diff = abs(event.location[0] - self._location[event.player.pid][0]) + abs(event.location[1] - self._location[event.player.pid][1])
+        self._location[event.player.pid] = event.location
+        if loc_diff > 15:
+            self._sps[event.player.pid][convert_gametime_to_realtime_r(replay, event.second)] += 1
         
     def handlePlayerLeaveEvent(self, event, replay):
         self._seconds_played[event.player.pid] = convert_gametime_to_realtime_r(replay, event.second)

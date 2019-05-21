@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 from metrics.sc2metric import Sc2MetricAnalyzer
-from metrics.util import convert_gametime_to_realtime_r
+from metrics.util import convert_to_realtime_r
 
 
 class SPMTracker(object):
@@ -31,10 +31,10 @@ class SPMTracker(object):
         loc_diff = abs(event.location[0] - self._location[event.player.pid][0]) + abs(event.location[1] - self._location[event.player.pid][1])
         self._location[event.player.pid] = event.location
         if loc_diff > 15:
-            self._sps[event.player.pid][convert_gametime_to_realtime_r(replay, event.second)] += 1
+            self._sps[event.player.pid][convert_to_realtime_r(replay, event.second)] += 1
         
     def handlePlayerLeaveEvent(self, event, replay):
-        self._seconds_played[event.player.pid] = convert_gametime_to_realtime_r(replay, event.second)
+        self._seconds_played[event.player.pid] = convert_to_realtime_r(replay, event.second)
         
     def handleEndGame(self, event, replay):
         for player in replay.players:

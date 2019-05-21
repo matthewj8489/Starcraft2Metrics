@@ -563,7 +563,7 @@ class Sc2MetricAnalyzer(object):
 ##
 ##        unit_born_events = self._events['UnitBornEvent']
 ##        unit_init_events = self._events['UnitInitEvent']
-##        game_time_s = util.convert_realtime_to_gametime_r(self._replay, real_time_s)
+##        game_time_s = util.convert_to_gametime_r(self._replay, real_time_s)
 ##        
 ##        player_ube = list(filter(lambda ube: ube.control_pid == self._player_id, unit_born_events))
 ##        player_uie = list(filter(lambda uie: uie.control_pid == self._player_id, unit_init_events))

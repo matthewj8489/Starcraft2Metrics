@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 from metrics.sc2metric import Sc2MetricAnalyzer
-from metrics.util import convert_gametime_to_realtime_r
+from metrics.util import convert_to_realtime_r
 
 
 class APMTracker(object):
@@ -44,7 +44,7 @@ class APMTracker(object):
             self._actions[event.player.pid] += 1
 
     def handlePlayerLeaveEvent(self, event, replay):
-        self._seconds_played[event.player.pid] = convert_gametime_to_realtime_r(replay, event.second) - convert_gametime_to_realtime_r(replay, self.initial_apm_seconds_skipped)
+        self._seconds_played[event.player.pid] = convert_to_realtime_r(replay, event.second) - convert_to_realtime_r(replay, self.initial_apm_seconds_skipped)
 
     def handleEndGame(self, event, replay):
         for player in replay.players:

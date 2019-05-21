@@ -24,7 +24,7 @@ class SupplyCreatedTracker(object):
 
     def _add_to_workers(self,event,replay):
         self._workers_created[event.unit.owner.pid] += event.unit.supply
-        supp = SupplyCount(util.convert_gametime_to_realtime_r(replay,event.second),
+        supp = SupplyCount(util.convert_to_realtime_r(replay,event.second),
                            self._workers_created[event.unit.owner.pid],
                            event.unit.supply,
                            event.unit.is_worker)
@@ -33,7 +33,7 @@ class SupplyCreatedTracker(object):
         
     def _add_to_army(self,event,replay):
         self._army_created[event.unit.owner.pid] += event.unit.supply
-        supp = SupplyCount(util.convert_gametime_to_realtime_r(replay,event.second),
+        supp = SupplyCount(util.convert_to_realtime_r(replay,event.second),
                            self._army_created[event.unit.owner.pid],
                            event.unit.supply,
                            event.unit.is_worker)
@@ -42,7 +42,7 @@ class SupplyCreatedTracker(object):
         
     def _add_to_supply(self,event,replay):
         self._supply_created[event.unit.owner.pid] += event.unit.supply
-        supp = SupplyCount(util.convert_gametime_to_realtime_r(replay,event.second),
+        supp = SupplyCount(util.convert_to_realtime_r(replay,event.second),
                            self._supply_created[event.unit.owner.pid],
                            event.unit.supply,
                            event.unit.is_worker)

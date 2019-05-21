@@ -13,7 +13,7 @@ def realtime_to_gametime_constant_r(replay):
     return 1 / gametime_to_realtime_constant_r(replay)
 
 
-def convert_realtime_to_gametime(real_time_s, game_frames,
+def convert_to_gametime(real_time_s, game_frames,
                                  game_fps, game_length_s):
     game_time = 0
 
@@ -24,7 +24,7 @@ def convert_realtime_to_gametime(real_time_s, game_frames,
     return game_time
 
 
-def convert_realtime_to_gametime_r(replay, real_time_s):
+def convert_to_gametime_r(replay, real_time_s):
     '''
     Converts the real time of a point in the replay to the internally
     calculated game time.
@@ -38,12 +38,12 @@ def convert_realtime_to_gametime_r(replay, real_time_s):
         int: The game time in seconds.
         
     '''
-    return convert_realtime_to_gametime(real_time_s, replay.frames,
+    return convert_to_gametime(real_time_s, replay.frames,
                                         replay.game_fps,
                                         replay.game_length.seconds)
 
 
-def convert_gametime_to_realtime(game_time_s, game_frames,
+def convert_to_realtime(game_time_s, game_frames,
                                  game_fps, game_length_s):
     real_time = 0
 
@@ -54,7 +54,7 @@ def convert_gametime_to_realtime(game_time_s, game_frames,
     return real_time
 
 
-def convert_gametime_to_realtime_r(replay, game_time_s):
+def convert_to_realtime_r(replay, game_time_s):
     """
     Converts the internally calculated game time of a point in the replay to the real
     time, as can be seen when watching a replay.
@@ -68,7 +68,7 @@ def convert_gametime_to_realtime_r(replay, game_time_s):
         int: The real time in seconds.
         
     """
-    return convert_gametime_to_realtime(game_time_s, replay.frames,
+    return convert_to_realtime(game_time_s, replay.frames,
                                         replay.game_fps,
                                         replay.game_length.seconds)
 
@@ -83,7 +83,7 @@ def convert_frame_to_gametime_r(replay, game_frame):
 
 def convert_frame_to_realtime_r(replay, game_frame):
     gt = convert_frame_to_gametime_r(replay, game_frame)
-    return convert_gametime_to_realtime_r(replay, gt)
+    return convert_to_realtime_r(replay, gt)
 
 
 def is_hallucinated(unit):

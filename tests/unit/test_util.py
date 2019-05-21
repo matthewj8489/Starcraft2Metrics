@@ -27,7 +27,7 @@ class TestUtil(unittest.TestCase):
         return replay
         
 
-    def test_convert_realtime_to_gametime_r(self):
+    def test_convert_to_gametime_r(self):
         replay = self._generate_stub_replay()
         
         # settings so that game_time == real_time
@@ -35,12 +35,12 @@ class TestUtil(unittest.TestCase):
         replay.game_fps = 1
         replay.frames = 100
         
-        game_time = convert_realtime_to_gametime_r(replay, 10)
+        game_time = convert_to_gametime_r(replay, 10)
         
         self.assertEqual(game_time, 10)
         
         
-    def test_convert_gametime_to_realtime_r(self):
+    def test_convert_to_realtime_r(self):
         replay = self._generate_stub_replay()
         
         # settings so that game_time == real_time
@@ -48,7 +48,7 @@ class TestUtil(unittest.TestCase):
         replay.game_fps = 1
         replay.frames = 100
         
-        real_time = convert_gametime_to_realtime_r(replay, 10)
+        real_time = convert_to_realtime_r(replay, 10)
         
         self.assertEqual(real_time, 10)
         

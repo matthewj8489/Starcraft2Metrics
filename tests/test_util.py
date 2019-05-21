@@ -21,12 +21,12 @@ class TestUtil(unittest.TestCase):
     def test_gametime_to_realtime_r(self):
         rep = sc2reader.load_replay(os.path.join(REPLAY_DIR, "pvt_macro1.SC2Replay"))
         
-        self.assertEqual(convert_gametime_to_realtime_r(rep, 1358), 970)
+        self.assertEqual(convert_to_realtime_r(rep, 1358), 970)
         
     def test_realtime_to_gametime_r(self):
         rep = sc2reader.load_replay(os.path.join(REPLAY_DIR, "pvt_macro1.SC2Replay"))
         
-        self.assertEqual(convert_realtime_to_gametime_r(rep, 970), 1358)
+        self.assertEqual(convert_to_gametime_r(rep, 970), 1358)
 
 
 

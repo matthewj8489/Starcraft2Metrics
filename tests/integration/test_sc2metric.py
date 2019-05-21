@@ -13,7 +13,7 @@ else:
 
 import metrics
 import sc2reader
-from metrics.util import convert_gametime_to_realtime_r
+from metrics.util import convert_to_realtime_r
 
 REPLAY_DIR=os.path.join(os.path.dirname(__file__),"test_replays")
 

@@ -11,6 +11,11 @@ class APMTracker(object):
     divided by the number of seconds played by the player (not
     necessarily the whole game) multiplied by 60.
     APM is 0 for games under 1 minute in length.
+    
+    *Note: APM is generally calculated starting after an initial time.
+    For example, APM in Brood War was calculated after the initial
+    150 seconds of game time. Therefore, actions before 150 seconds
+    were not counted towards actual APM.
     """
     name = 'APMTracker'
 
@@ -18,6 +23,7 @@ class APMTracker(object):
         #self._aps = {}
         self._actions = defaultdict(int)
         self._seconds_played = defaultdict(int)
+        self.initial_apm_seconds_skipped = 150
 
     def handleInitGame(self, event, replay):
         for player in replay.players:
@@ -26,16 +32,19 @@ class APMTracker(object):
             self._seconds_played[player.pid] = 0
 
     def handleControlGroupEvent(self, event, replay):
-        self._actions[event.player.pid] += 1
+        if event.second > self.initial_apm_seconds_skipped:
+            self._actions[event.player.pid] += 1
 
     def handleSelectionEvent(self, event, replay):
-        self._actions[event.player.pid] += 1
+        if event.second > self.initial_apm_seconds_skipped:
+            self._actions[event.player.pid] += 1
         
     def handleCommandEvent(self, event, replay):
-        self._actions[event.player.pid] += 1
+        if event.second > self.initial_apm_seconds_skipped:
+            self._actions[event.player.pid] += 1
 
     def handlePlayerLeaveEvent(self, event, replay):
-        self._seconds_played[event.player.pid] = convert_gametime_to_realtime_r(replay, event.second)
+        self._seconds_played[event.player.pid] = convert_gametime_to_realtime_r(replay, event.second) - convert_gametime_to_realtime_r(replay, self.initial_apm_seconds_skipped)
 
     def handleEndGame(self, event, replay):
         for player in replay.players:

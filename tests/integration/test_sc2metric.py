@@ -124,7 +124,15 @@ class TestMetrics(unittest.TestCase):
         p1_met = replay.player[1].metrics
         
         self.assertEqual(p1_met.supply_capped(), 64)
-
+        
+        
+#    def test_supply_recorded(self):
+#        replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "sc62_aur559.SC2Replay"))
+#        p1_met = replay.player[1].metrics
+#        
+#        for sp in p1_met.supply:
+#            print(sp.second, " ", sp.supply_used, "/", sp.supply_made)
+        
         
     def test_workers_created_at_time(self):
         replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "pvt_macro1.SC2Replay"))

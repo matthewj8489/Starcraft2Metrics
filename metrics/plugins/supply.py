@@ -86,7 +86,8 @@ class SupplyTracker(object):
             # traverse supply buildings to track created and died
             filtered_bldgs = list(filter(lambda x: (x.is_building) and (x.name in self.supply_gen_unit), plyr.units))
             for unit in filtered_bldgs:
-                sup_bldgs[convert_frame_to_realtime_r(replay, unit.started_at)] += self.supply_gen_unit[unit.name]
+                if unit.finished_at is not None:
+                    sup_bldgs[convert_frame_to_realtime_r(replay, unit.finished_at)] += self.supply_gen_unit[unit.name]
                 if unit.died_at is not None:
                     sup_bldgs[convert_frame_to_realtime_r(replay, unit.died_at)] -= self.supply_gen_unit[unit.name]
 

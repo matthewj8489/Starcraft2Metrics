@@ -30,15 +30,35 @@ class SupplyTracker(object):
         new_units_lst = []
         new_bldgs_lst = []
         
-        accsum = 0
         for key in dict_units:
-            accsum += dict_units[key]
-            new_units_lst.append(FoodCount(key, accsum, -1))
+            new_units_lst.append(FoodCount(key, dict_units[key], -1))
+            
+        new_units_lst = sorted(new_units_lst, key=lambda x: x.second)
+        
+        accsum = 0
+        for ut in new_units_lst:
+            accsum += ut.supply_used
+            ut.supply_used = accsum
+        
+        for key in dict_bldgs:
+            new_bldgs_lst.append(FoodCount(key, -1, dict_bldgs[key]))
+            
+        new_bldgs_lst = sorted(new_bldgs_lst, key=lambda x: x.second)
             
         accsum = 0
-        for key in dict_bldgs:
-            accsum += dict_bldgs[key]
-            new_bldgs_lst.append(FoodCount(key, -1, accsum))
+        for bd in new_bldgs_lst:
+            accsum += bd.supply_made
+            bd.supply_made = accsum
+        
+        #accsum = 0
+        #for key in dict_units:
+        #    accsum += dict_units[key]
+        #    new_units_lst.append(FoodCount(key, accsum, -1))
+            
+        #accsum = 0
+        #for key in dict_bldgs:
+        #    accsum += dict_bldgs[key]
+        #    new_bldgs_lst.append(FoodCount(key, -1, accsum))
             
         # combine entries occurring at the same time               
         for unit in new_units_lst:
@@ -71,7 +91,7 @@ class SupplyTracker(object):
             player.metrics = Sc2MetricAnalyzer()
     
     
-    def handleEndGame(self,event,replay):       
+    def handleEndGame(self,event,replay):   
         for plyr in replay.players:
             units = defaultdict(int)
             sup_bldgs = defaultdict(int)

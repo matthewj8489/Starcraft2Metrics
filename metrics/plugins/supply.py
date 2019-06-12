@@ -24,6 +24,24 @@ class SupplyTracker(object):
             'Pylon' : 8,
             'Nexus' : 15
         }
+        self.train_time = {
+            'Probe' : 12,
+            'Zealot' : 27,
+            'Adept' : 30,
+            'Stalker' : 30,
+            'HighTemplar' : 39,
+            'DarkTemplar' : 39,
+            'Sentry' : 26,
+            'Observer' : 21,
+            'Immortal' : 39,
+            'Colossus' : 54,
+            'Disruptor' : 36,
+            'Phoenix' : 25,
+            'Oracle' : 37,
+            'VoidRay' : 43,
+            'Carrier' : 64,
+            'Tempest' : 43            
+        }
         
                     
     def _generate_accumulated_FoodCount(self, dict_units, dict_bldgs):
@@ -96,10 +114,18 @@ class SupplyTracker(object):
             units = defaultdict(int)
             sup_bldgs = defaultdict(int)
             
+            # need to account for the fact that units that are training, but not yet 'born', still take up supply
+            
             # traverse units to track created and died
             filtered_units = list(filter(lambda x: (not x.hallucinated) and (x.is_worker or x.is_army), plyr.units))
             for unit in filtered_units:
-                units[convert_frame_to_realtime_r(replay, unit.started_at)] += unit.supply
+                if unit.started_at == unit.finished_at:
+                    start_time = convert_frame_to_realtime_r(replay, unit.started_at) - self.train_time[unit.name]
+                    if start_time < 0:
+                        start_time = 0
+                    units[start_time] += unit.supply
+                else:
+                    units[convert_frame_to_realtime_r(replay, unit.started_at)] += unit.supply
                 if unit.died_at is not None:
                     units[convert_frame_to_realtime_r(replay, unit.died_at)] -= unit.supply
                 

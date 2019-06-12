@@ -82,8 +82,13 @@ def convert_frame_to_gametime_r(replay, game_frame):
 
 
 def convert_frame_to_realtime_r(replay, game_frame):
-    gt = convert_frame_to_gametime_r(replay, game_frame)
-    return convert_to_realtime_r(replay, gt)
+    #gt = convert_frame_to_gametime_r(replay, game_frame)
+    #return convert_to_realtime_r(replay, gt)
+    real_fps = replay.frames / replay.game_length.seconds
+    real_time = round(game_frame / real_fps)
+    
+    return real_time
+    
 
 
 def is_hallucinated(unit):

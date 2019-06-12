@@ -114,12 +114,11 @@ class SupplyTracker(object):
             units = defaultdict(int)
             sup_bldgs = defaultdict(int)
             
-            # need to account for the fact that units that are training, but not yet 'born', still take up supply
-            
             # traverse units to track created and died
             filtered_units = list(filter(lambda x: (not x.hallucinated) and (x.is_worker or x.is_army), plyr.units))
             for unit in filtered_units:
                 if unit.started_at == unit.finished_at:
+                    # need to account for the fact that units that are training, but not yet 'born', still take up supply
                     start_time = convert_frame_to_realtime_r(replay, unit.started_at) - self.train_time[unit.name]
                     if start_time < 0:
                         start_time = 0

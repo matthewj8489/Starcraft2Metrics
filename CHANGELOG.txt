@@ -1,0 +1,16 @@
+v1.0.0 (June-2019)
+- Initial Release
+- Offers the following metrics through the SC2ReplayParser script:
+  * Time to Max (ttm)
+  * Time to 3 bases (ttb3)
+  * Time to 4 bases (ttb4)
+  * Time to 66 workers (ttw66)
+  * Time to 75 workers (ttw75)
+  * Average APM (apm)
+  * Average Spending Quotient (sq)
+  * Average Spending Quotient Pre-Max Supply (sq-max)
+  * Average Unspent Resources (aur)
+  * Average Unspent Resources Pre-Max Supply (aur-max)
+  * Average Resource Collection Rate (rcr)
+  * Average Resource Collection Rate Pre-Max Supply (rcr-max)
+  * Time spent Supply Capped (sc)

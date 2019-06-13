@@ -72,9 +72,9 @@ class TestAPMTrackerPlugin(unittest.TestCase):
         self._initialize_event_and_apm_tracker(replay, event, apm)
         
         apm.handleInitGame(event, replay)
-        event.second = 20
+        event.second = 230
         apm.handleControlGroupEvent(event, replay)
-        event.second = 193
+        event.second = 270
         apm.handlePlayerLeaveEvent(event, replay)
         apm.handleEndGame(event, replay)
         
@@ -89,9 +89,9 @@ class TestAPMTrackerPlugin(unittest.TestCase):
         self._initialize_event_and_apm_tracker(replay, event, apm)
         
         apm.handleInitGame(event, replay)
-        event.second = 20
+        event.second = 230
         apm.handleSelectionEvent(event, replay)
-        event.second = 60
+        event.second = 270
         apm.handlePlayerLeaveEvent(event, replay)
         apm.handleEndGame(event, replay)
         
@@ -106,9 +106,9 @@ class TestAPMTrackerPlugin(unittest.TestCase):
         self._initialize_event_and_apm_tracker(replay, event, apm)
         
         apm.handleInitGame(event, replay)
-        event.second = 20
+        event.second = 230
         apm.handleCommandEvent(event, replay)
-        event.second = 60
+        event.second = 270
         apm.handlePlayerLeaveEvent(event, replay)
         apm.handleEndGame(event, replay)
         
@@ -123,13 +123,13 @@ class TestAPMTrackerPlugin(unittest.TestCase):
         self._initialize_event_and_apm_tracker(replay, event, apm)
         
         apm.handleInitGame(event, replay)
-        event.second = 20
+        event.second = 230
         apm.handleControlGroupEvent(event, replay)
-        event.second = 40
+        event.second = 250
         apm.handleSelectionEvent(event, replay)
-        event.second = 80
+        event.second = 290
         apm.handleCommandEvent(event, replay)
-        event.second = 120
+        event.second = 330
         apm.handlePlayerLeaveEvent(event, replay)
         apm.handleEndGame(event, replay)
         

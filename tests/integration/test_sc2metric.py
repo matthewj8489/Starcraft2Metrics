@@ -124,7 +124,7 @@ class TestMetrics(unittest.TestCase):
         
         #self.assertEqual(p1_met.supply_capped(), 63)
         
-        replay = sc2reader.load_replay("test_replays\\pvt_macro1.SC2Replay")
+        replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "pvt_macro1.SC2Replay"))
         p1_met = replay.player[1].metrics
         
         self.assertEqual(p1_met.supply_capped(), 60)

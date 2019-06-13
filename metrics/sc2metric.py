@@ -479,18 +479,25 @@ class Sc2MetricAnalyzer(object):
         #supp = list(filter(lambda sp: sp.supply <= supply_count,
         #                   self.supply_created))
 
-        supp = []           
-        for sp in self.supply_created:
-            if sp.supply < supply_count:
-                supp.append(sp)
-            elif sp.supply >= supply_count and len(supp) > 0:
-                supp.append(sp)
-                break
-                           
-        if len(supp) > 0:
-            return supp[len(supp)-1].second
-        else:
-            return None
+        #supp = []           
+        #for sp in self.supply_created:
+        #    if sp.supply < supply_count:
+        #        supp.append(sp)
+        #    elif sp.supply >= supply_count and len(supp) > 0:
+        #        supp.append(sp)
+        #        break
+        #                   
+        #if len(supp) > 0:
+        #    return supp[len(supp)-1].second
+        #else:
+        #    return None
+        
+        for sc in self.supply_created:
+            if sc.supply >= supply_count:
+                return sc.second
+                
+        return None
+        
         
 
     def time_to_supply_created_max_workers(self, supply_count,

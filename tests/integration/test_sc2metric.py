@@ -57,20 +57,24 @@ class TestMetrics(unittest.TestCase):
 #        self.assertTrue(False)
         
 
-    def test_time_to_max_created(self):
-        replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "standard_1v1.SC2Replay"))
+    def test_time_to_supply_created(self):
+        #replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "standard_1v1.SC2Replay"))
+        replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "pvt_macro1.SC2Replay"))
         p1_met = replay.player[1].metrics
                                 
         # verify by going through replay
-        self.assertEqual(p1_met.time_to_supply_created(200), 613)
+        #self.assertEqual(p1_met.time_to_supply_created(200), 613)
+        self.assertEqual(p1_met.time_to_supply_created(141), 588)
 
 
-    def test_time_to_max_with_max_workers_created(self):
-        replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "standard_1v1.SC2Replay"))
+    def test_time_to_supply_with_max_workers_created(self):
+        #replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "standard_1v1.SC2Replay"))
+        replay = sc2reader.load_replay(os.path.join(REPLAY_DIR, "pvt_macro1.SC2Replay"))
         p1_met = replay.player[1].metrics
         
         # verify by going through replay
-        self.assertEqual(p1_met.time_to_supply_created_max_workers(200, 75), 613)
+        #self.assertEqual(p1_met.time_to_supply_created_max_workers(200, 75), 613)
+        self.assertEqual(p1_met.time_to_supply_created_max_workers(131, 70), 588)
 
 
     def test_time_to_supply_created_max_workers_with_more_than_total_supply(self):

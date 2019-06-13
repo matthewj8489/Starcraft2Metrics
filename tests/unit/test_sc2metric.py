@@ -333,10 +333,10 @@ class TestSc2MetricAnalyzer(unittest.TestCase):
         met.supply_created.append(SupplyCount(60, 11, 2, False))
         met.supply_created.append(SupplyCount(60, 11, 2, False)) # two army supplies tracked at zero seconds
         
-        self.assertIsNone(met.time_to_supply_created(0)) # bad input case
+        self.assertEqual(met.time_to_supply_created(0), 0) # bad input case
         self.assertEqual(met.time_to_supply_created(8), 50) # exact supply
         self.assertEqual(met.time_to_supply_created(10), 60) # in between 2 supplies tracked
-        self.assertEqual(met.time_to_supply_created(20), 60) # more supply than what was tracked
+        self.assertEqual(met.time_to_supply_created(20), None) # more supply than what was tracked
         
         
     def test_time_to_supply_created_max_workers(self):

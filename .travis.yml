@@ -7,5 +7,5 @@ install:
     - python setup.py develop
 # command to run tests
 script:
-    - python tests/__main__.py
+    - python tests/integration/__main__.py
     - python tests/unit/__main__.py

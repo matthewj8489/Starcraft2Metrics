@@ -73,12 +73,6 @@ class Sc2MetricAnalyzer(object):
 
         #: A list of :class:`~metrics.metric_containers.BaseCount` for each base created.
         self.bases_created = []
-
-        #: A list of :class:`~metrics.metric_containers.FoodCount` for each unit created.
-        self.current_food_used = []
-        
-        #: A list of :class:`~metrics.metric_containers.FoodCount` for each supply provider building.
-        self.current_food_made = []
         
         #: A list of :class:`~metrics.metric_containers.FoodCount` for each unit and supply provider
         #: created.

@@ -339,6 +339,12 @@ class TestSc2MetricAnalyzer(unittest.TestCase):
         self.assertEqual(met.time_to_supply_created(20), None) # more supply than what was tracked
         
         
+    def test_time_to_supply_created_when_no_supply_was_created(self):
+        met = Sc2MetricAnalyzer()
+        
+        self.assertEqual(met.time_to_supply_created(1), None)
+        
+        
     def test_time_to_supply_created_max_workers(self):
         met = Sc2MetricAnalyzer()
         met.supply_created.append(SupplyCount(0, 1, 1, True)) # worker supply

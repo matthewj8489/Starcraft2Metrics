@@ -74,3 +74,13 @@ class ResourceCount(object):
                 "res_col": self.res_col,
                 "res_unspent": self.res_unspent
                 }
+
+
+class BuildOrderElement(object):
+
+    def __init__(self, unit_name, total_supply, time, frame):
+        self.name = unit_name
+        self.supply = total_supply
+        self.time = time
+        self.frame = frame
+        

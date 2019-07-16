@@ -140,6 +140,34 @@ Notes: **_ToDo_**
 	- **_Graphs of the metric trends_**
 
 
+Design Considerations
+=====================
+
+Layered library to seperate out 3rd party libs:
+
+	Third Party Libraries
+     ---------------------------
+	Factories to generate
+	metric containers
+     ---------------------------
+	metric containers
+     ---------------------------
+	individual metrics
+
+
+Worker Killed metric:
+
+	wk_metric_container:
+		[time, killer]
+
+	metric to generalize when the highest percentage of workers are killed in a game
+		[minute-range, avg % of workers killed]
+		* can make a restriction for proximity to end of the game
+
+	metric to note which units killed workers the most at each stage in a game
+		[minute-range, [killer, avg % of workers killed]]
+
+
 
 Coverage Tool
 =============

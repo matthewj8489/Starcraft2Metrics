@@ -22,4 +22,7 @@ class BuildOrderDeviation(object):
 
         return [confidence, deviation]
 
+
+if __name__ == '__main__':
+    bod = BuildOrderDeviation()
     

@@ -78,7 +78,8 @@ class ResourceCount(object):
 
 class BuildOrderElement(object):
 
-    def __init__(self, unit_name, total_supply, time, frame):
+    def __init__(self, build_num, unit_name, total_supply, time, frame):
+        self.build_num = build_num
         self.name = unit_name
         self.supply = total_supply
         self.time = time

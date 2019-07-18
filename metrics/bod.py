@@ -60,8 +60,8 @@ class BuildOrderDeviation(object):
         iters_of_type = {name: None for name in build_unit_names}
         for nm in build_unit_names:
             #iters_of_type[nm] = (e for i, e in enumerate(bo) if e.name == nm)
-            iters_of_type[nm] = (x for x in bo if x.name == nm)
-            #iters_of_type[nm] = BuildOrderDeviation._bo_units(bo, nm)
+            #iters_of_type[nm] = (x for x in bo if x.name == nm)
+            iters_of_type[nm] = BuildOrderDeviation._bo_units(bo, nm)
             
 
         # create a new comparison build order that rearranges the elements
@@ -91,6 +91,7 @@ if __name__ == '__main__':
 
     compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
     compare_bo.append(BuildOrderElement(2, 'Assimilator', 15, 50, 200))
+    compare_bo.append(BuildOrderElement(3, 'Pylon', 16, 60, 220))
 
     bo_dev = BuildOrderDeviation(golden_bo)
     bo_dev.calculate_deviations(compare_bo)

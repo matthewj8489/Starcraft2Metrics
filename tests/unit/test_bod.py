@@ -69,7 +69,7 @@ class TestBuildOrderDeviation(unittest.TestCase):
 
         compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
         compare_bo.append(BuildOrderElement(2, 'Assimilator', 15, 50, 200))
-        golden_bo.append(BuildOrderElement(3, 'Pylon', 16, 60, 220))
+        compare_bo.append(BuildOrderElement(3, 'Pylon', 16, 60, 220))
 
         bo_dev = BuildOrderDeviation(golden_bo)
         bo_dev.calculate_deviations(compare_bo)
@@ -146,7 +146,7 @@ class TestBuildOrderDeviation(unittest.TestCase):
 
         compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
         compare_bo.append(BuildOrderElement(2, 'Assimilator', 15, 50, 200))
-        golden_bo.append(BuildOrderElement(3, 'Pylon', 16, 60, 220))
+        compare_bo.append(BuildOrderElement(3, 'Pylon', 16, 60, 220))
 
         bo_dev = BuildOrderDeviation(golden_bo)
         bo_dev.calculate_deviations(compare_bo)

@@ -55,14 +55,22 @@ class BuildOrderDeviation(object):
                 self.supp_dev += abs(self._bench_bo[idx].supply - cmp_bo[idx].supply)
                 self.time_dev += abs(self._bench_bo[idx].time - cmp_bo[idx].time)
                 self.acc_time_dev.append(self.time_dev)
-                print("BCH:{0} - CMP:{1} - sp:{2} - tm:{3}".format(self._bench_bo[idx].to_string(),
-                                                                   cmp_bo[idx].to_string(),
-                                                                   cmp_bo[idx].supply - self._bench_bo[idx].supply,
-                                                                   cmp_bo[idx].time - self._bench_bo[idx].time))
+                self.dev_arr.append([self._bench_bo[idx].to_string(),
+                                     cmp_bo[idx].to_string(),
+                                     cmp_bo[idx].supply - self._bench_bo[idx].supply,
+                                     cmp_bo[idx].time - self._bench_bo[idx].time])
+##                print("BCH:{0} - CMP:{1} - sp:{2} - tm:{3}".format(self._bench_bo[idx].to_string(),
+##                                                                   cmp_bo[idx].to_string(),
+##                                                                   cmp_bo[idx].supply - self._bench_bo[idx].supply,
+##                                                                   cmp_bo[idx].time - self._bench_bo[idx].time))
             else:
                 self.time_dev += abs(self._bench_bo[idx].time - self._bench_bo[-1].time)
                 self.acc_time_dev.append(self.time_dev)
-                print("BCH:{0} - None".format(self._bench_bo[idx].to_string()))
+                self.dev_arr.append([self._bench_bo[idx].to_string(),
+                                     '',
+                                     0,
+                                     self._bench_bo[-1].time - self._bench_bo[idx].time])
+##                print("BCH:{0} - None".format(self._bench_bo[idx].to_string()))
 
 
     def _bo_units(bo, nm):
@@ -120,6 +128,7 @@ class BuildOrderDeviation(object):
 if __name__ == '__main__':
     from metric_containers import *
     from metric_factory.spawningtool_factory import generateBuildOrderElements
+    from pprint import pprint
 
     boe_bench = generateBuildOrderElements('../tests/integration/test_replays/pvz_dt_archon_drop_benchmark_bo.SC2Replay', 'Gemini')
     #boe_exec = generateBuildOrderElements('../tests/integration/test_replays/pvz_dt_archon_drop_executed_bo.SC2Replay', 'NULL')
@@ -128,6 +137,8 @@ if __name__ == '__main__':
     bod = BuildOrderDeviation(boe_bench)
 
     bod.calculate_deviations(boe_exec, n=63)
+
+    pprint(bod.dev_arr)
 
     print(bod.supp_dev)
     print(bod.time_dev)

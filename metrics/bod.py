@@ -152,8 +152,31 @@ if __name__ == '__main__':
     plt.ylabel('ROC of time dev (s/bo)')
     plt.ylim(top=30)
     plt.title('ROC of Accumulated Time Deviation')
+    plt.grid(True)
     plt.savefig('roc_acc_time_dev.png')
     plt.show()
+
+    # Savitzky-Golay derivative digital filter algorithm
+    sg = []
+    coefficient = (1,-8,0,8,-1)
+    N = 5
+    h = 1
+    for d in range(0, len(bod.acc_time_dev), 5):
+        deriv = 0
+        if d+N < len(bod.acc_time_dev):
+            for i in range(d,d+N):
+                deriv += bod.acc_time_dev[i] * coefficient[i-d]
+            sg.append(deriv / (12 * h))
+
+    plt.plot(sg)
+    plt.xlabel('build order / 5')
+    plt.ylabel('Derivative of time dev (s/bo)')
+    plt.ylim(top=50, bottom=-50)
+    plt.title('Derivative of Accumulated Time Deviation')
+    plt.grid(True)
+    plt.savefig('deriv_acc_time_dev.png')
+    plt.show()
+
         
     
     

@@ -85,3 +85,5 @@ class BuildOrderElement(object):
         self.time = time
         self.frame = frame
         
+    def to_string(self):
+        return "({0})|{1}|{2}|{3}s".format(self.build_num, self.name, self.supply, self.time)

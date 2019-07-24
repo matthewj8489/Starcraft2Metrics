@@ -5,8 +5,6 @@ import itertools
 #       differences, and build discrepencies combined, 0 is a perfectly
 #       executed build order.
 #       (weight1 * metric1 + weight2 * metric2) / (weight1 + weight2)
-#       divide by number of build order elements to normalize by length
-#       of build order?
 #       Defining weights:
 #           Principal component analysis
 #           Linear discriminant analysis

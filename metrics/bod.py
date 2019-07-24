@@ -4,6 +4,17 @@ import itertools
 # dev - a metric that weights supply differences, time differences, order
 #       differences, and build discrepencies combined, 0 is a perfectly
 #       executed build order.
+#       (weight1 * metric1 + weight2 * metric2) / (weight1 + weight2)
+#       divide by number of build order elements to normalize by length
+#       of build order?
+#       Defining weights:
+#           Principal component analysis
+#           Linear discriminant analysis
+#           Naive Bayes classifier
+#           create a benchmark of total units (building and army/worker)
+#               created by a point in time and then compare that to the
+#               bench bo to see how much different metrics affect the
+#               differences in the end result of units
 # supp_dev  - total deviation in supply (absolute values?)
 # time_dev  - total deviation in time (absolute values?)
 # order_dev - total deviation in order (absolute values?)
@@ -22,11 +33,6 @@ import itertools
 #           (6)[1:50]21|Assim,(6)[1:62]22|Assim,+1,+0:12
 #           (7)[2:00]22|Probe,(8)[2:15]22|Probe,0,+0:15
 #           (8)[2:10]22|Pylon,(7)[2:00]22|Pylon,0,-0:10
-#
-#
-# Additions:
-#   - Add a parameter to calculate deviations that defines how far into the
-#       bench bo to go. (i.e. to the nth build)
 
 class BuildOrderDeviation(object):
 
@@ -35,42 +41,39 @@ class BuildOrderDeviation(object):
         self._initialize()
 
     def _initialize(self):
-        self.dev = 0
+        #self.dev = 0
         self.supp_dev = 0
         self.time_dev = 0
         self.order_dev = 0
-        self.discrepency = 0
-        self.worst_dev = None
+        #self.discrepency = 0
+        #self.worst_dev = None
         self.acc_time_dev = []
+        #self.acc_time_dev = []
+        #self.acc_order_dev = []
         self.dev_arr = []
 
-    def calculate_deviations(self, compare_bo, n=-1):
+    def calculate_deviations(self, compare_bo, depth=-1):
         self._initialize()
         
-        cmp_bo = self._get_sorted_build_order(compare_bo, n)
-        #shortest_bo = len(self._bench_bo) if len(self._bench_bo) < len(compare_bo) else len(compare_bo)
+        cmp_bo = self._get_sorted_build_order(compare_bo, depth)
 
-        for idx in range(n if n >= 0 else len(self._bench_bo)):
+        for idx in range(depth if depth >= 0 else len(self._bench_bo)):
             if cmp_bo[idx] is not None:
                 self.supp_dev += abs(self._bench_bo[idx].supply - cmp_bo[idx].supply)
                 self.time_dev += abs(self._bench_bo[idx].time - cmp_bo[idx].time)
+                self.order_dev += abs(self._bench_bo[idx].build_num - cmp_bo[idx].build_num)
                 self.acc_time_dev.append(self.time_dev)
                 self.dev_arr.append([self._bench_bo[idx].to_string(),
                                      cmp_bo[idx].to_string(),
                                      cmp_bo[idx].supply - self._bench_bo[idx].supply,
                                      cmp_bo[idx].time - self._bench_bo[idx].time])
-##                print("BCH:{0} - CMP:{1} - sp:{2} - tm:{3}".format(self._bench_bo[idx].to_string(),
-##                                                                   cmp_bo[idx].to_string(),
-##                                                                   cmp_bo[idx].supply - self._bench_bo[idx].supply,
-##                                                                   cmp_bo[idx].time - self._bench_bo[idx].time))
             else:
-                self.time_dev += abs(self._bench_bo[idx].time - self._bench_bo[-1].time)
-                self.acc_time_dev.append(self.time_dev)
+                #self.time_dev += abs(self._bench_bo[idx].time - self._bench_bo[-1].time)
+                #self.acc_time_dev.append(self.time_dev)
                 self.dev_arr.append([self._bench_bo[idx].to_string(),
                                      '',
                                      0,
-                                     self._bench_bo[-1].time - self._bench_bo[idx].time])
-##                print("BCH:{0} - None".format(self._bench_bo[idx].to_string()))
+                                     0])#self._bench_bo[-1].time - self._bench_bo[idx].time])
 
 
     def _bo_units(bo, nm):
@@ -78,9 +81,9 @@ class BuildOrderDeviation(object):
             if x.name == nm:
                 yield x
 
-    def _get_sorted_build_order(self, bo, n=-1):
+    def _get_sorted_build_order(self, bo, depth=-1):
         sort_bo = []
-        last_build_num = n if n >= -1 else self._bench_bo[-1].build_num
+        last_build_num = depth if depth >= -1 else self._bench_bo[-1].build_num
 
         # create a dictionary of iterators, each iterator returns the next
         # element that matches the build unit name
@@ -96,17 +99,11 @@ class BuildOrderDeviation(object):
         # based on the order of the benchmark build
         for boe in self._bench_bo:
             tmp_bo = next(iters_of_type[boe.name], None)
-            # if the build order difference is greater than 20, then discount
-            # this element as a correct part of the build
-##            if tmp_bo is not None and abs(tmp_bo.build_num - boe.build_num) <= 20:
-##                sort_bo.append(tmp_bo)
-##            else:
-##                # need to push back the last bo element into the iterator...
-##                sort_bo.append(None)
 
-            # if the build unit order is greater than the last build unit
-            # order of the bench, or if the build order difference is greater
-            # than 20, then the element is not a correct part of the build.
+            # if the build number is greater than the last build number
+            # of the bench, or if the build number difference is greater
+            # than 20, then the element is not associated with this part of
+            # the build.
             if tmp_bo is not None and tmp_bo.build_num <= last_build_num + 20 and abs(tmp_bo.build_num - boe.build_num) <= 20:
                 sort_bo.append(tmp_bo)
             else:
@@ -136,12 +133,13 @@ if __name__ == '__main__':
 
     bod = BuildOrderDeviation(boe_bench)
 
-    bod.calculate_deviations(boe_exec, n=63)
+    bod.calculate_deviations(boe_exec, depth=63)
 
     pprint(bod.dev_arr)
 
     print(bod.supp_dev)
     print(bod.time_dev)
+    print(bod.order_dev)
 
     import matplotlib.pyplot as plt
 

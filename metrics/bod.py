@@ -11,6 +11,7 @@ import itertools
 #           Principal component analysis
 #           Linear discriminant analysis
 #           Naive Bayes classifier
+#           Neural Networks - Backpropagation:
 #           create a benchmark of total units (building and army/worker)
 #               created by a point in time and then compare that to the
 #               bench bo to see how much different metrics affect the
@@ -45,7 +46,7 @@ class BuildOrderDeviation(object):
         self.supp_dev = 0
         self.time_dev = 0
         self.order_dev = 0
-        #self.discrepency = 0
+        self.discrepency = 0
         #self.worst_dev = None
         self.acc_time_dev = []
         #self.acc_time_dev = []
@@ -54,10 +55,12 @@ class BuildOrderDeviation(object):
 
     def calculate_deviations(self, compare_bo, depth=-1):
         self._initialize()
-        
-        cmp_bo = self._get_sorted_build_order(compare_bo, depth)
 
-        for idx in range(depth if depth >= 0 else len(self._bench_bo)):
+        bo_depth = depth if depth >= 0 and depth < len(self._bench_bo) else len(self._bench_bo)
+        
+        cmp_bo = self._get_sorted_build_order(compare_bo, bo_depth)
+
+        for idx in range(bo_depth):
             if cmp_bo[idx] is not None:
                 self.supp_dev += abs(self._bench_bo[idx].supply - cmp_bo[idx].supply)
                 self.time_dev += abs(self._bench_bo[idx].time - cmp_bo[idx].time)
@@ -70,11 +73,63 @@ class BuildOrderDeviation(object):
             else:
                 #self.time_dev += abs(self._bench_bo[idx].time - self._bench_bo[-1].time)
                 #self.acc_time_dev.append(self.time_dev)
+                self.discrepency += 1
                 self.dev_arr.append([self._bench_bo[idx].to_string(),
                                      '',
                                      0,
                                      0])#self._bench_bo[-1].time - self._bench_bo[idx].time])
 
+        self._calculate_additional_bo_units_discrepencies(compare_bo, bo_depth)
+
+
+    def get_unit_totals(self, bo=None, depth=-1):
+        """Get the total number of each units created in a build
+
+        Finds the total number of each unit made in a given build (or the benchmark build
+        if no build is supplied).
+
+        Args:
+            bo (dict): (Optional) The build order to extract unit totals from. Uses the
+                benchmark build order if no build order is supplied.
+            depth (int): (Optional) The depth with which to traverse the build order. If
+                not defined (-1), the entire build order will be used.
+
+        Returns:
+            (dict): A dictionary of the names of each unit created and the number
+                of them created in the entire build.
+        """
+        if bo is None:
+            bo = self._bench_bo
+        bo_depth = depth if depth >= 0 else len(bo)
+        bo_trimmed = bo[0:bo_depth]
+
+        build_unit_names = set([boe.name for boe in bo_trimmed])
+        name_count = {name: 0 for name in build_unit_names}
+
+        for x in range(bo_depth):
+            name_count[bo_trimmed[x].name] += 1
+
+        return name_count
+
+
+    def _calculate_additional_bo_units_discrepencies(self, compare_bo, depth=-1):
+        bo_depth = depth if depth >=0 else len(self._bench_bo)
+        bo_depth = bo_depth if bo_depth <= len(compare_bo) else len(compare_bo)
+        cmp_bo = compare_bo[0:bo_depth]
+        bch_bo = self._bench_bo[0:bo_depth]
+
+        build_unit_names = set([boe.name for boe in cmp_bo])
+        name_count_cmp = {name: 0 for name in build_unit_names}
+        name_count_bch = {name: 0 for name in build_unit_names}
+
+        for x in range(bo_depth):
+            name_count_cmp[cmp_bo[x].name] += 1
+            if bch_bo[x].name in name_count_bch:
+                name_count_bch[bch_bo[x].name] += 1
+
+        for x in name_count_cmp.keys():
+            self.discrepency += abs(name_count_cmp[x] - name_count_bch[x])
+            
 
     def _bo_units(bo, nm):
         for x in bo:
@@ -137,9 +192,12 @@ if __name__ == '__main__':
 
     pprint(bod.dev_arr)
 
-    print(bod.supp_dev)
-    print(bod.time_dev)
-    print(bod.order_dev)
+    print("supp_dev: ",bod.supp_dev)
+    print("time_dev: ",bod.time_dev)
+    print("order_dev: ",bod.order_dev)
+    print("disc: ", bod.discrepency)
+    pprint(bod.get_unit_totals(depth=63))
+    pprint(bod.get_unit_totals(boe_exec, depth=63))
 
     import matplotlib.pyplot as plt
 

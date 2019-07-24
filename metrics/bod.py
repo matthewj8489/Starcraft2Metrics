@@ -112,6 +112,18 @@ class BuildOrderDeviation(object):
         return name_count
 
 
+    def get_bench_time(self):
+        return self._bench_bo[-1].time
+
+
+    def get_bench_total_builds(self):
+        return self._bench_bo[-1].build_num
+
+
+    def get_bench_total_supply(self):
+        return self._bench_bo[-1].supply
+    
+
     def _calculate_additional_bo_units_discrepencies(self, compare_bo, depth=-1):
         bo_depth = depth if depth >=0 else len(self._bench_bo)
         bo_depth = bo_depth if bo_depth <= len(compare_bo) else len(compare_bo)
@@ -196,6 +208,10 @@ if __name__ == '__main__':
     print("time_dev: ",bod.time_dev)
     print("order_dev: ",bod.order_dev)
     print("disc: ", bod.discrepency)
+    print("supp_dev / supp: ",bod.supp_dev / bod.get_bench_total_supply())
+    print("time_dev / time: ",bod.time_dev / bod.get_bench_time())
+    print("order_dev / builds: ", bod.order_dev / bod.get_bench_total_builds())
+    print("disc / builds: ", bod.discrepency / bod.get_bench_total_builds())
     pprint(bod.get_unit_totals(depth=63))
     pprint(bod.get_unit_totals(boe_exec, depth=63))
 

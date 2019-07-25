@@ -98,7 +98,7 @@ class BuildOrderDeviation(object):
         """
         if bo is None:
             bo = self._bench_bo
-        bo_depth = depth if depth >= 0 else len(bo)
+        bo_depth = depth if depth >= 0 and depth < len(bo) else len(bo)
         bo_trimmed = bo[0:bo_depth]
 
         build_unit_names = set([boe.name for boe in bo_trimmed])
@@ -123,22 +123,15 @@ class BuildOrderDeviation(object):
     
 
     def _calculate_additional_bo_units_discrepencies(self, compare_bo, depth=-1):
-        bo_depth = depth if depth >=0 else len(self._bench_bo)
-        bo_depth = bo_depth if bo_depth <= len(compare_bo) else len(compare_bo)
-        cmp_bo = compare_bo[0:bo_depth]
-        bch_bo = self._bench_bo[0:bo_depth]
 
-        build_unit_names = set([boe.name for boe in cmp_bo])
-        name_count_cmp = {name: 0 for name in build_unit_names}
-        name_count_bch = {name: 0 for name in build_unit_names}
-
-        for x in range(bo_depth):
-            name_count_cmp[cmp_bo[x].name] += 1
-            if bch_bo[x].name in name_count_bch:
-                name_count_bch[bch_bo[x].name] += 1
+        name_count_cmp = self.get_unit_totals(compare_bo, depth)
+        name_count_bch = self.get_unit_totals(self._bench_bo, depth)
 
         for x in name_count_cmp.keys():
-            self.discrepency += abs(name_count_cmp[x] - name_count_bch[x])
+            if x in name_count_bch:
+                self.discrepency += abs(name_count_cmp[x] - name_count_bch[x])
+            else:
+                self.discrepency += name_count_cmp[x]
             
 
     def _bo_units(bo, nm):

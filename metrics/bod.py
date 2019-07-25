@@ -19,6 +19,11 @@ import itertools
 # order_dev - total deviation in order (absolute values?)
 # discrepency   - total discrepencies in build (elements missing or elements
 #               that shouldn't be there)
+# time_diff     - the difference in time between the build orders finished
+# supp_diff     - the difference in supply between the build orders finished
+# supp_dev_p    - additional supp_dev accounting for missing build items
+# time_dev_p    - additional time_dev accounting for missing build items
+# order_dev_p   - additional order_dev accounting for missing build items
 # worst_dev - the worst deviation in the build
 # acc_supp_dev  - the accumulated deviation in supply vs bench build ordering
 # acc_time_dev  - the accumulated deviation in time vs bench build ordering
@@ -45,6 +50,11 @@ class BuildOrderDeviation(object):
         self.time_dev = 0
         self.order_dev = 0
         self.discrepency = 0
+        self.time_diff = 0
+        self.supp_diff = 0
+        self.supp_dev_p = 0
+        self.time_dev_p = 0
+        self.order_dev_p = 0
         #self.worst_dev = None
         self.acc_time_dev = []
         #self.acc_time_dev = []
@@ -71,13 +81,18 @@ class BuildOrderDeviation(object):
             else:
                 #self.time_dev += abs(self._bench_bo[idx].time - self._bench_bo[-1].time)
                 #self.acc_time_dev.append(self.time_dev)
+                self.time_dev_p += abs(self._bench_bo[-1].time - self._bench_bo[idx].time)
+                self.supp_dev_p += abs(self._bench_bo[-1].supply - self._bench_bo[idx].supply)
+                self.order_dev_p += abs(self._bench_bo[-1].build_num - self._bench_bo[idx].build_num)
                 self.discrepency += 1
                 self.dev_arr.append([self._bench_bo[idx].to_string(),
                                      '',
                                      0,
                                      0])#self._bench_bo[-1].time - self._bench_bo[idx].time])
 
-        self._calculate_additional_bo_units_discrepencies(compare_bo, bo_depth)
+        self.time_diff = abs(self._bench_bo[bo_depth-1].time - cmp_bo[bo_depth-1].time)
+        self.supp_diff = abs(self._bench_bo[bo_depth-1].supply - cmp_bo[bo_depth-1].supply)
+        #self.discrepency += self._calculate_additional_bo_units_discrepencies(compare_bo, bo_depth)
 
 
     def get_unit_totals(self, bo=None, depth=-1):
@@ -120,18 +135,62 @@ class BuildOrderDeviation(object):
 
     def get_bench_total_supply(self):
         return self._bench_bo[-1].supply
-    
+
+
+    def get_scaled_time_dev(self, depth=-1):
+        tm = 0
+        bo_depth = depth if depth > 0 and depth <= len(self._bench_bo) else len(self._bench_bo)
+        bch_bo = self._bench_bo[0:bo_depth]
+        tm = sum(bo.time for bo in bch_bo)
+        return (self.time_dev + self.time_dev_p) / tm
+
+
+    def get_scaled_supp_dev(self, depth=-1):
+        sp = 0
+        bo_depth = depth if depth > 0 and depth <= len(self._bench_bo) else len(self._bench_bo)
+        bch_bo = self._bench_bo[0:bo_depth]
+        sp = sum(bo.supply for bo in bch_bo)
+        return (self.supp_dev + self.supp_dev_p) / sp
+
+
+    def get_scaled_order_dev(self, depth=-1):
+        od = 0
+        bo_depth = depth if depth > 0 and depth <= len(self._bench_bo) else len(self._bench_bo)
+        bch_bo = self._bench_bo[0:bo_depth]
+        od = sum(bo.build_num for bo in bch_bo)
+        return (self.order_dev + self.order_dev_p) / od
+
+
+    def get_scaled_discrepency(self, depth=-1):
+        bo_depth = depth if depth > 0 and depth <= len(self._bench_bo) else len(self._bench_bo)
+        bch_bo = self._bench_bo[0:bo_depth]
+        dis = len(bch_bo)
+        return self.discrepency / dis
+
+
+    def get_scaled_time_diff(self, depth=-1):
+        bo_depth = depth if depth > 0 and depth <= len(self._bench_bo) else len(self._bench_bo)
+        return self.time_diff / self._bench_bo[bo_depth-1].time
+
+
+    def get_scaled_supp_diff(self, depth=-1):
+        bo_depth = depth if depth > 0 and depth <= len(self._bench_bo) else len(self._bench_bo)
+        return self.supp_diff / self._bench_bo[bo_depth-1].supply
+
 
     def _calculate_additional_bo_units_discrepencies(self, compare_bo, depth=-1):
+        disc = 0
 
         name_count_cmp = self.get_unit_totals(compare_bo, depth)
         name_count_bch = self.get_unit_totals(self._bench_bo, depth)
 
         for x in name_count_cmp.keys():
             if x in name_count_bch:
-                self.discrepency += abs(name_count_cmp[x] - name_count_bch[x])
+                disc += abs(name_count_cmp[x] - name_count_bch[x])
             else:
-                self.discrepency += name_count_cmp[x]
+                disc += name_count_cmp[x]
+
+        return disc
             
 
     def _bo_units(bo, nm):
@@ -185,13 +244,15 @@ if __name__ == '__main__':
     from metric_factory.spawningtool_factory import generateBuildOrderElements
     from pprint import pprint
 
+    BO_DEPTH=63
+
     boe_bench = generateBuildOrderElements('../tests/integration/test_replays/pvz_dt_archon_drop_benchmark_bo.SC2Replay', 'Gemini')
     #boe_exec = generateBuildOrderElements('../tests/integration/test_replays/pvz_dt_archon_drop_executed_bo.SC2Replay', 'NULL')
     boe_exec = generateBuildOrderElements('../tests/integration/test_replays/pvz_dt_archon_drop_executed_bo_closer.SC2Replay', 'NULL')
 
     bod = BuildOrderDeviation(boe_bench)
 
-    bod.calculate_deviations(boe_exec, depth=63)
+    bod.calculate_deviations(boe_exec, depth=BO_DEPTH)
 
     pprint(bod.dev_arr)
 
@@ -203,6 +264,10 @@ if __name__ == '__main__':
     print("time_dev / time: ",bod.time_dev / bod.get_bench_time())
     print("order_dev / builds: ", bod.order_dev / bod.get_bench_total_builds())
     print("disc / builds: ", bod.discrepency / bod.get_bench_total_builds())
+    print("SCALED time_dev: ", bod.get_scaled_time_dev(depth=BO_DEPTH))
+    print("SCALED supp_dev: ", bod.get_scaled_supp_dev(depth=BO_DEPTH))
+    print("SCALED order_dev: ", bod.get_scaled_order_dev(depth=BO_DEPTH))
+    print("SCALED output_eval: ", (bod.get_scaled_discrepency(depth=BO_DEPTH) + bod.get_scaled_time_diff(depth=BO_DEPTH) + bod.get_scaled_supp_diff(depth=BO_DEPTH)) / 3)
     pprint(bod.get_unit_totals(depth=63))
     pprint(bod.get_unit_totals(boe_exec, depth=63))
 

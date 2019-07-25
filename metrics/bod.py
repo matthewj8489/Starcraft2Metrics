@@ -20,7 +20,7 @@ import itertools
 # discrepency   - total discrepencies in build (elements missing or elements
 #               that shouldn't be there)
 # time_diff     - the difference in time between the build orders finished
-# supp_diff     - the difference in supply between the build orders finished
+## (this seems irrelevent in evaluating the result) supp_diff     - the difference in supply between the build orders finished
 # supp_dev_p    - additional supp_dev accounting for missing build items
 # time_dev_p    - additional time_dev accounting for missing build items
 # order_dev_p   - additional order_dev accounting for missing build items
@@ -37,6 +37,12 @@ import itertools
 #           (6)[1:50]21|Assim,(6)[1:62]22|Assim,+1,+0:12
 #           (7)[2:00]22|Probe,(8)[2:15]22|Probe,0,+0:15
 #           (8)[2:10]22|Pylon,(7)[2:00]22|Pylon,0,-0:10
+#
+#
+# order_dev + order_dev_p, time_dev + time_dev_p : scale and average these to derive deviation, as these are the only
+#                                                   sub-metrics that matter in determining how well a build is
+#                                                   performed.
+# discrepency (including additional elements not in bench) : use this for build order detection.
 
 class BuildOrderDeviation(object):
 
@@ -51,7 +57,7 @@ class BuildOrderDeviation(object):
         self.order_dev = 0
         self.discrepency = 0
         self.time_diff = 0
-        self.supp_diff = 0
+        #self.supp_diff = 0
         self.supp_dev_p = 0
         self.time_dev_p = 0
         self.order_dev_p = 0
@@ -90,8 +96,10 @@ class BuildOrderDeviation(object):
                                      0,
                                      0])#self._bench_bo[-1].time - self._bench_bo[idx].time])
 
-        self.time_diff = abs(self._bench_bo[bo_depth-1].time - cmp_bo[bo_depth-1].time)
-        self.supp_diff = abs(self._bench_bo[bo_depth-1].supply - cmp_bo[bo_depth-1].supply)
+        #self.time_diff = abs(self._bench_bo[bo_depth-1].time - cmp_bo[bo_depth-1].time)
+        self.time_diff = abs(self._bench_bo[bo_depth-1].time - max(x.time for x in cmp_bo if x is not None))
+        #self.supp_diff = abs(self._bench_bo[bo_depth-1].supply - cmp_bo[bo_depth-1].supply)
+        #self.supp_diff = abs(self._bench_bo[bo_depth-1].supply - max(x.supply for x in cmp_bo if x is not None))
         #self.discrepency += self._calculate_additional_bo_units_discrepencies(compare_bo, bo_depth)
 
 
@@ -267,7 +275,7 @@ if __name__ == '__main__':
     print("SCALED time_dev: ", bod.get_scaled_time_dev(depth=BO_DEPTH))
     print("SCALED supp_dev: ", bod.get_scaled_supp_dev(depth=BO_DEPTH))
     print("SCALED order_dev: ", bod.get_scaled_order_dev(depth=BO_DEPTH))
-    print("SCALED output_eval: ", (bod.get_scaled_discrepency(depth=BO_DEPTH) + bod.get_scaled_time_diff(depth=BO_DEPTH) + bod.get_scaled_supp_diff(depth=BO_DEPTH)) / 3)
+    print("SCALED output_eval: ", (bod.get_scaled_discrepency(depth=BO_DEPTH) + bod.get_scaled_time_diff(depth=BO_DEPTH)) / 2)
     pprint(bod.get_unit_totals(depth=63))
     pprint(bod.get_unit_totals(boe_exec, depth=63))
 

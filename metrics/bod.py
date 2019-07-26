@@ -204,9 +204,10 @@ class BuildOrderDeviation(object):
 
 
     def detect_build_order(self, compare_bo):
+        deviation = self.calculate_deviations(compare_bo)
+        discrepencies = self.get_scaled_discrepency()
+
         confidence = 0
-        deviation = 0
-        #deviation = calculate_deviation(golden_bo, compare_bo)
 
         return [confidence, deviation]
 

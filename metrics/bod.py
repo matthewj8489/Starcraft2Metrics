@@ -1,31 +1,16 @@
 import itertools
 
 # Outputs:
-# dev - a metric that weights supply differences, time differences, order
-#       differences, and build discrepencies combined, 0 is a perfectly
-#       executed build order.
-#       (weight1 * metric1 + weight2 * metric2) / (weight1 + weight2)
-#       Defining weights:
-#           Principal component analysis
-#           Linear discriminant analysis
-#           Naive Bayes classifier
-#           Neural Networks - Backpropagation:
-#           create a benchmark of total units (building and army/worker)
-#               created by a point in time and then compare that to the
-#               bench bo to see how much different metrics affect the
-#               differences in the end result of units
-# supp_dev  - total deviation in supply (absolute values?)
-# time_dev  - total deviation in time (absolute values?)
-# order_dev - total deviation in order (absolute values?)
+# dev - a metric that averages the scaled values of time deviation and
+#       order deviation to give an overall value of closeness to the
+#       benchmark build order. A zero means the builds are exactly
+#       the same.
+# time_dev      - total deviation in time (absolute values?)
+# time_dev_p    - additional time_dev accounting for missing build items
+# order_dev     - total deviation in order (absolute values?)
+# order_dev_p   - additional order_dev accounting for missing build items
 # discrepency   - total discrepencies in build (elements missing or elements
 #               that shouldn't be there)
-# time_diff     - the difference in time between the build orders finished
-## (this seems irrelevent in evaluating the result) supp_diff     - the difference in supply between the build orders finished
-# supp_dev_p    - additional supp_dev accounting for missing build items
-# time_dev_p    - additional time_dev accounting for missing build items
-# order_dev_p   - additional order_dev accounting for missing build items
-# worst_dev - the worst deviation in the build
-# acc_supp_dev  - the accumulated deviation in supply vs bench build ordering
 # acc_time_dev  - the accumulated deviation in time vs bench build ordering
 # acc_order_dev - the accumulated deviation in order vs bench build ordering
 # dev_arr   - array containing the benchmark, build, dev_supp, dev_time for
@@ -46,25 +31,26 @@ import itertools
 
 class BuildOrderDeviation(object):
 
+    # ORDER_DEV_GRACE is used to specify how far a build unit can be in the
+    # build order past its corresponding build unit in the benchmark
+    # before it can no longer be considered related to that benchmark
+    # build unit. Also, allows the compared build order to go this amount
+    # of build order units past the last benchmark build unit (or depth).
+    ORDER_DEV_GRACE=20
+
     def __init__(self, bench_bo):
         self._bench_bo = bench_bo
         self._initialize()
 
     def _initialize(self):
         self.dev = 0
-        self.supp_dev = 0
         self.time_dev = 0
-        self.order_dev = 0
-        self.discrepency = 0
-        self.time_diff = 0
-        #self.supp_diff = 0
-        self.supp_dev_p = 0
         self.time_dev_p = 0
+        self.order_dev = 0
         self.order_dev_p = 0
-        #self.worst_dev = None
+        self.discrepency = 0
         self.acc_time_dev = []
-        #self.acc_time_dev = []
-        #self.acc_order_dev = []
+        self.acc_order_dev = []
         self.dev_arr = []
 
     def calculate_deviations(self, compare_bo, depth=-1):
@@ -76,19 +62,16 @@ class BuildOrderDeviation(object):
 
         for idx in range(bo_depth):
             if cmp_bo[idx] is not None:
-                self.supp_dev += abs(self._bench_bo[idx].supply - cmp_bo[idx].supply)
                 self.time_dev += abs(self._bench_bo[idx].time - cmp_bo[idx].time)
                 self.order_dev += abs(self._bench_bo[idx].build_num - cmp_bo[idx].build_num)
                 self.acc_time_dev.append(self.time_dev)
+                self.acc_order_dev.append(self.order_dev)
                 self.dev_arr.append([self._bench_bo[idx].to_string(),
                                      cmp_bo[idx].to_string(),
                                      cmp_bo[idx].supply - self._bench_bo[idx].supply,
                                      cmp_bo[idx].time - self._bench_bo[idx].time])
             else:
-                #self.time_dev += abs(self._bench_bo[idx].time - self._bench_bo[-1].time)
-                #self.acc_time_dev.append(self.time_dev)
                 self.time_dev_p += abs(self._bench_bo[-1].time - self._bench_bo[idx].time)
-                self.supp_dev_p += abs(self._bench_bo[-1].supply - self._bench_bo[idx].supply)
                 self.order_dev_p += abs(self._bench_bo[-1].build_num - self._bench_bo[idx].build_num)
                 self.discrepency += 1
                 self.dev_arr.append([self._bench_bo[idx].to_string(),
@@ -96,11 +79,7 @@ class BuildOrderDeviation(object):
                                      0,
                                      0])#self._bench_bo[-1].time - self._bench_bo[idx].time])
 
-        #self.time_diff = abs(self._bench_bo[bo_depth-1].time - cmp_bo[bo_depth-1].time)
-        self.time_diff = abs(self._bench_bo[bo_depth-1].time - max(x.time for x in cmp_bo if x is not None))
-        #self.supp_diff = abs(self._bench_bo[bo_depth-1].supply - cmp_bo[bo_depth-1].supply)
-        #self.supp_diff = abs(self._bench_bo[bo_depth-1].supply - max(x.supply for x in cmp_bo if x is not None))
-        #self.discrepency += self._calculate_additional_bo_units_discrepencies(compare_bo, bo_depth)
+        self.discrepency += self._calculate_additional_bo_units_discrepencies(compare_bo, bo_depth)
         self.dev = (self.get_scaled_time_dev(depth) + self.get_scaled_order_dev(depth)) / 2
 
         return self.dev
@@ -156,14 +135,6 @@ class BuildOrderDeviation(object):
         return (self.time_dev + self.time_dev_p) / tm
 
 
-    def get_scaled_supp_dev(self, depth=-1):
-        sp = 0
-        bo_depth = depth if depth > 0 and depth <= len(self._bench_bo) else len(self._bench_bo)
-        bch_bo = self._bench_bo[0:bo_depth]
-        sp = sum(bo.supply for bo in bch_bo)
-        return (self.supp_dev + self.supp_dev_p) / sp
-
-
     def get_scaled_order_dev(self, depth=-1):
         od = 0
         bo_depth = depth if depth > 0 and depth <= len(self._bench_bo) else len(self._bench_bo)
@@ -177,16 +148,6 @@ class BuildOrderDeviation(object):
         bch_bo = self._bench_bo[0:bo_depth]
         dis = len(bch_bo)
         return self.discrepency / dis
-
-
-    def get_scaled_time_diff(self, depth=-1):
-        bo_depth = depth if depth > 0 and depth <= len(self._bench_bo) else len(self._bench_bo)
-        return self.time_diff / self._bench_bo[bo_depth-1].time
-
-
-    def get_scaled_supp_diff(self, depth=-1):
-        bo_depth = depth if depth > 0 and depth <= len(self._bench_bo) else len(self._bench_bo)
-        return self.supp_diff / self._bench_bo[bo_depth-1].supply
 
 
     def _calculate_additional_bo_units_discrepencies(self, compare_bo, depth=-1):
@@ -232,7 +193,7 @@ class BuildOrderDeviation(object):
             # of the bench, or if the build number difference is greater
             # than 20, then the element is not associated with this part of
             # the build.
-            if tmp_bo is not None and tmp_bo.build_num <= last_build_num + 20 and abs(tmp_bo.build_num - boe.build_num) <= 20:
+            if tmp_bo is not None and tmp_bo.build_num <= last_build_num + self.ORDER_DEV_GRACE and abs(tmp_bo.build_num - boe.build_num) <= self.ORDER_DEV_GRACE:
                 sort_bo.append(tmp_bo)
             else:
                 sort_bo.append(None)

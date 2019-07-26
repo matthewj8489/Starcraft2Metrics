@@ -211,7 +211,7 @@ class BuildOrderDeviation(object):
 
     def _get_sorted_build_order(self, bo, depth=-1):
         sort_bo = []
-        last_build_num = depth if depth >= -1 else self._bench_bo[-1].build_num
+        last_build_num = depth if depth >= 0 else self._bench_bo[-1].build_num
 
         # create a dictionary of iterators, each iterator returns the next
         # element that matches the build unit name

@@ -51,7 +51,7 @@ class BuildOrderDeviation(object):
         self._initialize()
 
     def _initialize(self):
-        #self.dev = 0
+        self.dev = 0
         self.supp_dev = 0
         self.time_dev = 0
         self.order_dev = 0
@@ -101,6 +101,9 @@ class BuildOrderDeviation(object):
         #self.supp_diff = abs(self._bench_bo[bo_depth-1].supply - cmp_bo[bo_depth-1].supply)
         #self.supp_diff = abs(self._bench_bo[bo_depth-1].supply - max(x.supply for x in cmp_bo if x is not None))
         #self.discrepency += self._calculate_additional_bo_units_discrepencies(compare_bo, bo_depth)
+        self.dev = (self.get_scaled_time_dev(depth) + self.get_scaled_order_dev(depth)) / 2
+
+        return self.dev
 
 
     def get_unit_totals(self, bo=None, depth=-1):
@@ -247,82 +250,115 @@ class BuildOrderDeviation(object):
         return [confidence, deviation]
 
 
+def get_argument_parser():
+    parser = argparse.ArgumentParser(description='Build Order Deviation metric')
+
+    parser.add_argument('player_name', type=str, help='The name of the player to gather the metric data on.')
+    parser.add_argument('bench_path', type=str, help='The replay to use as a benchmark for the build order.')
+    parser.add_argument('--bench_player', type=str, help='The name of the player to monitor in the bench replay. If not specified the same name will be used as player_name.')
+    parser.add_argument('--depth', type=int, default=-1, help='Specify how deep into the build order to track.')
+    parser.add_argument('compare_path', nargs=argparse.REMAINDER, help='The replay(s) to compare against the benchmark build order. Specifying a folder will use all the replays in that folder.')
+
+    return parser
+    
+
+# bod [bench] [compare1] [compare2] ... --depth=DEPTH
 if __name__ == '__main__':
+    import argparse
     from metric_containers import *
     from metric_factory.spawningtool_factory import generateBuildOrderElements
-    from pprint import pprint
 
-    BO_DEPTH=63
+    parser = get_argument_parser()
+    args = parser.parse_args()
 
-    boe_bench = generateBuildOrderElements('../tests/integration/test_replays/pvz_dt_archon_drop_benchmark_bo.SC2Replay', 'Gemini')
-    #boe_exec = generateBuildOrderElements('../tests/integration/test_replays/pvz_dt_archon_drop_executed_bo.SC2Replay', 'NULL')
-    boe_exec = generateBuildOrderElements('../tests/integration/test_replays/pvz_dt_archon_drop_executed_bo_closer.SC2Replay', 'NULL')
+    bo_bench = generateBuildOrderElements(args.bench_path, args.player_name if not args.bench_player else args.bench_player)
+    bod = BuildOrderDeviation(bo_bench)
 
-    bod = BuildOrderDeviation(boe_bench)
-
-    bod.calculate_deviations(boe_exec, depth=BO_DEPTH)
-
-    pprint(bod.dev_arr)
-
-    print("supp_dev: ",bod.supp_dev)
-    print("time_dev: ",bod.time_dev)
-    print("order_dev: ",bod.order_dev)
-    print("disc: ", bod.discrepency)
-    print("supp_dev / supp: ",bod.supp_dev / bod.get_bench_total_supply())
-    print("time_dev / time: ",bod.time_dev / bod.get_bench_time())
-    print("order_dev / builds: ", bod.order_dev / bod.get_bench_total_builds())
-    print("disc / builds: ", bod.discrepency / bod.get_bench_total_builds())
-    print("SCALED time_dev: ", bod.get_scaled_time_dev(depth=BO_DEPTH))
-    print("SCALED supp_dev: ", bod.get_scaled_supp_dev(depth=BO_DEPTH))
-    print("SCALED order_dev: ", bod.get_scaled_order_dev(depth=BO_DEPTH))
-    print("SCALED output_eval: ", (bod.get_scaled_discrepency(depth=BO_DEPTH) + bod.get_scaled_time_diff(depth=BO_DEPTH)) / 2)
-    pprint(bod.get_unit_totals(depth=63))
-    pprint(bod.get_unit_totals(boe_exec, depth=63))
-
-    import matplotlib.pyplot as plt
-
-    plt.plot(bod.acc_time_dev)
-
-    plt.xlabel('build order')
-    plt.ylabel('time dev (s)')
-    plt.title('Accumulated Time Deviation')
-    plt.grid(True)
-    plt.savefig('acc_time_dev.png')
-    plt.show()
+    for pth in args.compare_path:
+        bo_compare = generateBuildOrderElements(pth, args.player_name)
+        print(bod.calculate_deviations(bo_compare, args.depth))
     
-    roc = []
-    for d in range(1, len(bod.acc_time_dev)):
-        roc.append((bod.acc_time_dev[d] - bod.acc_time_dev[d-1]))
+    
 
-    plt.plot(roc)
-    plt.xlabel('build order')
-    plt.ylabel('ROC of time dev (s/bo)')
-    plt.ylim(top=30)
-    plt.title('ROC of Accumulated Time Deviation')
-    plt.grid(True)
-    plt.savefig('roc_acc_time_dev.png')
-    plt.show()
+    
 
-    # Savitzky-Golay derivative digital filter algorithm
-    sg = []
-    coefficient = (1,-8,0,8,-1)
-    N = 5
-    h = 1
-    for d in range(0, len(bod.acc_time_dev), 5):
-        deriv = 0
-        if d+N < len(bod.acc_time_dev):
-            for i in range(d,d+N):
-                deriv += bod.acc_time_dev[i] * coefficient[i-d]
-            sg.append(deriv / (12 * h))
-
-    plt.plot(sg)
-    plt.xlabel('build order / 5')
-    plt.ylabel('Derivative of time dev (s/bo)')
-    plt.ylim(top=50, bottom=-50)
-    plt.title('Derivative of Accumulated Time Deviation')
-    plt.grid(True)
-    plt.savefig('deriv_acc_time_dev.png')
-    plt.show()
+##def test_things():
+##    from metric_containers import *
+##    from metric_factory.spawningtool_factory import generateBuildOrderElements
+##    from pprint import pprint
+##
+##    BO_DEPTH=63
+##
+##    boe_bench = generateBuildOrderElements('../tests/integration/test_replays/pvz_dt_archon_drop_benchmark_bo.SC2Replay', 'Gemini')
+##    #boe_exec = generateBuildOrderElements('../tests/integration/test_replays/pvz_dt_archon_drop_executed_bo.SC2Replay', 'NULL')
+##    boe_exec = generateBuildOrderElements('../tests/integration/test_replays/pvz_dt_archon_drop_executed_bo_closer.SC2Replay', 'NULL')
+##
+##    bod = BuildOrderDeviation(boe_bench)
+##
+##    bod.calculate_deviations(boe_exec, depth=BO_DEPTH)
+##
+##    pprint(bod.dev_arr)
+##
+##    #print("supp_dev: ",bod.supp_dev)
+##    print("time_dev: ",bod.time_dev)
+##    print("order_dev: ",bod.order_dev)
+##    print("disc: ", bod.discrepency)
+##    #print("supp_dev / supp: ",bod.supp_dev / bod.get_bench_total_supply())
+##    #print("time_dev / time: ",bod.time_dev / bod.get_bench_time())
+##    #print("order_dev / builds: ", bod.order_dev / bod.get_bench_total_builds())
+##    #print("disc / builds: ", bod.discrepency / bod.get_bench_total_builds())
+##    print("SCALED time_dev: ", bod.get_scaled_time_dev(depth=BO_DEPTH))
+##    #print("SCALED supp_dev: ", bod.get_scaled_supp_dev(depth=BO_DEPTH))
+##    print("SCALED order_dev: ", bod.get_scaled_order_dev(depth=BO_DEPTH))
+##    #print("SCALED output_eval: ", (bod.get_scaled_discrepency(depth=BO_DEPTH) + bod.get_scaled_time_diff(depth=BO_DEPTH)) / 2)
+##    print("BOD: ", bod.dev)
+##    pprint(bod.get_unit_totals(depth=63))
+##    pprint(bod.get_unit_totals(boe_exec, depth=63))
+##
+##    import matplotlib.pyplot as plt
+##
+##    plt.plot(bod.acc_time_dev)
+##
+##    plt.xlabel('build order')
+##    plt.ylabel('time dev (s)')
+##    plt.title('Accumulated Time Deviation')
+##    plt.grid(True)
+##    plt.savefig('acc_time_dev.png')
+##    plt.show()
+##    
+##    roc = []
+##    for d in range(1, len(bod.acc_time_dev)):
+##        roc.append((bod.acc_time_dev[d] - bod.acc_time_dev[d-1]))
+##
+##    plt.plot(roc)
+##    plt.xlabel('build order')
+##    plt.ylabel('ROC of time dev (s/bo)')
+##    plt.ylim(top=30)
+##    plt.title('ROC of Accumulated Time Deviation')
+##    plt.grid(True)
+##    plt.savefig('roc_acc_time_dev.png')
+##    plt.show()
+##
+##    # Savitzky-Golay derivative digital filter algorithm
+##    sg = []
+##    coefficient = (1,-8,0,8,-1)
+##    N = 5
+##    h = 1
+##    for d in range(0, len(bod.acc_time_dev), 5):
+##        deriv = 0
+##        if d+N < len(bod.acc_time_dev):
+##            for i in range(d,d+N):
+##                deriv += bod.acc_time_dev[i] * coefficient[i-d]
+##            sg.append(deriv / (12 * h))
+##
+##    plt.plot(sg)
+##    plt.xlabel('build order / 5')
+##    plt.ylabel('Derivative of time dev (s/bo)')
+##    plt.ylim(top=50, bottom=-50)
+##    plt.title('Derivative of Accumulated Time Deviation')
+##    plt.grid(True)
+##    plt.savefig('deriv_acc_time_dev.png')
+##    plt.show()
 
         
     

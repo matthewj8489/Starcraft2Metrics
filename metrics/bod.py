@@ -226,19 +226,32 @@ def get_argument_parser():
 
 # bod [bench] [compare1] [compare2] ... --depth=DEPTH
 if __name__ == '__main__':
+    import os
     import argparse
     from metric_containers import *
-    from metric_factory.spawningtool_factory import generateBuildOrderElements
+    from metric_factory.spawningtool_factory import SpawningtoolFactory
 
     parser = get_argument_parser()
     args = parser.parse_args()
 
-    bo_bench = generateBuildOrderElements(args.bench_path, args.player_name if not args.bench_player else args.bench_player)
+    bench_factory = SpawningtoolFactory(args.bench_path)
+    bo_bench = bench_factory.generateBuildOrderElements(args.player_name if not args.bench_player else args.bench_player)
     bod = BuildOrderDeviation(bo_bench)
 
-    for pth in args.compare_path:
-        bo_compare = generateBuildOrderElements(pth, args.player_name)
-        print(bod.calculate_deviations(bo_compare, args.depth))
+    print("depth : ", args.depth if args.depth >= 0 else len(bo_bench))
+
+    replay_paths = []
+    if os.path.isdir(args.compare_path[0]):
+        for pth in os.listdir(args.compare_path[0]):
+            replay_paths.append(os.path.join(args.compare_path[0], pth))
+    else:
+        replay_paths = args.compare_path
+        
+    for pth in replay_paths:
+        fact = SpawningtoolFactory(pth)
+        bo_compare = fact.generateBuildOrderElements(args.player_name)
+        meta = fact.generateReplayMetadata()
+        print(round(bod.calculate_deviations(bo_compare, args.depth), 4), ":", meta.to_string())
     
     
 

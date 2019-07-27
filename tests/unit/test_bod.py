@@ -50,10 +50,12 @@ class TestBuildOrderDeviation(unittest.TestCase):
         golden_bo = []
         compare_bo = []
         golden_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
-        golden_bo.append(BuildOrderElement(2, 'Assimilator', 15, 50, 200))
+        golden_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        golden_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
 
         compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
-        compare_bo.append(BuildOrderElement(2, 'Assimilator', 15, 50, 200))
+        compare_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        compare_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
 
         bo_dev = BuildOrderDeviation(golden_bo)
         bo_dev.calculate_deviations(compare_bo)
@@ -530,6 +532,26 @@ class TestBuildOrderDeviation(unittest.TestCase):
         bo_dev.calculate_deviations(compare_bo)
 
         self.assertEqual(bo_dev.order_dev_p, 1)
+
+
+############################ TEST DEVIATION ############################
+
+    def test_deviation_is_zero_when_builds_are_exactly_the_same(self):
+        golden_bo = []
+        compare_bo = []
+        golden_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        golden_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        golden_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        compare_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        bo_dev = BuildOrderDeviation(golden_bo)
+        bo_dev.calculate_deviations(compare_bo)
+
+        self.assertEqual(bo_dev.dev, 0)
+
 
         
 if __name__ == '__main__':

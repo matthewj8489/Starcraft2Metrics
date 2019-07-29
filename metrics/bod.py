@@ -39,6 +39,8 @@ class BuildOrderDeviation(object):
     ORDER_DEV_GRACE=20
 
     def __init__(self, bench_bo):
+        if len(bench_bo) <= 0:
+            raise ValueError('bench_bo does not contain any build order elements.')
         self._bench_bo = bench_bo
         self._initialize()
 
@@ -54,6 +56,9 @@ class BuildOrderDeviation(object):
         self.dev_arr = []
 
     def calculate_deviations(self, compare_bo, depth=-1):
+        if len(compare_bo) <= 0:
+            raise ValueError('compare_bo does not contain any build order elements.')
+        
         self._initialize()
 
         bo_depth = depth if depth >= 0 and depth < len(self._bench_bo) else len(self._bench_bo)
@@ -219,6 +224,7 @@ def get_argument_parser():
     parser.add_argument('bench_path', type=str, help='The replay to use as a benchmark for the build order.')
     parser.add_argument('--bench_player', type=str, help='The name of the player to monitor in the bench replay. If not specified the same name will be used as player_name.')
     parser.add_argument('--depth', type=int, default=-1, help='Specify how deep into the build order to track.')
+    parser.add_argument('--out_met_file', type=str, help='The filepath to save a .csv file containing the metric data.')
     parser.add_argument('compare_path', nargs=argparse.REMAINDER, help='The replay(s) to compare against the benchmark build order. Specifying a folder will use all the replays in that folder.')
 
     return parser
@@ -227,6 +233,7 @@ def get_argument_parser():
 # bod [bench] [compare1] [compare2] ... --depth=DEPTH
 if __name__ == '__main__':
     import os
+    import csv
     import argparse
     from metric_containers import *
     from metric_factory.spawningtool_factory import SpawningtoolFactory
@@ -237,6 +244,13 @@ if __name__ == '__main__':
     bench_factory = SpawningtoolFactory(args.bench_path)
     bo_bench = bench_factory.generateBuildOrderElements(args.player_name if not args.bench_player else args.bench_player)
     bod = BuildOrderDeviation(bo_bench)
+
+    out_met_file = open(args.out_met_file, write_mode, newline='') if args.out_met_file else None
+    out_met_writer = csv.DictWriter(out_met_file, fieldnames=['deviation', 'scaled time dev', 'scaled order dev', 'depth', 'replay info']) if out_met_file else None
+
+    print(args.out_met_file)
+    print(1 if out_met_file else 0)
+    print(1 if out_met_writer else 0)
 
     print("depth : ", args.depth if args.depth >= 0 else len(bo_bench))
 
@@ -250,10 +264,14 @@ if __name__ == '__main__':
     for pth in replay_paths:
         fact = SpawningtoolFactory(pth)
         bo_compare = fact.generateBuildOrderElements(args.player_name)
-        meta = fact.generateReplayMetadata()
-        print(round(bod.calculate_deviations(bo_compare, args.depth), 4), ":", meta.to_string())
+        if len(bo_compare) > 0:
+            meta = fact.generateReplayMetadata()
+            print(round(bod.calculate_deviations(bo_compare, args.depth), 4), ":", round(bod.get_scaled_time_dev(), 4), ":", round(bod.get_scaled_order_dev(), 4), ":",  meta.to_string())
+            if out_met_writer:
+                out_met_writer.writerow([round(bod.deviation, 4), round(bod.get_scaled_time_dev(), 4), round(bod.get_scaled_order_dev(), 4), args.depth if args.depth >= 0 else len(bo_bench), meta.to_string()])
     
-    
+    if out_met_file:
+        out_met_file.close()
 
     
 

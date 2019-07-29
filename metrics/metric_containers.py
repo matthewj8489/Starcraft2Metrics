@@ -91,16 +91,16 @@ class BuildOrderElement(object):
 
 class ReplayMetadata(object):
 
-    def __init__(self, game_length=0, players=[], winner='', date=''):
-        self.game_length = game_length
-        self.players = players
-        self.winner = winner
-        self.date = date
-
+    def __init__(self):
+        self.game_length = 0
+        self.players = []
+        self.winner = ''
+        self.date = ''
 
     def to_string(self):
-        out_str = "{0} - {1}s - W:{2} - ".format(self.date, self.game_length, self.winner)
+        out_str = "{0} - {1}s - W:{2} - ".format(self.date, round(self.game_length, 1), self.winner)
         for pl in self.players[:-1]:
             out_str += "{0} vs ".format(pl)
         out_str += self.players[-1]
-        
+
+        return out_str

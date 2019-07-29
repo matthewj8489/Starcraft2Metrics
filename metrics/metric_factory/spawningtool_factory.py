@@ -29,12 +29,14 @@ class SpawningtoolFactory(object):
     def generateReplayMetadata(self):
         meta = ReplayMetadata()
 
-        meta.game_length = self._build.frames / 24
-        meta.date = datetime.utcfromtimestamp(self._build.unix_timestamp).strftime('%Y-%m-%d %H:%M;%S')
-        for plyr in self._build.players:
-            meta.players.append("({0}){1}".format(plyr.race[0], plyr.name))
-            if plyr.winner:
-                meta.winner = plyr.name
+        meta.game_length = self._build['frames'] / self._build['frames_per_second']
+        meta.date = datetime.utcfromtimestamp(self._build['unix_timestamp']).strftime('%Y-%m-%d %H:%M;%S')
+        for plyr in self._build['players'].values():
+            meta.players.append("({0}){1}".format(plyr['race'][0], plyr['name']))
+            if plyr['is_winner']:
+                meta.winner = plyr['name']
+
+        return meta
         
 
     def generateSupplyCountArray(self):

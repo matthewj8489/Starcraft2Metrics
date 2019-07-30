@@ -120,6 +120,15 @@ class BuildOrderDeviation(object):
         return name_count
 
 
+    def detect_build_order(self, compare_bo):
+        deviation = self.calculate_deviations(compare_bo)
+        discrepencies = self.get_scaled_discrepency()
+
+        confidence = 0
+
+        return [confidence, deviation]
+
+
     def get_bench_time(self):
         return self._bench_bo[-1].time
 
@@ -206,15 +215,6 @@ class BuildOrderDeviation(object):
 
         return sort_bo
         
-
-
-    def detect_build_order(self, compare_bo):
-        deviation = self.calculate_deviations(compare_bo)
-        discrepencies = self.get_scaled_discrepency()
-
-        confidence = 0
-
-        return [confidence, deviation]
 
 
 def get_argument_parser():

@@ -44,6 +44,7 @@ class BuildOrderDeviation(object):
         self._bench_bo = bench_bo
         self._initialize()
 
+
     def _initialize(self):
         self.dev = 0
         self.time_dev = 0
@@ -55,13 +56,24 @@ class BuildOrderDeviation(object):
         self.acc_order_dev = []
         self.dev_arr = []
 
+
+    # when depth is defined, the calculated depth will be the minimum between depth and bench bo
+    # when depth is not defined, the calculated depth is the minimum between bench and compare bo
+    def _calculate_depth(self, desired_depth, compare_bo):
+        if (desired_depth < 0):
+            return min(len(self._bench_bo), len(compare_bo))
+        else:
+            return min(desired_depth, len(self._bench_bo))
+            
+
     def calculate_deviations(self, compare_bo, depth=-1):
         if len(compare_bo) <= 0:
             raise ValueError('compare_bo does not contain any build order elements.')
         
         self._initialize()
 
-        bo_depth = depth if depth >= 0 and depth < len(self._bench_bo) else len(self._bench_bo)
+        #bo_depth = depth if depth >= 0 and depth < len(self._bench_bo) else len(self._bench_bo)
+        bo_depth = self._calculate_depth(depth, compare_bo)
         
         cmp_bo = self._get_sorted_build_order(compare_bo, bo_depth)
 

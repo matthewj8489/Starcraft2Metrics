@@ -170,7 +170,8 @@ class TestBuildOrderDeviation(unittest.TestCase):
         bo_dev = BuildOrderDeviation(golden_bo)
         bo_dev.calculate_deviations(compare_bo, depth=2)
 
-        self.assertEqual(bo_dev.time_dev, 0)
+        self.assertEqual(bo_dev.dev, 0)
+        self.assertEqual(bo_dev.discrepency, 0)
 
 
     def test_depth_when_depth_is_greater_than_compare_bo(self):
@@ -187,8 +188,9 @@ class TestBuildOrderDeviation(unittest.TestCase):
         bo_dev = BuildOrderDeviation(golden_bo)
         bo_dev.calculate_deviations(compare_bo, depth=3)
 
-        self.assertEqual(bo_dev.time_dev, 0)
-
+        self.assertEqual(bo_dev.dev, 0)
+        self.assertEqual(bo_dev.discrepency, 1)
+        
 
     def test_depth_when_depth_is_greater_than_bench_bo(self):
         golden_bo = []
@@ -204,7 +206,8 @@ class TestBuildOrderDeviation(unittest.TestCase):
         bo_dev = BuildOrderDeviation(golden_bo)
         bo_dev.calculate_deviations(compare_bo, depth=3)
 
-        self.assertEqual(bo_dev.time_dev, 0)
+        self.assertEqual(bo_dev.dev, 0)
+        self.assertEqual(bo_dev.discrepency, 0)
 
         
 
@@ -255,8 +258,8 @@ class TestBuildOrderDeviation(unittest.TestCase):
         bo_dev = BuildOrderDeviation(golden_bo)
         bo_dev.calculate_deviations(compare_bo)
 
-        self.assertEqual(bo_dev.order_dev, 1)
-
+        self.assertEqual(bo_dev.order_dev, 0)
+        
 
     def test_order_deviation_isnt_affected_when_build_order_deviates_by_more_than_20(self):
         golden_bo = []
@@ -317,12 +320,12 @@ class TestBuildOrderDeviation(unittest.TestCase):
         golden_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
         golden_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
         golden_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
-
+        
         compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
-        compare_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        compare_bo.append(BuildOrderElement(2, 'Assimilator', 15, 50, 200))
 
         bo_dev = BuildOrderDeviation(golden_bo)
-        bo_dev.calculate_deviations(compare_bo)
+        bo_dev.calculate_deviations(compare_bo, depth=3)
 
         self.assertEqual(bo_dev.discrepency, 1)
 
@@ -515,6 +518,23 @@ class TestBuildOrderDeviation(unittest.TestCase):
         bo_dev.calculate_deviations(compare_bo)
 
         self.assertEqual(bo_dev.order_dev_p, 0)
+
+
+    def test_order_deviation_calculated_correctly_when_build_has_different_element(self):
+        golden_bo = []
+        compare_bo = []
+        golden_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        golden_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        golden_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(2, 'Probe', 14, 20, 90))
+        compare_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        bo_dev = BuildOrderDeviation(golden_bo)
+        bo_dev.calculate_deviations(compare_bo)
+
+        self.assertEqual(bo_dev.order_dev_p, 1)
 
 
     def test_order_dev_p_is_correct_when_build_unit_is_not_missing_but_greater_than_ORDER_DEV_GRACE(self):

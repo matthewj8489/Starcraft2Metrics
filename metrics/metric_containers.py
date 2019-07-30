@@ -104,3 +104,18 @@ class ReplayMetadata(object):
         out_str += self.players[-1]
 
         return out_str
+
+    def to_csv_list(self):
+        out = []
+        out.append(self.date)
+        out.append(self.game_length)
+        out.append(self.winner)
+        pl_str = ""
+        for pl in self.players[:-1]:
+            pl_str += "{0} vs ".format(pl)
+        out.append(pl_str)
+
+        return out
+
+    def csv_header():
+        return ['Date', 'Length (s)', 'Winner', 'Players']

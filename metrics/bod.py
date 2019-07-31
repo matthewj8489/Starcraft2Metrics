@@ -296,6 +296,12 @@ def get_argument_parser():
     parser.add_argument('--out_met_file', type=str, help='The filepath to save a .csv file containing the metric data.')
     parser.add_argument('compare_path', type=str, help='The replay(s) to compare against the benchmark build order. Specifying a folder will use all the replays in that folder.')
 
+    parser.add_argument('--output_path', type=str, help='The location to store output files. If not specified, the same location as this program will be used.')
+    parser.add_argument('--metric_output', action='store_true', default=False, help='Output a file containing the metric data.')
+    parser.add_argument('--dev_array_output', action='store_true', default=False, help='Output a file containing a comparison of each build element.')
+    parser.add_argument('--plot_output', action='store_true', default=False, help='Output files containing plots of the deviation metric for each replay.')
+    parser.add_argument('--all_output', action='store_true', default=False, help='Generate all output files.')
+
     return parser
     
 

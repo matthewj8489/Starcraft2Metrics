@@ -68,6 +68,22 @@ class BuildOrderDeviation(object):
             
 
     def calculate_deviations(self, compare_bo, depth=-1):
+        """Calculates the deviation metrics from the given build order
+
+        Calculates all of the deviation metrics that arise from comparing the given
+        build order to the benchmark build order.
+
+        Args:
+            compare_bo (BuildOrderElement[]): The build order to compare to the
+                benchmark.
+
+            (depth) (int): Optional. The depth with which to traverse the build order. If
+                not defined (-1), the entire build order will be used.
+
+        Returns:
+            float: The deviation recorded between the builds.
+            
+        """
         if len(compare_bo) <= 0:
             raise ValueError('compare_bo does not contain any build order elements.')
         
@@ -118,6 +134,7 @@ class BuildOrderDeviation(object):
         Returns:
             (dict): A dictionary of the names of each unit created and the number
                 of them created in the entire build.
+                
         """
         if bo is None:
             bo = self._bench_bo
@@ -145,7 +162,24 @@ class BuildOrderDeviation(object):
 
         return out
 
-    def detect_build_order(self, compare_bo, depth=-1):       
+    def detect_build_order(self, compare_bo, depth=-1):
+        """Determines how likely a build order is modeled after the benchmark build.
+
+        Determines the confidence that the given build order is modeled after the
+        benchmark build order contained here.
+
+        Args:
+            compare_bo (BuildOrderElement[]): An array of BuildOrderElements to
+                determine if it closely matches the benchmark build order.
+                
+            (depth) (int): Optional. The depth with which to traverse the build order. If
+                not defined (-1), the entire build order will be used.
+
+        Returns:
+            int: The confidence (0.0 - 1.0) that the given build order is a derivative
+                of the benchmark build order.
+                
+        """
         self.calculate_deviations(compare_bo, depth)
         order_dev = self.get_scaled_order_dev()
         discrepencies = self.get_scaled_discrepency()
@@ -156,18 +190,23 @@ class BuildOrderDeviation(object):
 
 
     def get_bench_time(self):
+        """Returns the time of the last build order element in the benchmark."""
         return self._bench_bo[-1].time
 
 
     def get_bench_total_builds(self):
+        """Returns the total number of builds in the benchmark."""
         return self._bench_bo[-1].build_num
 
 
     def get_bench_total_supply(self):
+        """Returns the supply of the last build order element in the benchmark."""
         return self._bench_bo[-1].supply
 
 
     def get_scaled_time_dev(self, depth=-1):
+        """Returns the total time deviation scaled to the sum of the time of the
+        benchmark."""
         tm = 0
         bo_depth = self._calculate_depth(depth, self._bench_bo)
         bch_bo = self._bench_bo[0:bo_depth]
@@ -176,6 +215,8 @@ class BuildOrderDeviation(object):
 
 
     def get_scaled_order_dev(self, depth=-1):
+        """Returns the total order deviation scaled to the sum of build numbers in the
+        benchmark."""
         od = 0
         bo_depth = self._calculate_depth(depth, self._bench_bo)
         bch_bo = self._bench_bo[0:bo_depth]
@@ -184,6 +225,8 @@ class BuildOrderDeviation(object):
 
 
     def get_scaled_discrepency(self, depth=-1):
+        """Returns the total discrepencies scaled to the sum of the total number of
+        build elements in the benchmark."""
         bo_depth = self._calculate_depth(depth, self._bench_bo)
         bch_bo = self._bench_bo[0:bo_depth]
         dis = len(bch_bo)
@@ -256,7 +299,6 @@ def get_argument_parser():
     return parser
     
 
-# bod [bench] [compare1] [compare2] ... --depth=DEPTH
 if __name__ == '__main__':
     import os
     import csv
@@ -292,7 +334,6 @@ if __name__ == '__main__':
         if len(bo_compare) > 0:
             meta = fact.generateReplayMetadata()
             confidence = bod.detect_build_order(bo_compare, args.depth)
-            #print(round(bod.calculate_deviations(bo_compare, args.depth), 4), ":", meta.to_string())
             print(round(bod.dev, 4), ":", round(confidence, 4), ":", meta.to_string())
             if out_met_writer:
                 rw = [round(bod.dev, 4), round(bod.get_scaled_time_dev(), 4), round(bod.get_scaled_order_dev(), 4), args.depth if args.depth >= 0 else len(bo_bench), round(confidence, 4)] + meta.to_csv_list()

@@ -1,4 +1,5 @@
 import itertools
+import math
 
 # Outputs:
 # dev - a metric that averages the scaled values of time deviation and
@@ -120,7 +121,7 @@ class BuildOrderDeviation(object):
         """
         if bo is None:
             bo = self._bench_bo
-        bo_depth = depth if depth >= 0 and depth < len(bo) else len(bo)
+        bo_depth = min(len(bo), depth) if depth >= 0 else len(bo)
         bo_trimmed = bo[0:bo_depth]
 
         build_unit_names = set([boe.name for boe in bo_trimmed])
@@ -132,13 +133,26 @@ class BuildOrderDeviation(object):
         return name_count
 
 
-    def detect_build_order(self, compare_bo):
-        deviation = self.calculate_deviations(compare_bo)
+    def _nn_feed_forward(self, order, disc):
+        NN_WI1 = -0.8326388182288694
+        NN_WI2 = -7.0693717100666690
+        NN_BI = 0.8541325726369238
+        NN_WH = 19.123065721771997
+        NN_BH = 0.20449835272881134
+
+        h = 1 / (1 + math.exp(-(order * NN_WI1 + disc * NN_WI2 + NN_BI)))
+        out = 1 / (1 + math.exp(-(h * NN_WH + NN_BH)))
+
+        return out
+
+    def detect_build_order(self, compare_bo, depth=-1):       
+        self.calculate_deviations(compare_bo, depth)
+        order_dev = self.get_scaled_order_dev()
         discrepencies = self.get_scaled_discrepency()
 
-        confidence = 0
+        confidence = self._nn_feed_forward(order_dev, discrepencies)
 
-        return [confidence, deviation]
+        return confidence
 
 
     def get_bench_time(self):
@@ -155,7 +169,7 @@ class BuildOrderDeviation(object):
 
     def get_scaled_time_dev(self, depth=-1):
         tm = 0
-        bo_depth = depth if depth > 0 and depth <= len(self._bench_bo) else len(self._bench_bo)
+        bo_depth = self._calculate_depth(depth, self._bench_bo)
         bch_bo = self._bench_bo[0:bo_depth]
         tm = sum(bo.time for bo in bch_bo)
         return (self.time_dev + self.time_dev_p) / tm
@@ -163,14 +177,14 @@ class BuildOrderDeviation(object):
 
     def get_scaled_order_dev(self, depth=-1):
         od = 0
-        bo_depth = depth if depth > 0 and depth <= len(self._bench_bo) else len(self._bench_bo)
+        bo_depth = self._calculate_depth(depth, self._bench_bo)
         bch_bo = self._bench_bo[0:bo_depth]
         od = sum(bo.build_num for bo in bch_bo)
         return (self.order_dev + self.order_dev_p) / od
 
 
     def get_scaled_discrepency(self, depth=-1):
-        bo_depth = depth if depth > 0 and depth <= len(self._bench_bo) else len(self._bench_bo)
+        bo_depth = self._calculate_depth(depth, self._bench_bo)
         bch_bo = self._bench_bo[0:bo_depth]
         dis = len(bch_bo)
         return self.discrepency / dis
@@ -198,7 +212,7 @@ class BuildOrderDeviation(object):
 
     def _get_sorted_build_order(self, bo, depth=-1):
         sort_bo = []
-        last_build_num = depth if depth >= 0 else self._bench_bo[-1].build_num
+        last_build_num = self._calculate_depth(depth, self._bench_bo)
 
         # create a dictionary of iterators, each iterator returns the next
         # element that matches the build unit name
@@ -260,7 +274,7 @@ if __name__ == '__main__':
     out_met_file = open(args.out_met_file, 'w+', newline='') if args.out_met_file else None
     out_met_writer = csv.writer(out_met_file, quoting=csv.QUOTE_MINIMAL) if out_met_file else None
     if out_met_writer:
-        rw = ['deviation', 'scaled time dev', 'scaled order dev', 'depth'] + ReplayMetadata.csv_header()
+        rw = ['deviation', 'scaled time dev', 'scaled order dev', 'depth', 'confidence'] + ReplayMetadata.csv_header()
         out_met_writer.writerow(rw)
 
     print("depth : ", args.depth if args.depth >= 0 else len(bo_bench))
@@ -277,9 +291,11 @@ if __name__ == '__main__':
         bo_compare = fact.generateBuildOrderElements(args.player_name)
         if len(bo_compare) > 0:
             meta = fact.generateReplayMetadata()
-            print(round(bod.calculate_deviations(bo_compare, args.depth), 4), ":", meta.to_string())
+            confidence = bod.detect_build_order(bo_compare, args.depth)
+            #print(round(bod.calculate_deviations(bo_compare, args.depth), 4), ":", meta.to_string())
+            print(round(bod.dev, 4), ":", round(confidence, 4), ":", meta.to_string())
             if out_met_writer:
-                rw = [round(bod.dev, 4), round(bod.get_scaled_time_dev(), 4), round(bod.get_scaled_order_dev(), 4), args.depth if args.depth >= 0 else len(bo_bench)] + meta.to_csv_list()
+                rw = [round(bod.dev, 4), round(bod.get_scaled_time_dev(), 4), round(bod.get_scaled_order_dev(), 4), args.depth if args.depth >= 0 else len(bo_bench), round(confidence, 4)] + meta.to_csv_list()
                 out_met_writer.writerow(rw)
     
     if out_met_file:

@@ -27,14 +27,14 @@ for tup in rep_tuple:
     bo = fact.generateBuildOrderElements('NULL')
     if len(bo) > 0:
         bod.calculate_deviations(bo)
-        train_data.append([[bod.dev, bod.get_scaled_discrepency()], [tup[1]]])
+        train_data.append([[bod.get_scaled_order_dev(), bod.get_scaled_discrepency()], [tup[1]]])
         print(bod.dev, ":", bod.get_scaled_discrepency(), ":", tup[1], ":", tup[0])
 
 
 ### Train
 nn = NeuralNetwork(2, 1, 1)
 
-for i in range(50000):
+for i in range(100000):
     tr_in, tr_out = random.choice(train_data)
     nn.train(tr_in, tr_out)
 

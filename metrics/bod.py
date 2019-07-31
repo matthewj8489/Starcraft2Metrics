@@ -30,6 +30,21 @@ import math
 #                                                   performed.
 # discrepency (including additional elements not in bench) : use this for build order detection.
 
+
+WORKER_NAMES = ['Probe', 'SCV', 'Drone']
+ARMY_NAMES = ['Zealot', 'Adept', 'Stalker', 'Sentry', 'DarkTemplar', 'HighTemplar', 'Archon',
+              'Observer', 'Immortal', 'WarpPrism', 'Colossus', 'Disruptor',
+              'Phoenix', 'VoidRay', 'Oracle', 'Carrier', 'Tempest', 'Mothership']
+BUILDING_NAMES = ['Nexus', 'Pylon', 'Assimilator', 'Gateway', 'Forge', 'CyberneticsCore', 'PhotonCannon', 'ShieldBattery',
+                  'RoboticsFacility', 'RoboticsBay', 'Stargate', 'FleetBeacon', 'TwilightCouncil', 'TemplarArchives', 'DarkShrine']
+UPGRADE_NAMES = ['ProtossGroundWeapons1', 'ProtossGroundWeapons2', 'ProtossGroundWeapons3',
+                 'ProtossGroundArmor1', 'ProtossGroundArmor2', 'ProtossGroundArmor3',
+                 'ProtossShieldArmor1', 'ProtossShieldArmor2', 'ProtossShieldArmor3',
+                 'ProtossAirWeapons1', 'ProtossAirWeapons2', 'ProtossAirWeapons3',
+                 'ProtossAirArmor1', 'ProtossAirArmor2', 'ProtossAirArmor3',
+                 'WarpGate', 'Charge', 'Blink', 'Glaives', 'ShadowStride', 'PsionicStorm', 'ExtendedThermalLance', 'GraviticDrive']
+
+
 class BuildOrderDeviation(object):
 
     # ORDER_DEV_GRACE is used to specify how far a build unit can be in the
@@ -65,6 +80,20 @@ class BuildOrderDeviation(object):
             return min(len(self._bench_bo), len(compare_bo))
         else:
             return min(desired_depth, len(self._bench_bo))
+
+
+    def _get_unit_category(unit_name):
+        if unit_name in WORKER_NAMES:
+            return 'worker'
+
+        if unit_name in ARMY_NAMES:
+            return 'army'
+
+        if unit_name in BUILDING_NAMES:
+            return 'building'
+
+        if unit_name in UPGRADE_NAMES:
+            return 'upgrade'
             
 
     def calculate_deviations(self, compare_bo, depth=-1):
@@ -182,6 +211,8 @@ class BuildOrderDeviation(object):
         """
         self.calculate_deviations(compare_bo, depth)
         order_dev = self.get_scaled_order_dev()
+        ## there could be more accuracy if the discrepencies were split into 4 categories:
+        ## worker, army, building, upgrade and a NN trained on those inputs instead.
         discrepencies = self.get_scaled_discrepency()
 
         confidence = self._nn_feed_forward(order_dev, discrepencies)
@@ -296,11 +327,11 @@ def get_argument_parser():
     parser.add_argument('--out_met_file', type=str, help='The filepath to save a .csv file containing the metric data.')
     parser.add_argument('compare_path', type=str, help='The replay(s) to compare against the benchmark build order. Specifying a folder will use all the replays in that folder.')
 
-    parser.add_argument('--output_path', type=str, help='The location to store output files. If not specified, the same location as this program will be used.')
-    parser.add_argument('--metric_output', action='store_true', default=False, help='Output a file containing the metric data.')
-    parser.add_argument('--dev_array_output', action='store_true', default=False, help='Output a file containing a comparison of each build element.')
-    parser.add_argument('--plot_output', action='store_true', default=False, help='Output files containing plots of the deviation metric for each replay.')
-    parser.add_argument('--all_output', action='store_true', default=False, help='Generate all output files.')
+    #parser.add_argument('--output_path', type=str, help='The location to store output files. If not specified, the same location as this program will be used.')
+    #parser.add_argument('--metric_output', action='store_true', default=False, help='Output a file containing the metric data.')
+    #parser.add_argument('--dev_array_output', action='store_true', default=False, help='Output a file containing a comparison of each build element.')
+    #parser.add_argument('--plot_output', action='store_true', default=False, help='Output files containing plots of the deviation metric for each replay.')
+    #parser.add_argument('--all_output', action='store_true', default=False, help='Generate all output files.')
 
     return parser
     

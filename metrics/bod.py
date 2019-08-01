@@ -45,6 +45,27 @@ UPGRADE_NAMES = ['ProtossGroundWeapons1', 'ProtossGroundWeapons2', 'ProtossGroun
                  'WarpGate', 'Charge', 'Blink', 'Glaives', 'ShadowStride', 'PsionicStorm', 'ExtendedThermalLance', 'GraviticDrive']
 
 
+class BuildOrderDeviationElement(object):
+
+    def __init__(self, bench_boe, compare_boe):
+        self.bench = bench_boe
+        self.compare = compare_boe
+        if compare_boe is not None:
+            self.order_dev = abs(self.bench.build_num - self.compare.build_num)
+            self.time_dev = abs(self.bench.time - self.compare.time)
+            self.discrepency = 0
+        else:
+            self.order_dev = 0
+            self.time_dev = 0
+            self.discrepency = 1
+
+    def to_csvrow(self):
+        return [self.bench.build_num, self.bench.time, self.bench.supply, self.bench.name,
+                self.compare.build_num, self.compare.time, self.compare.supply, self.compare.name,
+                self.order_dev, self.time_dev, self.discrepency, self.order_dev_p, self.time_dev_p]
+           
+
+
 class BuildOrderDeviation(object):
 
     # ORDER_DEV_GRACE is used to specify how far a build unit can be in the
@@ -70,7 +91,8 @@ class BuildOrderDeviation(object):
         self.discrepency = 0
         self.acc_time_dev = []
         self.acc_order_dev = []
-        self.dev_arr = []
+        #self.dev_arr = []
+        self.bode_arr = []
 
 
     # when depth is defined, the calculated depth will be the minimum between depth and bench bo
@@ -124,23 +146,18 @@ class BuildOrderDeviation(object):
         cmp_bo = self._get_sorted_build_order(compare_bo, bo_depth)
 
         for idx in range(bo_depth):
+            bode = BuildOrderDeviationElement(self._bench_bo[idx], cmp_bo[idx])
+            self.bode_arr.append(bode)
+
+            self.discrepency += bode.discrepency
             if cmp_bo[idx] is not None:
-                self.time_dev += abs(self._bench_bo[idx].time - cmp_bo[idx].time)
-                self.order_dev += abs(self._bench_bo[idx].build_num - cmp_bo[idx].build_num)
-                self.acc_time_dev.append(self.time_dev)
-                self.acc_order_dev.append(self.order_dev)
-                self.dev_arr.append([self._bench_bo[idx].to_string(),
-                                     cmp_bo[idx].to_string(),
-                                     cmp_bo[idx].supply - self._bench_bo[idx].supply,
-                                     cmp_bo[idx].time - self._bench_bo[idx].time])
+                self.time_dev += bode.time_dev
+                self.order_dev += bode.order_dev
+                self.acc_time_dev.append(bode.time_dev)
+                self.acc_order_dev.append(bode.order_dev)
             else:
                 self.time_dev_p += abs(self._bench_bo[-1].time - self._bench_bo[idx].time)
                 self.order_dev_p += abs(self._bench_bo[-1].build_num - self._bench_bo[idx].build_num)
-                self.discrepency += 1
-                self.dev_arr.append([self._bench_bo[idx].to_string(),
-                                     '',
-                                     0,
-                                     0])#self._bench_bo[-1].time - self._bench_bo[idx].time])
 
         self.discrepency += self._calculate_additional_bo_units_discrepencies(compare_bo, bo_depth)
         self.dev = (self.get_scaled_time_dev(depth) + self.get_scaled_order_dev(depth)) / 2
@@ -369,12 +386,13 @@ def get_argument_parser():
 
     parser.add_argument('--output_path', type=str, help='The location to store output files. If not specified, the same location as this program will be used.')
     parser.add_argument('--metric_output', action='store_true', default=False, help='Output a file containing the metric data.')
-    #parser.add_argument('--dev_array_output', action='store_true', default=False, help='Output a file containing a comparison of each build element.')
+    parser.add_argument('--dev_array_output', action='store_true', default=False, help='Output a file containing a comparison of each build element.')
     #parser.add_argument('--plot_output', action='store_true', default=False, help='Output files containing plots of the deviation metric for each replay.')
     #parser.add_argument('--all_output', action='store_true', default=False, help='Generate all output files.')
 
     return parser
-    
+
+   
 
 if __name__ == '__main__':
     import os
@@ -384,13 +402,17 @@ if __name__ == '__main__':
     from metric_factory.spawningtool_factory import SpawningtoolFactory
 
     METRIC_OUTPUT_FILENAME = 'metric_output.csv'
+    DEV_ARR_OUTPUT_FILENAME = 'dev_array_output.csv'
+
 
     parser = get_argument_parser()
     args = parser.parse_args()
 
+
     bench_factory = SpawningtoolFactory(args.bench_path)
     bo_bench = bench_factory.generateBuildOrderElements(args.player_name if not args.bench_player else args.bench_player)
     bod = BuildOrderDeviation(bo_bench)
+
 
     ## output metric file
     out_met_path = os.path.join(args.output_path, METRIC_OUTPUT_FILENAME) if args.output_path else METRIC_OUTPUT_FILENAME
@@ -399,6 +421,18 @@ if __name__ == '__main__':
     if out_met_writer:
         rw = ['deviation', 'scaled time dev', 'scaled order dev', 'depth', 'confidence'] + ReplayMetadata.csv_header() + ['filename']
         out_met_writer.writerow(rw)
+
+
+##    ## output deviation array
+##    out_dev_arr_path = os.path.join(args.output_path, DEV_ARR_OUTPUT_FILENAME) if args.output_path else DEV_ARR_OUTPUT_FILENAME
+##    out_dev_arr_file = open(out_dev_arr_path, 'w+', newline='') if args.dev_array_output else None
+##    out_dev_arr_writer = csv.writer(out_dev_arr_file, quoting=csv.QUOTE_MINIMAL) if out_dev_arr_file else None
+##    if out_dev_arr_writer:
+##        rw = ['order_bench', 'time_bench', 'supply_bench', 'name_bench',
+##              'order_compare', 'time_compare', 'supply_compare', 'name_compare',
+##              'order_dev', 'time_dev', 'discrepency', 'order_dev_p', 'time_dev_p']
+##        out_dev_arr_writer.writerow(rw)
+
 
     print("depth : ", args.depth if args.depth >= 0 else len(bo_bench))
 
@@ -409,7 +443,7 @@ if __name__ == '__main__':
                 replay_paths.append(os.path.join(args.compare_path, pth))
     else:
         replay_paths.append(args.compare_path)
-        
+
     for pth in replay_paths:
         fact = SpawningtoolFactory(pth)
         bo_compare = fact.generateBuildOrderElements(args.player_name)
@@ -420,6 +454,10 @@ if __name__ == '__main__':
             if out_met_writer:
                 rw = [round(bod.dev, 4), round(bod.get_scaled_time_dev(), 4), round(bod.get_scaled_order_dev(), 4), args.depth if args.depth >= 0 else len(bo_bench), round(confidence, 4)] + meta.to_csv_list() + [os.path.basename(pth)]
                 out_met_writer.writerow(rw)
+##            if out_dev_arr_writer:
+##                for bode in bod.bode_arr:
+##                    out_dev_arr_writer.writerow(bode.to_csvrow())
+            
     
     if out_met_file:
         out_met_file.close()

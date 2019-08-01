@@ -149,7 +149,7 @@ class TestBuildOrderDeviation(unittest.TestCase):
         bo_dev = BuildOrderDeviation(golden_bo)
         bo_dev.calculate_deviations(compare_bo)
 
-        self.assertEqual(3, len(bo_dev.dev_arr))
+        self.assertEqual(3, len(bo_dev.bode_arr))
         
 
 

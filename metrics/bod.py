@@ -213,7 +213,23 @@ class BuildOrderDeviation(object):
 ##  Bias: 0.8140641980822715
 ##------
     def _nn2_feed_forward(self, order, disc):
-        return 0
+        NN_WOH1 = 8.338633843804
+        NN_WDH1 = -1.5270798061037594
+        NN_BH1 = 0.9785443288439529
+        NN_WOH2 = -13.711848744765582
+        NN_WDH2 = 1.835616004688895
+        NN_BH2 = 0.9785443288439529
+        NN_WO1 = -8.431803459641838
+        NN_WO2 = 20.56901232827286
+        NN_BO = 0.8140641980822715
+
+        h1 = 1 / (1 + math.exp(-(order * NN_WOH1 + disc * NN_WDH1 + NN_BH1)))
+        h2 = 1 / (1 + math.exp(-(order * NN_WOH2 + disc * NN_WDH2 + NN_BH2)))
+
+        out = 1 / (1 + math.exp(-(h1 * NN_WO1 + h2 * NN_WO2 + NN_BO)))
+
+        return out
+
 
     def detect_build_order(self, compare_bo, depth=-1):
         """Determines how likely a build order is modeled after the benchmark build.
@@ -239,7 +255,7 @@ class BuildOrderDeviation(object):
         ## worker, army, building, upgrade and a NN trained on those inputs instead.
         discrepencies = self.get_scaled_discrepency()
 
-        confidence = self._nn_feed_forward(order_dev, discrepencies)
+        confidence = self._nn2_feed_forward(order_dev, discrepencies)
 
         return confidence
 
@@ -348,11 +364,11 @@ def get_argument_parser():
     parser.add_argument('bench_path', type=str, help='The replay to use as a benchmark for the build order.')
     parser.add_argument('--bench_player', type=str, help='The name of the player to monitor in the bench replay. If not specified the same name will be used as player_name.')
     parser.add_argument('--depth', type=int, default=-1, help='Specify how deep into the build order to track.')
-    parser.add_argument('--out_met_file', type=str, help='The filepath to save a .csv file containing the metric data.')
+    #parser.add_argument('--out_met_file', type=str, help='The filepath to save a .csv file containing the metric data.')
     parser.add_argument('compare_path', type=str, help='The replay(s) to compare against the benchmark build order. Specifying a folder will use all the replays in that folder.')
 
-    #parser.add_argument('--output_path', type=str, help='The location to store output files. If not specified, the same location as this program will be used.')
-    #parser.add_argument('--metric_output', action='store_true', default=False, help='Output a file containing the metric data.')
+    parser.add_argument('--output_path', type=str, help='The location to store output files. If not specified, the same location as this program will be used.')
+    parser.add_argument('--metric_output', action='store_true', default=False, help='Output a file containing the metric data.')
     #parser.add_argument('--dev_array_output', action='store_true', default=False, help='Output a file containing a comparison of each build element.')
     #parser.add_argument('--plot_output', action='store_true', default=False, help='Output files containing plots of the deviation metric for each replay.')
     #parser.add_argument('--all_output', action='store_true', default=False, help='Generate all output files.')
@@ -367,6 +383,8 @@ if __name__ == '__main__':
     from metric_containers import *
     from metric_factory.spawningtool_factory import SpawningtoolFactory
 
+    METRIC_OUTPUT_FILENAME = 'metric_output.csv'
+
     parser = get_argument_parser()
     args = parser.parse_args()
 
@@ -374,7 +392,9 @@ if __name__ == '__main__':
     bo_bench = bench_factory.generateBuildOrderElements(args.player_name if not args.bench_player else args.bench_player)
     bod = BuildOrderDeviation(bo_bench)
 
-    out_met_file = open(args.out_met_file, 'w+', newline='') if args.out_met_file else None
+    ## output metric file
+    out_met_path = os.path.join(args.output_path, METRIC_OUTPUT_FILENAME) if args.output_path else METRIC_OUTPUT_FILENAME
+    out_met_file = open(out_met_path, 'w+', newline='') if args.metric_output else None
     out_met_writer = csv.writer(out_met_file, quoting=csv.QUOTE_MINIMAL) if out_met_file else None
     if out_met_writer:
         rw = ['deviation', 'scaled time dev', 'scaled order dev', 'depth', 'confidence'] + ReplayMetadata.csv_header() + ['filename']

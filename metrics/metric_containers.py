@@ -113,6 +113,7 @@ class ReplayMetadata(object):
         pl_str = ""
         for pl in self.players[:-1]:
             pl_str += "{0} vs ".format(pl)
+        pl_str += self.players[-1]
         out.append(pl_str)
 
         return out

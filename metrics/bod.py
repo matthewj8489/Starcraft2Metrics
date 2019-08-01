@@ -191,6 +191,30 @@ class BuildOrderDeviation(object):
 
         return out
 
+##------
+##* Inputs: 2
+##------
+##Hidden Layer
+##Neurons: 2
+## Neuron 0
+##  Weight: 8.338633843804
+##  Weight: -1.5270798061037594
+##  Bias: 0.9785443288439529
+## Neuron 1
+##  Weight: -13.711848744765582
+##  Weight: 1.835616004688895
+##  Bias: 0.9785443288439529
+##------
+##* Output Layer
+##Neurons: 1
+## Neuron 0
+##  Weight: -8.431803459641838
+##  Weight: 20.56901232827286
+##  Bias: 0.8140641980822715
+##------
+    def _nn2_feed_forward(self, order, disc):
+        return 0
+
     def detect_build_order(self, compare_bo, depth=-1):
         """Determines how likely a build order is modeled after the benchmark build.
 
@@ -353,7 +377,7 @@ if __name__ == '__main__':
     out_met_file = open(args.out_met_file, 'w+', newline='') if args.out_met_file else None
     out_met_writer = csv.writer(out_met_file, quoting=csv.QUOTE_MINIMAL) if out_met_file else None
     if out_met_writer:
-        rw = ['deviation', 'scaled time dev', 'scaled order dev', 'depth', 'confidence'] + ReplayMetadata.csv_header()
+        rw = ['deviation', 'scaled time dev', 'scaled order dev', 'depth', 'confidence'] + ReplayMetadata.csv_header() + ['filename']
         out_met_writer.writerow(rw)
 
     print("depth : ", args.depth if args.depth >= 0 else len(bo_bench))
@@ -361,7 +385,8 @@ if __name__ == '__main__':
     replay_paths = []
     if os.path.isdir(args.compare_path):
         for pth in os.listdir(args.compare_path):
-            replay_paths.append(os.path.join(args.compare_path, pth))
+            if os.path.splitext(pth)[1] == '.SC2Replay':
+                replay_paths.append(os.path.join(args.compare_path, pth))
     else:
         replay_paths.append(args.compare_path)
         
@@ -373,7 +398,7 @@ if __name__ == '__main__':
             confidence = bod.detect_build_order(bo_compare, args.depth)
             print(round(bod.dev, 4), ":", round(confidence, 4), ":", meta.to_string())
             if out_met_writer:
-                rw = [round(bod.dev, 4), round(bod.get_scaled_time_dev(), 4), round(bod.get_scaled_order_dev(), 4), args.depth if args.depth >= 0 else len(bo_bench), round(confidence, 4)] + meta.to_csv_list()
+                rw = [round(bod.dev, 4), round(bod.get_scaled_time_dev(), 4), round(bod.get_scaled_order_dev(), 4), args.depth if args.depth >= 0 else len(bo_bench), round(confidence, 4)] + meta.to_csv_list() + [os.path.basename(pth)]
                 out_met_writer.writerow(rw)
     
     if out_met_file:

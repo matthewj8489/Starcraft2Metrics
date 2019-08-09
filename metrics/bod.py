@@ -389,6 +389,7 @@ def get_argument_parser():
     parser.add_argument('--dev_array_output', action='store_true', default=False, help='Output a file containing a comparison of each build element.')
     #parser.add_argument('--plot_output', action='store_true', default=False, help='Output files containing plots of the deviation metric for each replay.')
     #parser.add_argument('--all_output', action='store_true', default=False, help='Generate all output files.')
+    parser.add_argument('--latest', action='store_true', default=False, help='Parse only the latest replay in a folder.')
 
     return parser
 
@@ -396,6 +397,7 @@ def get_argument_parser():
 
 if __name__ == '__main__':
     import os
+    import glob
     import csv
     import argparse
     from metric_containers import *
@@ -416,9 +418,10 @@ if __name__ == '__main__':
 
     ## output metric file
     out_met_path = os.path.join(args.output_path, METRIC_OUTPUT_FILENAME) if args.output_path else METRIC_OUTPUT_FILENAME
-    out_met_file = open(out_met_path, 'w+', newline='') if args.metric_output else None
+    out_met_file_exists = os.path.isfile(out_met_path)
+    out_met_file = open(out_met_path, 'a', newline='') if args.metric_output else None
     out_met_writer = csv.writer(out_met_file, quoting=csv.QUOTE_MINIMAL) if out_met_file else None
-    if out_met_writer:
+    if out_met_writer and not out_met_file_exists:
         rw = ['deviation', 'scaled time dev', 'scaled order dev', 'depth', 'confidence'] + ReplayMetadata.csv_header() + ['filename']
         out_met_writer.writerow(rw)
 
@@ -438,9 +441,12 @@ if __name__ == '__main__':
 
     replay_paths = []
     if os.path.isdir(args.compare_path):
-        for pth in os.listdir(args.compare_path):
-            if os.path.splitext(pth)[1] == '.SC2Replay':
-                replay_paths.append(os.path.join(args.compare_path, pth))
+        if args.latest:
+            replay_paths.append(max(glob.iglob(os.path.join(args.compare_path, '*.[Ss][Cc]2[Rr]eplay')), key=os.path.getctime))
+        else:
+            for pth in os.listdir(args.compare_path):
+                if os.path.splitext(pth)[1] == '.SC2Replay':
+                    replay_paths.append(os.path.join(args.compare_path, pth))
     else:
         replay_paths.append(args.compare_path)
 

@@ -379,10 +379,9 @@ def get_argument_parser():
 
     parser.add_argument('player_name', type=str, help='The name of the player to gather the metric data on.')
     parser.add_argument('bench_path', type=str, help='The replay to use as a benchmark for the build order.')
+    parser.add_argument('compare_path', type=str, help='The replay(s) to compare against the benchmark build order. Specifying a folder will use all the replays in that folder.')
     parser.add_argument('--bench_player', type=str, help='The name of the player to monitor in the bench replay. If not specified the same name will be used as player_name.')
     parser.add_argument('--depth', type=int, default=-1, help='Specify how deep into the build order to track.')
-    #parser.add_argument('--out_met_file', type=str, help='The filepath to save a .csv file containing the metric data.')
-    parser.add_argument('compare_path', type=str, help='The replay(s) to compare against the benchmark build order. Specifying a folder will use all the replays in that folder.')
 
     parser.add_argument('--output_path', type=str, help='The location to store output files. If not specified, the same location as this program will be used.')
     parser.add_argument('--metric_output', action='store_true', default=False, help='Output a file containing the metric data.')
@@ -393,7 +392,6 @@ def get_argument_parser():
 
     return parser
 
-   
 
 if __name__ == '__main__':
     import os

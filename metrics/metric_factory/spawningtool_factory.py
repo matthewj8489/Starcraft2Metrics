@@ -1,3 +1,5 @@
+import os
+import json
 from datetime import datetime
 
 import spawningtool.parser
@@ -6,8 +8,8 @@ from metric_containers import *
 #metricfactory.spawningtool
 class SpawningtoolFactory(object):
 
-    def __init__(self, file_path):
-        self._build = spawningtool.parser.parse_replay(file_path)
+    def __init__(self, file_path, cache_dir=None):
+        self._build = spawningtool.parser.parse_replay(file_path, cache_dir=cache_dir)
     
     def generateBuildOrderElements(self, player_name):
         boe = []

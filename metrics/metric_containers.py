@@ -96,10 +96,21 @@ class BuildOrder(object):
         self.name = ''
 
     def serialize(self):
-        return self.__dict__
+        serial = self.__dict__
+        bld_s = []
+        for bld in self.build:
+            bld_s.append(bld.__dict__)
+        serial['build'] = bld_s
+
+        return serial
+        
         
     def deserialize(self, json_str):        
         self.__dict__ = json_str
+        blds = []
+        for bld in self.build:
+            blds.append(BuildOrderElement(bld['build_num'], bld['name'], bld['supply'], bld['time'], bld['frame']))
+        self.__dict__['build'] = blds
         
 
 class ReplayMetadata(object):

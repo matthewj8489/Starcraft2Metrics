@@ -93,6 +93,8 @@ class BuildOrderDeviation(object):
         self.acc_order_dev = []
         #self.dev_arr = []
         self.bode_arr = []
+        self.confidence = 0
+        self.bench_depth = len(self._bench_bo)
 
 
     # when depth is defined, the calculated depth will be the minimum between depth and bench bo
@@ -273,6 +275,7 @@ class BuildOrderDeviation(object):
         discrepencies = self.get_scaled_discrepency()
 
         confidence = self._nn2_feed_forward(order_dev, discrepencies)
+        self.confidence = confidence
 
         return confidence
 

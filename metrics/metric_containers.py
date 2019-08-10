@@ -89,6 +89,19 @@ class BuildOrderElement(object):
         return "({0})|{1}|{2}|{3}s".format(self.build_num, self.name, self.supply, self.time)
 
 
+class BuildOrder(object):
+        
+    def __init__(self):
+        self.build = []
+        self.name = ''
+
+    def serialize(self):
+        return self.__dict__
+        
+    def deserialize(self, json_str):        
+        self.__dict__ = json_str
+        
+
 class ReplayMetadata(object):
 
     def __init__(self):

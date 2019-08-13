@@ -17,6 +17,7 @@ if __name__ == '__main__':
     import argparse
     import json
     import csv
+    import copy
     from metric_containers import *
     #from build_order_detect import BuildOrderDetect
     from bod import BuildOrderDeviation
@@ -41,7 +42,7 @@ if __name__ == '__main__':
             j_builds = json.load(bch_fl)
             for j_bld in j_builds:
                 bench_build = BuildOrder()
-                bench_build.deserialize(j_bld)
+                bench_build.deserialize(copy.deepcopy(j_bld))
                 bch_builds.append(bench_build)
             
 
@@ -58,7 +59,6 @@ if __name__ == '__main__':
         bo.name = args.add_to_cache_name
         j_builds.append(bo.serialize())
         with open(args.benchmark_cache, 'w') as bch_fl:
-            pprint(j_builds)
             json.dump(j_builds, bch_fl)
             print('Successfully added build to benchmark builds!')
             raise SystemExit
@@ -70,6 +70,7 @@ if __name__ == '__main__':
     for bch in bch_builds:
         bch_bod = BuildOrderDeviation(bch.build)
         bch_bod.detect_build_order(cmp_bo)
+        print(bch_bod.confidence, ":", bch.name)
         closest_bod = bch_bod if not closest_bod else closest_bod
         closest_bod = bch_bod if bch_bod.confidence >= closest_bod.confidence else closest_bod
         closest_bch_name = bch.name if bch_bod.confidence >= closest_bod.confidence else closest_bch_name

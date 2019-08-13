@@ -249,6 +249,45 @@ class BuildOrderDeviation(object):
 
         return out
 
+##------
+##* Inputs: 2
+##------
+##Hidden Layer
+##Neurons: 2
+## Neuron 0
+##  Weight: -7.605137795850566
+##  Weight: -2.0031154649023453
+##  Bias: 0.7924616674420797
+## Neuron 1
+##  Weight: 5.556900142766295
+##  Weight: 0.427239990025159
+##  Bias: 0.7924616674420797
+##------
+##* Output Layer
+##Neurons: 1
+## Neuron 0
+##  Weight: 22.604220170902686
+##  Weight: -6.1049626514600215
+##  Bias: 0.8554616195309589
+##------
+    def _nn3_feed_forward(self, order, disc):
+        NN_WOH1 = -7.605137795850566
+        NN_WDH1 = -2.0031154649023453
+        NN_BH1 = 0.7924616674420797
+        NN_WOH2 = 5.556900142766295
+        NN_WDH2 = 0.427239990025159
+        NN_BH2 = 0.7924616674420797
+        NN_WO1 = 22.604220170902686
+        NN_WO2 = -6.1049626514600215
+        NN_BO = 0.8554616195309589
+
+        h1 = 1 / (1 + math.exp(-(order * NN_WOH1 + disc * NN_WDH1 + NN_BH1)))
+        h2 = 1 / (1 + math.exp(-(order * NN_WOH2 + disc * NN_WDH2 + NN_BH2)))
+
+        out = 1 / (1 + math.exp(-(h1 * NN_WO1 + h2 * NN_WO2 + NN_BO)))
+
+        return out
+    
 
     def detect_build_order(self, compare_bo, depth=-1):
         """Determines how likely a build order is modeled after the benchmark build.
@@ -274,7 +313,7 @@ class BuildOrderDeviation(object):
         ## worker, army, building, upgrade and a NN trained on those inputs instead.
         discrepencies = self.get_scaled_discrepency()
 
-        confidence = self._nn2_feed_forward(order_dev, discrepencies)
+        confidence = self._nn3_feed_forward(order_dev, discrepencies)
         self.confidence = confidence
 
         return confidence

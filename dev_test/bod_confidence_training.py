@@ -19,9 +19,9 @@ bench_fact = SpawningtoolFactory('../tests/integration/test_replays/bod_tests/pv
 bo_bench = bench_fact.generateBuildOrderElements('Gemini')
 bod_dt_archon_drop = BuildOrderDeviation(bo_bench)
 
-bench_fact = SpawningtoolFactory('../tests/integration/test_replays/bod_tests/pvz_chargelot_allin_NULL.SC2Replay')
+bench_fact = SpawningtoolFactory('../tests/integration/test_replays/bod_tests/pvz_chargelot_allin_benchmark_NULL.SC2Replay')
 bo_bench = bench_fact.generateBuildOrderElements('NULL')
-bod_dt_archon_drop = BuildOrderDeviation(bo_bench)
+bod_chargelot_allin = BuildOrderDeviation(bo_bench)
 
 
 rep_tuples = {'blink_robo': [], '2_gate_expand': [], 'dt_archon_drop': [], 'chargelot_allin': []}
@@ -75,7 +75,7 @@ for tup in rep_tuples['dt_archon_drop']:
 for tup in rep_tuples['chargelot_allin']:
     fact = SpawningtoolFactory(tup[0])
     bo = fact.generateBuildOrderElements('NULL')
-    bod = bod_dt_archon_drop
+    bod = bod_chargelot_allin
     if len(bo) > 0:
         bod.calculate_deviations(bo)
         train_data.append([[bod.get_scaled_order_dev(), bod.get_scaled_discrepency()], [tup[1]]])

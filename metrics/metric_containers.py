@@ -105,8 +105,8 @@ class BuildOrder(object):
         return serial
         
         
-    def deserialize(self, json_str):        
-        self.__dict__ = json_str
+    def deserialize(self, json_obj):        
+        self.__dict__ = json_obj
         blds = []
         for bld in self.build:
             blds.append(BuildOrderElement(bld['build_num'], bld['name'], bld['supply'], bld['time'], bld['frame']))

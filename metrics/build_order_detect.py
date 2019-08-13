@@ -1,3 +1,4 @@
+import math
 from bod import BuildOrderDeviation
 
 class BuildOrderDetect(object):
@@ -29,12 +30,12 @@ class BuildOrderDetect(object):
         ## worker, army, building, upgrade and a NN trained on those inputs instead.
         discrepencies = bod.get_scaled_discrepency()
 
-        confidence = self._nn3_feed_forward(order_dev, discrepencies)
+        confidence = BuildOrderDetect._nn3_feed_forward(order_dev, discrepencies)
 
         return confidence, bod
 
 
-    def _nn_feed_forward(self, order, disc):
+    def _nn_feed_forward(order, disc):
         NN_WI1 = -0.8326388182288694
         NN_WI2 = -7.0693717100666690
         NN_BI = 0.8541325726369238
@@ -67,7 +68,7 @@ class BuildOrderDetect(object):
 ##  Weight: 20.56901232827286
 ##  Bias: 0.8140641980822715
 ##------
-    def _nn2_feed_forward(self, order, disc):
+    def _nn2_feed_forward(order, disc):
         NN_WOH1 = 8.338633843804
         NN_WDH1 = -1.5270798061037594
         NN_BH1 = 0.9785443288439529
@@ -106,7 +107,7 @@ class BuildOrderDetect(object):
 ##  Weight: -6.1049626514600215
 ##  Bias: 0.8554616195309589
 ##------
-    def _nn3_feed_forward(self, order, disc):
+    def _nn3_feed_forward(order, disc):
         NN_WOH1 = -7.605137795850566
         NN_WDH1 = -2.0031154649023453
         NN_BH1 = 0.7924616674420797

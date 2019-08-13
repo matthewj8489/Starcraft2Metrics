@@ -58,7 +58,6 @@ if __name__ == '__main__':
         bo.name = args.add_to_cache_name
         j_builds.append(bo.serialize())
         with open(args.benchmark_cache, 'w') as bch_fl:
-            pprint(j_builds)
             json.dump(j_builds, bch_fl)
             print('Successfully added build to benchmark builds!')
             raise SystemExit
@@ -84,4 +83,5 @@ if __name__ == '__main__':
             out_writer.writerow(rw)
         rw = [round(closest_bod.dev, 4), round(closest_bod.get_scaled_time_dev(), 4), round(closest_bod.get_scaled_order_dev(), 4), closest_bod.bench_depth, closest_bch_name, round(closest_bod.confidence, 4)] + cmp_meta.to_csv_list()
         out_writer.writerow(rw)
-    
+        print('Successfully added the BOD metrics!')    
+

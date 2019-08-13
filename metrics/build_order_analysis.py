@@ -19,7 +19,7 @@ if __name__ == '__main__':
     import csv
     import copy
     from metric_containers import *
-    #from build_order_detect import BuildOrderDetect
+    from build_order_detect import BuildOrderDetect
     from bod import BuildOrderDeviation
     from metric_factory.spawningtool_factory import SpawningtoolFactory
     from pprint import pprint
@@ -66,14 +66,21 @@ if __name__ == '__main__':
 
     # find the closest matching build order from the benchmarks
     closest_bod = None
+    closest_confidence = 0
     closest_bch_name = ''
     for bch in bch_builds:
-        bch_bod = BuildOrderDeviation(bch.build)
-        bch_bod.detect_build_order(cmp_bo)
-        print(bch_bod.confidence, ":", bch.name)
+        confidence, bch_bod = BuildOrderDetect.detect_build_order(bch.build, cmp_bo)
+        print(confidence, ":", bch.name)
         closest_bod = bch_bod if not closest_bod else closest_bod
-        closest_bod = bch_bod if bch_bod.confidence >= closest_bod.confidence else closest_bod
-        closest_bch_name = bch.name if bch_bod.confidence >= closest_bod.confidence else closest_bch_name
+        closest_bod = bch_bod if confidence >= closest_confidence else closest_bod
+        closest_bch_name = bch.name if confidence >= closest_confidence else closest_bch_name
+        closest_confidence = confidence if confidence >= closest_confidence else closest_confidence
+        #bch_bod = BuildOrderDeviation(bch.build)
+        #bch_bod.detect_build_order(cmp_bo)
+        #print(bch_bod.confidence, ":", bch.name)
+        #closest_bod = bch_bod if not closest_bod else closest_bod
+        #closest_bod = bch_bod if bch_bod.confidence >= closest_bod.confidence else closest_bod
+        #closest_bch_name = bch.name if bch_bod.confidence >= closest_bod.confidence else closest_bch_name
 
     # report the build deviations
     out_path = 'bod_output.csv'
@@ -83,7 +90,7 @@ if __name__ == '__main__':
         if not out_file_exists:
             rw = ['deviation', 'scaled time dev', 'scaled order dev', 'depth', 'build', 'confidence'] + ReplayMetadata.csv_header()
             out_writer.writerow(rw)
-        rw = [round(closest_bod.dev, 4), round(closest_bod.get_scaled_time_dev(), 4), round(closest_bod.get_scaled_order_dev(), 4), closest_bod.bench_depth, closest_bch_name, round(closest_bod.confidence, 4)] + cmp_meta.to_csv_list()
+        rw = [round(closest_bod.dev, 4), round(closest_bod.get_scaled_time_dev(), 4), round(closest_bod.get_scaled_order_dev(), 4), closest_bod.bench_depth, closest_bch_name, round(closest_confidence, 4)] + cmp_meta.to_csv_list()
         out_writer.writerow(rw)
         print('Successfully added the BOD metrics!')    
 

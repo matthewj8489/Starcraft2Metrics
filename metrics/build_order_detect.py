@@ -18,6 +18,8 @@ class BuildOrderDetect(object):
         Returns:
             int: The confidence (0.0 - 1.0) that the given build order is a derivative
                 of the benchmark build order.
+
+            BuildOrderDeviation: The BOD object used to determine the confidence.
                 
         """
         bod = BuildOrderDeviation(bo)
@@ -29,7 +31,7 @@ class BuildOrderDetect(object):
 
         confidence = self._nn3_feed_forward(order_dev, discrepencies)
 
-        return confidence
+        return confidence, bod
 
 
     def _nn_feed_forward(self, order, disc):

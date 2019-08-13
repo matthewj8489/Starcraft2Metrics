@@ -93,7 +93,6 @@ class BuildOrderDeviation(object):
         self.acc_order_dev = []
         #self.dev_arr = []
         self.bode_arr = []
-        self.confidence = 0
         self.bench_depth = len(self._bench_bo)
 
 
@@ -196,127 +195,6 @@ class BuildOrderDeviation(object):
             name_count[bo_trimmed[x].name] += 1
 
         return name_count
-
-
-    def _nn_feed_forward(self, order, disc):
-        NN_WI1 = -0.8326388182288694
-        NN_WI2 = -7.0693717100666690
-        NN_BI = 0.8541325726369238
-        NN_WH = 19.123065721771997
-        NN_BH = 0.20449835272881134
-
-        h = 1 / (1 + math.exp(-(order * NN_WI1 + disc * NN_WI2 + NN_BI)))
-        out = 1 / (1 + math.exp(-(h * NN_WH + NN_BH)))
-
-        return out
-
-##------
-##* Inputs: 2
-##------
-##Hidden Layer
-##Neurons: 2
-## Neuron 0
-##  Weight: 8.338633843804
-##  Weight: -1.5270798061037594
-##  Bias: 0.9785443288439529
-## Neuron 1
-##  Weight: -13.711848744765582
-##  Weight: 1.835616004688895
-##  Bias: 0.9785443288439529
-##------
-##* Output Layer
-##Neurons: 1
-## Neuron 0
-##  Weight: -8.431803459641838
-##  Weight: 20.56901232827286
-##  Bias: 0.8140641980822715
-##------
-    def _nn2_feed_forward(self, order, disc):
-        NN_WOH1 = 8.338633843804
-        NN_WDH1 = -1.5270798061037594
-        NN_BH1 = 0.9785443288439529
-        NN_WOH2 = -13.711848744765582
-        NN_WDH2 = 1.835616004688895
-        NN_BH2 = 0.9785443288439529
-        NN_WO1 = -8.431803459641838
-        NN_WO2 = 20.56901232827286
-        NN_BO = 0.8140641980822715
-
-        h1 = 1 / (1 + math.exp(-(order * NN_WOH1 + disc * NN_WDH1 + NN_BH1)))
-        h2 = 1 / (1 + math.exp(-(order * NN_WOH2 + disc * NN_WDH2 + NN_BH2)))
-
-        out = 1 / (1 + math.exp(-(h1 * NN_WO1 + h2 * NN_WO2 + NN_BO)))
-
-        return out
-
-##------
-##* Inputs: 2
-##------
-##Hidden Layer
-##Neurons: 2
-## Neuron 0
-##  Weight: -7.605137795850566
-##  Weight: -2.0031154649023453
-##  Bias: 0.7924616674420797
-## Neuron 1
-##  Weight: 5.556900142766295
-##  Weight: 0.427239990025159
-##  Bias: 0.7924616674420797
-##------
-##* Output Layer
-##Neurons: 1
-## Neuron 0
-##  Weight: 22.604220170902686
-##  Weight: -6.1049626514600215
-##  Bias: 0.8554616195309589
-##------
-    def _nn3_feed_forward(self, order, disc):
-        NN_WOH1 = -7.605137795850566
-        NN_WDH1 = -2.0031154649023453
-        NN_BH1 = 0.7924616674420797
-        NN_WOH2 = 5.556900142766295
-        NN_WDH2 = 0.427239990025159
-        NN_BH2 = 0.7924616674420797
-        NN_WO1 = 22.604220170902686
-        NN_WO2 = -6.1049626514600215
-        NN_BO = 0.8554616195309589
-
-        h1 = 1 / (1 + math.exp(-(order * NN_WOH1 + disc * NN_WDH1 + NN_BH1)))
-        h2 = 1 / (1 + math.exp(-(order * NN_WOH2 + disc * NN_WDH2 + NN_BH2)))
-
-        out = 1 / (1 + math.exp(-(h1 * NN_WO1 + h2 * NN_WO2 + NN_BO)))
-
-        return out
-    
-
-    def detect_build_order(self, compare_bo, depth=-1):
-        """Determines how likely a build order is modeled after the benchmark build.
-
-        Determines the confidence that the given build order is modeled after the
-        benchmark build order contained here.
-
-        Args:
-            compare_bo (BuildOrderElement[]): An array of BuildOrderElements to
-                determine if it closely matches the benchmark build order.
-                
-            (depth) (int): Optional. The depth with which to traverse the build order. If
-                not defined (-1), the entire build order will be used.
-
-        Returns:
-            int: The confidence (0.0 - 1.0) that the given build order is a derivative
-                of the benchmark build order.
-                
-        """
-        self.calculate_deviations(compare_bo, depth)
-        order_dev = self.get_scaled_order_dev()
-        ## there could be more accuracy if the discrepencies were split into 4 categories:
-        ## worker, army, building, upgrade and a NN trained on those inputs instead.
-        discrepencies = self.get_scaled_discrepency()
-
-        confidence = self._nn3_feed_forward(order_dev, discrepencies)
-        self.confidence = confidence
-
-        return confidence
 
 
     def get_bench_time(self):
@@ -462,7 +340,7 @@ if __name__ == '__main__':
     out_met_file = open(out_met_path, 'a', newline='') if args.metric_output else None
     out_met_writer = csv.writer(out_met_file, quoting=csv.QUOTE_MINIMAL) if out_met_file else None
     if out_met_writer and not out_met_file_exists:
-        rw = ['deviation', 'scaled time dev', 'scaled order dev', 'depth', 'confidence'] + ReplayMetadata.csv_header() + ['filename']
+        rw = ['deviation', 'scaled time dev', 'scaled order dev', 'depth'] + ReplayMetadata.csv_header() + ['filename']
         out_met_writer.writerow(rw)
 
 
@@ -495,10 +373,10 @@ if __name__ == '__main__':
         bo_compare = fact.generateBuildOrderElements(args.player_name)
         if len(bo_compare) > 0:
             meta = fact.generateReplayMetadata()
-            confidence = bod.detect_build_order(bo_compare, args.depth)
-            print(round(bod.dev, 4), ":", round(confidence, 4), ":", meta.to_string())
+            bod.calculate_deviations(bo_compare, args.depth)
+            print(round(bod.dev, 4), ":", meta.to_string())
             if out_met_writer:
-                rw = [round(bod.dev, 4), round(bod.get_scaled_time_dev(), 4), round(bod.get_scaled_order_dev(), 4), args.depth if args.depth >= 0 else len(bo_bench), round(confidence, 4)] + meta.to_csv_list() + [os.path.basename(pth)]
+                rw = [round(bod.dev, 4), round(bod.get_scaled_time_dev(), 4), round(bod.get_scaled_order_dev(), 4), args.depth if args.depth >= 0 else len(bo_bench)] + meta.to_csv_list() + [os.path.basename(pth)]
                 out_met_writer.writerow(rw)
 ##            if out_dev_arr_writer:
 ##                for bode in bod.bode_arr:

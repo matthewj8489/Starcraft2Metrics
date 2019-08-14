@@ -32,14 +32,14 @@ class BuildOrderDetect(object):
         discrepencies = bod.get_scaled_discrepency()
 
         #confidence = BuildOrderDetect._nn3_feed_forward(order_dev, discrepencies)
-        nn = _get_nn()
-        confidence = nn.feed_forward([order_dev, discrepencies])
+        nn = BuildOrderDetect._get_nn()
+        confidence = nn.feed_forward([order_dev, discrepencies])[0]
 
         return confidence, bod
 
 
     def _get_nn():
-        return _get_nn3()
+        return BuildOrderDetect._get_nn3()
 
     def _get_nn1():
         return None

@@ -2,7 +2,7 @@
 def get_argument_parser():
     parser = argparse.ArgumentParser(description='Build Order Benchmark Comparison')
 
-    parser.add_argument('benchmark_cache', type=str, help='The cache directory containing build orders.')
+    parser.add_argument('benchmark_cache', type=str, help='The cache file containing build orders.')
     parser.add_argument('comparison_build', type=str, help='The build (.SC2Replay) to compare to a benchmark build.')
     parser.add_argument('player_name', type=str, help='The name of the player to monitor in the comparison_build replay.')
 

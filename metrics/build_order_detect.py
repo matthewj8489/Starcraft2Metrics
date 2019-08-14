@@ -1,5 +1,6 @@
 import math
 from bod import BuildOrderDeviation
+from build_order_detect_training.neural_network import NeuralNetwork
 
 class BuildOrderDetect(object):
 
@@ -30,10 +31,58 @@ class BuildOrderDetect(object):
         ## worker, army, building, upgrade and a NN trained on those inputs instead.
         discrepencies = bod.get_scaled_discrepency()
 
-        confidence = BuildOrderDetect._nn3_feed_forward(order_dev, discrepencies)
+        #confidence = BuildOrderDetect._nn3_feed_forward(order_dev, discrepencies)
+        nn = _get_nn()
+        confidence = nn.feed_forward([order_dev, discrepencies])
 
         return confidence, bod
 
+
+    def _get_nn():
+        return _get_nn3()
+
+    def _get_nn1():
+        return None
+
+    def _get_nn2():
+        return None
+
+##------
+##* Inputs: 2
+##------
+##Hidden Layer
+##Neurons: 3
+## Neuron 0
+##  Weight: 1.438617802013817
+##  Weight: 1.210894486550306
+##  Bias: 0.9830518282072616
+## Neuron 1
+##  Weight: -6.123341253463274
+##  Weight: -2.4295370408770265
+##  Bias: 0.9830518282072616
+## Neuron 2
+##  Weight: 2.255625136086102
+##  Weight: 1.2090876656522709
+##  Bias: 0.9830518282072616
+##------
+##* Output Layer
+##Neurons: 1
+## Neuron 0
+##  Weight: -2.9882917693755138
+##  Weight: 25.94240655627592
+##  Weight: -4.283797205140412
+##  Bias: 0.3817826993754133
+##------
+    def _get_nn3():
+        h0_w = [1.438617802013817, 1.210894486550306]
+        h1_w = [-6.123341253463274, -2.4295370408770265]
+        h2_w = [2.255625136086102, 1.2090876656522709]
+        h_b = 0.9830518282072616
+        o_w = [-2.9882917693755138, 25.94240655627592, -4.283797205140412]
+        o_b = 0.3817826993754133
+
+        return NeuralNetwork(2, 3, 1, h0_w + h1_w + h2_w, h_b, o_w, o_b)
+        
 
     def _nn_feed_forward(order, disc):
         NN_WI1 = -0.8326388182288694

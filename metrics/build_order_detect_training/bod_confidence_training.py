@@ -1,35 +1,39 @@
 import os
+import sys
 import random
 import json
 
 from neural_network import NeuralNetwork
+
+if __name__ == '__main__':
+    sys.path.insert(0,os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
 from bod import BuildOrderDeviation
 from metric_factory.spawningtool_factory import SpawningtoolFactory
 from metric_containers import *
 
-bench_fact = SpawningtoolFactory('../tests/integration/test_replays/bod_tests/pvt_blink_robo_benchmark.SC2Replay')
+bench_fact = SpawningtoolFactory('../../tests/integration/test_replays/bod_tests/pvt_blink_robo_benchmark.SC2Replay')
 bo_bench = bench_fact.generateBuildOrderElements('Gemini')
 bod_blink_robo = BuildOrderDeviation(bo_bench)
 
-bench_fact = SpawningtoolFactory('../tests/integration/test_replays/bod_tests/pvp_2_gate_expand_benchmark_Gemini.SC2Replay')
+bench_fact = SpawningtoolFactory('../../tests/integration/test_replays/bod_tests/pvp_2_gate_expand_benchmark_Gemini.SC2Replay')
 bo_bench = bench_fact.generateBuildOrderElements('Gemini')
 bod_2_gate_expand = BuildOrderDeviation(bo_bench)
 
-bench_fact = SpawningtoolFactory('../tests/integration/test_replays/bod_tests/pvz_dt_archon_drop_benchmark_Gemini.SC2Replay')
+bench_fact = SpawningtoolFactory('../../tests/integration/test_replays/bod_tests/pvz_dt_archon_drop_benchmark_Gemini.SC2Replay')
 bo_bench = bench_fact.generateBuildOrderElements('Gemini')
 bod_dt_archon_drop = BuildOrderDeviation(bo_bench)
 
-bench_fact = SpawningtoolFactory('../tests/integration/test_replays/bod_tests/pvz_chargelot_allin_benchmark_NULL.SC2Replay')
+bench_fact = SpawningtoolFactory('../../tests/integration/test_replays/bod_tests/pvz_chargelot_allin_benchmark_NULL.SC2Replay')
 bo_bench = bench_fact.generateBuildOrderElements('NULL')
 bod_chargelot_allin = BuildOrderDeviation(bo_bench)
 
-bench_fact = SpawningtoolFactory('../tests/integration/test_replays/bod_tests/pvz_sentry_drop_into_soul_train_benchmark_Gemini.SC2Replay')
+bench_fact = SpawningtoolFactory('../../tests/integration/test_replays/bod_tests/pvz_sentry_drop_into_soul_train_benchmark_Gemini.SC2Replay')
 bo_bench = bench_fact.generateBuildOrderElements('Gemini')
 bod_sentry_drop_soul_train = BuildOrderDeviation(bo_bench)
 
 # create tuples for each build order over all the test replays from each build
 rep_tuples = {'blink_robo': [], '2_gate_expand': [], 'dt_archon_drop': [], 'chargelot_allin': [], 'sentry_drop_soul_train': []}
-test_reps = '../tests/integration/test_replays/bod_tests/'
+test_reps = '../../tests/integration/test_replays/bod_tests/'
 
 blink_robo_path = os.path.join(test_reps, 'pvt_blink_robo/')
 for pth in os.listdir(blink_robo_path):

@@ -23,88 +23,89 @@ bench_fact = SpawningtoolFactory('../tests/integration/test_replays/bod_tests/pv
 bo_bench = bench_fact.generateBuildOrderElements('NULL')
 bod_chargelot_allin = BuildOrderDeviation(bo_bench)
 
+bench_fact = SpawningtoolFactory('../tests/integration/test_replays/bod_tests/pvz_sentry_drop_into_soul_train_benchmark_Gemini.SC2Replay')
+bo_bench = bench_fact.generateBuildOrderElements('Gemini')
+bod_sentry_drop_soul_train = BuildOrderDeviation(bo_bench)
+
 # create tuples for each build order over all the test replays from each build
-rep_tuples = {'blink_robo': [], '2_gate_expand': [], 'dt_archon_drop': [], 'chargelot_allin': []}
+rep_tuples = {'blink_robo': [], '2_gate_expand': [], 'dt_archon_drop': [], 'chargelot_allin': [], 'sentry_drop_soul_train': []}
 test_reps = '../tests/integration/test_replays/bod_tests/'
-for pth in os.listdir(os.path.join(test_reps, 'pvt_blink_robo/')):
-    if os.path.splitext(pth)[1] == '.SC2Replay':
-        rep_tuples['blink_robo'].append([os.path.join(test_reps, 'pvt_blink_robo/', pth), 1])
-        rep_tuples['2_gate_expand'].append([os.path.join(test_reps, 'pvt_blink_robo/', pth), 0])
-        rep_tuples['dt_archon_drop'].append([os.path.join(test_reps, 'pvt_blink_robo/', pth), 0])
-        rep_tuples['chargelot_allin'].append([os.path.join(test_reps, 'pvt_blink_robo/', pth), 0])
 
-for pth in os.listdir(os.path.join(test_reps, 'pvp_2_gate_expand/')):
+blink_robo_path = os.path.join(test_reps, 'pvt_blink_robo/')
+for pth in os.listdir(blink_robo_path):
+    rep_path = os.path.join(blink_robo_path, pth)
     if os.path.splitext(pth)[1] == '.SC2Replay':
-        rep_tuples['blink_robo'].append([os.path.join(test_reps, 'pvp_2_gate_expand/', pth), 0])
-        rep_tuples['2_gate_expand'].append([os.path.join(test_reps, 'pvp_2_gate_expand/', pth), 1])
-        rep_tuples['dt_archon_drop'].append([os.path.join(test_reps, 'pvp_2_gate_expand/', pth), 0])
-        rep_tuples['chargelot_allin'].append([os.path.join(test_reps, 'pvp_2_gate_expand/', pth), 0])
+        rep_tuples['blink_robo'].append([rep_path, 1])
+        rep_tuples['2_gate_expand'].append([rep_path, 0])
+        rep_tuples['dt_archon_drop'].append([rep_path, 0])
+        rep_tuples['chargelot_allin'].append([rep_path, 0])
+        rep_tuples['sentry_drop_soul_train'].append([rep_path, 0])
 
-for pth in os.listdir(os.path.join(test_reps, 'pvz_dt_archon_drop/')):
+_2_gate_expand_path = os.path.join(test_reps, 'pvp_2_gate_expand/')
+for pth in os.listdir(_2_gate_expand_path):
+    rep_path = os.path.join(_2_gate_expand_path, pth)
     if os.path.splitext(pth)[1] == '.SC2Replay':
-        rep_tuples['blink_robo'].append([os.path.join(test_reps, 'pvz_dt_archon_drop/', pth), 0])
-        rep_tuples['2_gate_expand'].append([os.path.join(test_reps, 'pvz_dt_archon_drop/', pth), 0])
-        rep_tuples['dt_archon_drop'].append([os.path.join(test_reps, 'pvz_dt_archon_drop/', pth), 1])
-        rep_tuples['chargelot_allin'].append([os.path.join(test_reps, 'pvz_dt_archon_drop/', pth), 0])
+        rep_tuples['blink_robo'].append([rep_path, 0])
+        rep_tuples['2_gate_expand'].append([rep_path, 1])
+        rep_tuples['dt_archon_drop'].append([rep_path, 0])
+        rep_tuples['chargelot_allin'].append([rep_path, 0])
+        rep_tuples['sentry_drop_soul_train'].append([rep_path, 0])
 
-for pth in os.listdir(os.path.join(test_reps, 'pvz_chargelot_allin/')):
+dt_archon_drop_path = os.path.join(test_reps, 'pvz_dt_archon_drop/')
+for pth in os.listdir(dt_archon_drop_path):
+    rep_path = os.path.join(dt_archon_drop_path, pth)
     if os.path.splitext(pth)[1] == '.SC2Replay':
-        rep_tuples['blink_robo'].append([os.path.join(test_reps, 'pvz_chargelot_allin/', pth), 0])
-        rep_tuples['2_gate_expand'].append([os.path.join(test_reps, 'pvz_chargelot_allin/', pth), 0])
-        rep_tuples['dt_archon_drop'].append([os.path.join(test_reps, 'pvz_chargelot_allin/', pth), 0])
-        rep_tuples['chargelot_allin'].append([os.path.join(test_reps, 'pvz_chargelot_allin/', pth), 1])
+        rep_tuples['blink_robo'].append([rep_path, 0])
+        rep_tuples['2_gate_expand'].append([rep_path, 0])
+        rep_tuples['dt_archon_drop'].append([rep_path, 1])
+        rep_tuples['chargelot_allin'].append([rep_path, 0])
+        rep_tuples['sentry_drop_soul_train'].append([rep_path, 0])
+
+chargelot_allin_path = os.path.join(test_reps, 'pvz_chargelot_allin/')
+for pth in os.listdir(chargelot_allin_path):
+    rep_path = os.path.join(chargelot_allin_path, pth)
+    if os.path.splitext(pth)[1] == '.SC2Replay':
+        rep_tuples['blink_robo'].append([rep_path, 0])
+        rep_tuples['2_gate_expand'].append([rep_path, 0])
+        rep_tuples['dt_archon_drop'].append([rep_path, 0])
+        rep_tuples['chargelot_allin'].append([rep_path, 1])
+        rep_tuples['sentry_drop_soul_train'].append([rep_path, 0])
+
 
 # find the bod metrics for each replay tuple and add them to the train_data
 train_data = []
-train_data_tmp = []
 
-# blink_robo
-td_path = os.path.join(test_reps, 'pvt_blink_robo/', 'train_data.json')
-if os.path.isfile(td_path):
-    with open(td_path, 'r') as td_fl:
-        train_data_tmp = json.load(td_fl)
-else:
-    for tup in rep_tuples['blink_robo']:
-        fact = SpawningtoolFactory(tup[0])
-        bo = fact.generateBuildOrderElements('NULL')
-        bod = bod_blink_robo
-        if len(bo) > 0:
-            bod.calculate_deviations(bo)
-            train_data_tmp.append([[bod.get_scaled_order_dev(), bod.get_scaled_discrepency()], [tup[1]]])
-            print(bod.dev, ":", bod.get_scaled_discrepency(), ":", tup[1], ":", tup[0])
-    
-    with open(td_path, 'w') as td_fl:
-        json.dump(train_data_tmp, td_fl)
+def get_additional_train_data(td_path, rep_tuple, bod_bench):
+    train_data_tmp = []
+    if os.path.isfile(td_path):
+        with open(td_path, 'r') as td_fl:
+            train_data_tmp = json.load(td_fl)
+    else:
+        for tup in rep_tuple:
+            fact = SpawningtoolFactory(tup[0])
+            bo = fact.generateBuildOrderElements('NULL')
+            bod = bod_bench
+            if len(bo) > 0:
+                bod.calculate_deviations(bo)
+                train_data_tmp.append([[bod.get_scaled_order_dev(), bod.get_scaled_discrepency()], [tup[1]]])
+                print(bod.dev, ":", bod.get_scaled_discrepency(), ":", tup[1], ":", tup[0])
+        
+        with open(td_path, 'w') as td_fl:
+            json.dump(train_data_tmp, td_fl)
 
-train_data += train_data_tmp
+    return train_data_tmp
 
 
-for tup in rep_tuples['2_gate_expand']:
-    fact = SpawningtoolFactory(tup[0])
-    bo = fact.generateBuildOrderElements('NULL')
-    bod = bod_2_gate_expand
-    if len(bo) > 0:
-        bod.calculate_deviations(bo)
-        train_data.append([[bod.get_scaled_order_dev(), bod.get_scaled_discrepency()], [tup[1]]])
-        print(bod.dev, ":", bod.get_scaled_discrepency(), ":", tup[1], ":", tup[0])
+train_data += get_additional_train_data(os.path.join(test_reps, 'pvt_blink_robo/', 'train_data.json'), rep_tuples['blink_robo'], bod_blink_robo)
 
-for tup in rep_tuples['dt_archon_drop']:
-    fact = SpawningtoolFactory(tup[0])
-    bo = fact.generateBuildOrderElements('NULL')
-    bod = bod_dt_archon_drop
-    if len(bo) > 0:
-        bod.calculate_deviations(bo)
-        train_data.append([[bod.get_scaled_order_dev(), bod.get_scaled_discrepency()], [tup[1]]])
-        print(bod.dev, ":", bod.get_scaled_discrepency(), ":", tup[1], ":", tup[0])
+train_data += get_additional_train_data(os.path.join(test_reps, 'pvp_2_gate_expand/', 'train_data.json'), rep_tuples['2_gate_expand'], bod_2_gate_expand)
 
-for tup in rep_tuples['chargelot_allin']:
-    fact = SpawningtoolFactory(tup[0])
-    bo = fact.generateBuildOrderElements('NULL')
-    bod = bod_chargelot_allin
-    if len(bo) > 0:
-        bod.calculate_deviations(bo)
-        train_data.append([[bod.get_scaled_order_dev(), bod.get_scaled_discrepency()], [tup[1]]])
-        print(bod.dev, ":", bod.get_scaled_discrepency(), ":", tup[1], ":", tup[0])
+train_data += get_additional_train_data(os.path.join(test_reps, 'pvz_dt_archon_drop/', 'train_data.json'), rep_tuples['dt_archon_drop'], bod_dt_archon_drop)
+
+train_data += get_additional_train_data(os.path.join(test_reps, 'pvz_chargelot_allin/', 'train_data.json'), rep_tuples['chargelot_allin'], bod_chargelot_allin)
+
+train_data += get_additional_train_data(os.path.join(test_reps, 'pvz_sentry_drop_soul_train/', 'train_data.json'), rep_tuples['sentry_drop_soul_train'], bod_sentry_drop_soul_train)
+
 
 ### Train
 nn = NeuralNetwork(2, 3, 1)

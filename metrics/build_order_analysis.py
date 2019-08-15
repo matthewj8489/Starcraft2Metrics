@@ -11,6 +11,8 @@ def get_argument_parser():
 
     parser.add_argument('--latest', action='store_true', default=False, help='Use the latest build replay found in comparison_path. Used when comparison_path is a directory.')
 
+    parser.add_argument('--monitor', action='store_true', default=False, help='Continuously monitor the comparison_path (if it is a folder) for new replay files. New files will be parsed, analyzed, and added to the output file.')
+
     return parser
 
 
@@ -21,6 +23,7 @@ if __name__ == '__main__':
     import json
     import csv
     import copy
+    from monitor_folder import Win32NewFileMonitor
     from metric_containers import *
     from build_order_detect import BuildOrderDetect
     from bod import BuildOrderDeviation
@@ -49,17 +52,25 @@ if __name__ == '__main__':
                 bch_builds.append(bench_build)
             
 
-    # gather each replay in the comparison_path
-    replay_paths = []
-    if os.path.isdir(args.comparison_path):
-        if args.latest:
-            replay_paths.append(max(glob.iglob(os.path.join(args.comparison_path, '*.[Ss][Cc]2[Rr]eplay')), key=os.path.getctime))
-        else:
-            for pth in os.listdir(args.comparison_path):
-                if os.path.splitext(pth)[1] == '.SC2Replay':
-                    replay_paths.append(os.path.join(args.comparison_path, pth))
+    # monitor folder for new files to parse
+    replay_paths = None
+    if args.monitor and os.path.isdir(args.comparison_path):
+        replay_paths = Win32NewFileMonitor(args.comparison_path)
+    elif args.monitor and not os.path.isdir(args.comparison_path):
+        print("The comparison_path must be a folder in order to monitor.")
+        raise SystemExit
     else:
-        replay_paths.append(args.comparison_path)
+        # gather each replay in the comparison_path
+        replay_paths = []
+        if os.path.isdir(args.comparison_path):
+            if args.latest:
+                replay_paths.append(max(glob.iglob(os.path.join(args.comparison_path, '*.[Ss][Cc]2[Rr]eplay')), key=os.path.getctime))
+            else:
+                for pth in os.listdir(args.comparison_path):
+                    if os.path.splitext(pth)[1] == '.SC2Replay':
+                        replay_paths.append(os.path.join(args.comparison_path, pth))
+        else:
+            replay_paths.append(args.comparison_path)
 
 
     # cycle through each replay and add its analysis info
@@ -71,6 +82,7 @@ if __name__ == '__main__':
         cmp_bo_factory = SpawningtoolFactory(comp_pth)
         cmp_bo = cmp_bo_factory.generateBuildOrderElements(args.player_name)
         cmp_meta = cmp_bo_factory.generateReplayMetadata()
+
 
         # continue if the comparison build order has no build order elements (could be a replay without the specified player in it)
         if len(cmp_bo) == 0:

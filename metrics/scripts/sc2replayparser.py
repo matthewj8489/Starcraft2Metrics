@@ -5,7 +5,7 @@ import csv
 
 import sys
 if __name__ == '__main__':
-    sys.path.insert(0,os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
+    sys.path.insert(0,os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir)))
 import metrics
 
 import sc2reader

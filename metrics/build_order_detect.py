@@ -1,6 +1,6 @@
 import math
 from bod import BuildOrderDeviation
-from build_order_detect_training.neural_network import NeuralNetwork
+from neural_network import NeuralNetwork
 
 class BuildOrderDetect(object):
 

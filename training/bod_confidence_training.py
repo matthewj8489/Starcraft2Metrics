@@ -3,11 +3,10 @@ import sys
 import random
 import json
 
-from neural_network import NeuralNetwork
-
 if __name__ == '__main__':
     sys.path.insert(0,os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, 'metrics')))
-    
+
+from neural_network import NeuralNetwork    
 from bod import BuildOrderDeviation
 from metric_factory.spawningtool_factory import SpawningtoolFactory
 from metric_containers import *

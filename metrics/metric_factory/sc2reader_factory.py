@@ -1,6 +1,6 @@
 import sc2reader
 
-from metric_containers import *
+from metrics.metric_containers import *
 from metrics.util import convert_to_realtime_r
 
 class Sc2ReaderFactory(object):

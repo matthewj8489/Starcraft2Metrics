@@ -14,6 +14,9 @@ from plugins.test_bases_created_plugin import *
 from plugins.test_resource_tracker_plugin import *
 from plugins.test_apm_tracker_plugin import *
 from test_util import *
+from test_bod import *
+from metric_factory.test_spawningtool_factory import *
+from metric_factory.test_sc2reader_factory import *
 
 if __name__ == '__main__':
     unittest.main()

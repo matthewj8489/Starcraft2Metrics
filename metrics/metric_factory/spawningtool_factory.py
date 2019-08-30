@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 
 import spawningtool.parser
-from metric_containers import *
+from metrics.metric_containers import *
 
 #metricfactory.spawningtool
 class SpawningtoolFactory(object):

@@ -53,6 +53,9 @@ if __name__ == '__main__':
                 bench_build = BuildOrder()
                 bench_build.deserialize(copy.deepcopy(j_bld))
                 bch_builds.append(bench_build)
+    else:
+        print('a valid file must be supplied for benchmark_cache.')
+        raise SystemExit
             
 
     # monitor folder for new files to parse

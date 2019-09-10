@@ -10,6 +10,7 @@ def get_argument_parser():
     parser.add_argument('--add_to_cache_name', type=str, help='The name to store for the build order in cache. Default: race_vs_race_bo.')
 
     parser.add_argument('--latest', action='store_true', default=False, help='Use the latest build replay found in comparison_path. Used when comparison_path is a directory.')
+    parser.add_argument('--last', type=int, help='Use the most recent X number of replays found in comparison_path. Used when comparison_path is a directory.')
     #parser.add_argument('--no_ai', action='store_true', default=False, help='Do not include games where the opponent was an A.I.')
     
     parser.add_argument('--monitor', action='store_true', default=False, help='Continuously monitor the comparison_path (if it is a folder) for new replay files. New files will be parsed, analyzed, and added to the output file.')
@@ -72,6 +73,10 @@ if __name__ == '__main__':
         if os.path.isdir(args.comparison_path):
             if args.latest:
                 replay_paths.append(max(glob.iglob(os.path.join(args.comparison_path, '*.[Ss][Cc]2[Rr]eplay')), key=os.path.getctime))
+            elif args.last:
+                sorted_pths = sorted(glob.glob(os.path.join(args.comparison_path, '*.[Ss][Cc]2[Rr]eplay')), key=os.path.getctime, reverse=True)
+                for ith in range(args.last):
+                    replay_paths.append(sorted_pths[ith])
             else:
                 for pth in os.listdir(args.comparison_path):
                     if os.path.splitext(pth)[1] == '.SC2Replay':

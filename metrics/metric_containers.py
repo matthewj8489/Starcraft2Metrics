@@ -118,6 +118,7 @@ class ReplayMetadata(object):
     def __init__(self):
         self.game_length = 0
         self.players = []
+        self.player = []
         self.winner = ''
         self.date = ''
 

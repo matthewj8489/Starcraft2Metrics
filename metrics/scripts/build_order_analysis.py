@@ -12,6 +12,7 @@ def get_argument_parser():
     parser.add_argument('--latest', action='store_true', default=False, help='Use the latest build replay found in comparison_path. Used when comparison_path is a directory.')
     parser.add_argument('--last', type=int, help='Use the most recent X number of replays found in comparison_path. Used when comparison_path is a directory.')
     #parser.add_argument('--no_ai', action='store_true', default=False, help='Do not include games where the opponent was an A.I.')
+    parser.add_argument('--confidence_threshold', type=int, default=0, help='The threshold of confidence to consider a build prediction accurate. (in % out of 100). (default=0)')
     
     parser.add_argument('--monitor', action='store_true', default=False, help='Continuously monitor the comparison_path (if it is a folder) for new replay files. New files will be parsed, analyzed, and added to the output file.')
 
@@ -133,9 +134,17 @@ if __name__ == '__main__':
         with open(out_path, 'a', newline='') as out_file:
             out_writer = csv.writer(out_file, quoting=csv.QUOTE_MINIMAL)
             if not out_file_exists:
-                rw = ['deviation', 'scaled time dev', 'scaled order dev', 'depth', 'build', 'confidence'] + ReplayMetadata.csv_header()
+                rw = ['deviation', 'scaled time dev', 'scaled order dev',
+                      'depth', 'build', 'confidence'] + ReplayMetadata.csv_header()
                 out_writer.writerow(rw)
-            rw = [round(closest_bod.dev, 4), round(closest_bod.get_scaled_time_dev(), 4), round(closest_bod.get_scaled_order_dev(), 4), closest_bod.bench_depth, closest_bch_name, round(closest_confidence, 4)] + cmp_meta.to_csv_list()
+                
+            if closest_confidence * 100 >= args.confidence_threshold:
+                rw = [round(closest_bod.dev, 4), round(closest_bod.get_scaled_time_dev(), 4),
+                      round(closest_bod.get_scaled_order_dev(), 4), closest_bod.bench_depth,
+                      closest_bch_name, round(closest_confidence, 4)] + cmp_meta.to_csv_list()
+            else:
+                rw = [100, 100, 100, closest_bod.bench_depth, "unknown", round(closest_confidence, 4)] + cmp_meta.to_csv_list()
+                
             out_writer.writerow(rw)
             print('Successfully added the BOD metrics!')    
 

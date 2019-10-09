@@ -42,7 +42,8 @@ UPGRADE_NAMES = ['ProtossGroundWeapons1', 'ProtossGroundWeapons2', 'ProtossGroun
                  'ProtossShieldArmor1', 'ProtossShieldArmor2', 'ProtossShieldArmor3',
                  'ProtossAirWeapons1', 'ProtossAirWeapons2', 'ProtossAirWeapons3',
                  'ProtossAirArmor1', 'ProtossAirArmor2', 'ProtossAirArmor3',
-                 'WarpGate', 'Charge', 'Blink', 'Glaives', 'ShadowStride', 'PsionicStorm', 'ExtendedThermalLance', 'GraviticDrive']
+                 'WarpGate', 'Charge', 'Blink', 'ResonatingGlaives', 'ShadowStride', 'PsionicStorm', 
+                 'ExtendedThermalLance', 'GraviticDrive', 'GraviticBoosters', 'AnionPulseCrystals']
 
 
 class BuildOrderDeviationElement(object):

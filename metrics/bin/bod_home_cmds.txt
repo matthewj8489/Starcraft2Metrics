@@ -1,3 +1,0 @@
-python bod.py --bench_player "Gemini" --metric_output --latest "NULL" "../tests/integration/test_replays/bod_tests/pvz_dt_archon_drop_benchmark_Gemini.SC2Replay" "C:/Users/matthew/Documents/StarCraft II/Accounts/62997088/1-S2-1-440880/Replays/Multiplayer/"
-python bod.py --bench_player "Gemini" --metric_output --latest "NULL" "../tests/integration/test_replays/bod_tests/pvp_2_gate_expand_benchmark_Gemini.SC2Replay" "C:/Users/matthew/Documents/StarCraft II/Accounts/62997088/1-S2-1-440880/Replays/Multiplayer/"
-python bod.py --bench_player "Gemini" --metric_output --latest "NULL" "../tests/integration/test_replays/bod_tests/pvt_blink_robo_benchmark.SC2Replay" "C:/Users/matthew/Documents/StarCraft II/Accounts/62997088/1-S2-1-440880/Replays/Multiplayer/"

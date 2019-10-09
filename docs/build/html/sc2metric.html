@@ -1,0 +1,502 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>sc2metric &#8212; Starcraft2Metrics 0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to Starcraft2Metrics’s documentation!" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Starcraft2Metrics’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Starcraft2Metrics 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sc2metric">
+<h1>sc2metric<a class="headerlink" href="#sc2metric" title="Permalink to this headline">¶</a></h1>
+<p>Metrics gathered from Starcraft 2 replay data.</p>
+<span class="target" id="module-metrics.sc2metric"></span><dl class="class">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer">
+<em class="property">class </em><code class="descclassname">metrics.sc2metric.</code><code class="descname">Sc2MetricAnalyzer</code><a class="reference internal" href="_modules/metrics/sc2metric.html#Sc2MetricAnalyzer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class that derives useful metrics from replay files</p>
+<p>This class is an extension to the <code class="docutils literal notranslate"><span class="pre">sc2reader</span></code>. It is meant to be used
+to offer useful metric data to each player in a Starcraft II replay. The
+class contains raw data gathered from each replay to derive its metrics.
+The raw data is filled from the :mod:’plugins’ associated with this package.</p>
+<dl class="attribute">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.army_created">
+<code class="descname">army_created</code><em class="property"> = None</em><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.army_created" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of <code class="xref py py-class docutils literal notranslate"><span class="pre">SupplyCount</span></code> for each army supply created.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list(<code class="xref py py-class docutils literal notranslate"><span class="pre">metrics.metric_containers.SupplyCount</span></code>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.army_created_at_time">
+<code class="descname">army_created_at_time</code><span class="sig-paren">(</span><em>game_time_s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics/sc2metric.html#Sc2MetricAnalyzer.army_created_at_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.army_created_at_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>The army supply created up to a specified time</p>
+<p>Calculate the total army supply created at the specified time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>game_time_s</strong> (<em>int</em>) – The time (in seconds) of the replay to count army
+supply.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The amount of army supply created in the given time.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.aur">
+<code class="descname">aur</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics/sc2metric.html#Sc2MetricAnalyzer.aur"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.aur" title="Permalink to this definition">¶</a></dt>
+<dd><p>Average Unspent Resources</p>
+<p>Calculates the Average Unspent Resources (AUR) during the game.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The Average Unspent Resources (AUR)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.aur_at_time">
+<code class="descname">aur_at_time</code><span class="sig-paren">(</span><em>time_s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics/sc2metric.html#Sc2MetricAnalyzer.aur_at_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.aur_at_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Averague Unspent Resources up to a specified time</p>
+<p>Calculates the Average Unspent Resources (AUR) up until the specified
+time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>time_s</strong> (<em>int</em>) – The time in the replay to stop calculating average
+unspent resources.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The Average Unspent Resources (AUR) up until the specified</dt><dd><p>time.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.aur_pre_max">
+<code class="descname">aur_pre_max</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics/sc2metric.html#Sc2MetricAnalyzer.aur_pre_max"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.aur_pre_max" title="Permalink to this definition">¶</a></dt>
+<dd><p>Average Unspent Resources before max supply</p>
+<p>Calculates the Average Unspent Resources (AUR) up until the player first
+reaches max supply.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>The Average Unspent Resources (AUR) up until the player first</dt><dd><p>maxes.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.avg_rcr">
+<code class="descname">avg_rcr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics/sc2metric.html#Sc2MetricAnalyzer.avg_rcr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.avg_rcr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Average Resource Collection Rate</p>
+<p>Calculates the average Resource Collection Rate (RCR) during the game.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The average Resource Collection Rate (RCR)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.avg_rcr_at_time">
+<code class="descname">avg_rcr_at_time</code><span class="sig-paren">(</span><em>time_s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics/sc2metric.html#Sc2MetricAnalyzer.avg_rcr_at_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.avg_rcr_at_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Average Resource Collection Rate up to a specified time</p>
+<p>Calculates the average Resource Collection Rate (RCR) up until the
+specified time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>time_s</strong> (<em>int</em>) – The time in the replay to stop calculating average
+resource collection rate.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The average Resource Collection Rate (RCR) up until the</dt><dd><p>specified time.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.avg_rcr_pre_max">
+<code class="descname">avg_rcr_pre_max</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics/sc2metric.html#Sc2MetricAnalyzer.avg_rcr_pre_max"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.avg_rcr_pre_max" title="Permalink to this definition">¶</a></dt>
+<dd><p>Average Resource Collection Rate before max supply</p>
+<p>Calculates the average Resource Collection Rate (RCR) up until the
+player first reaches max supply.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>The average Resource Collection Rate (RCR) up until the player</dt><dd><p>first maxes.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.avg_sq">
+<code class="descname">avg_sq</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics/sc2metric.html#Sc2MetricAnalyzer.avg_sq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.avg_sq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Average Spending Quotient</p>
+<p>Calculates the average Spending Quotient (SQ).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The average Spending Quotient (SQ).</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.avg_sq_at_time">
+<code class="descname">avg_sq_at_time</code><span class="sig-paren">(</span><em>time_s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics/sc2metric.html#Sc2MetricAnalyzer.avg_sq_at_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.avg_sq_at_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Average Spending Quotient up to a specified time</p>
+<p>Calculates the average Spending Quotient (SQ) up until the specified
+time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>time_s</strong> (<em>int</em>) – The time in the replay to stop calculating spending
+quotient.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The average Spending Quotient (SQ) up until the specified time.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.avg_sq_pre_max">
+<code class="descname">avg_sq_pre_max</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics/sc2metric.html#Sc2MetricAnalyzer.avg_sq_pre_max"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.avg_sq_pre_max" title="Permalink to this definition">¶</a></dt>
+<dd><p>Average Spending Quotient before max supply</p>
+<p>Calculates the average Spending Quotient (SQ) up until the player first
+reaches max supply.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>The average Spending Quotient (SQ) up until the player first</dt><dd><p>maxes.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.bases_created">
+<code class="descname">bases_created</code><em class="property"> = None</em><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.bases_created" title="Permalink to this definition">¶</a></dt>
+<dd><p>BaseCount for each base created.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>A list of</p>
+</dd>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p>class</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.first_max">
+<code class="descname">first_max</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics/sc2metric.html#Sc2MetricAnalyzer.first_max"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.first_max" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the time at which the player first reached max supply.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.metrics">
+<code class="descname">metrics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics/sc2metric.html#Sc2MetricAnalyzer.metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dictionairy of basic metrics.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.supply_capped">
+<code class="descname">supply_capped</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics/sc2metric.html#Sc2MetricAnalyzer.supply_capped"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.supply_capped" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time spent supply capped</p>
+<p>Determines the amount of time the player was supply capped this game.
+Supply capped is acknowledged when supply of units = supply created
+when supply created &lt; 200.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The amount of time spent supply capped.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.supply_created">
+<code class="descname">supply_created</code><em class="property"> = None</em><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.supply_created" title="Permalink to this definition">¶</a></dt>
+<dd><p>SupplyCount for each unit created.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>A list of</p>
+</dd>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p>class</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.supply_created_at_time">
+<code class="descname">supply_created_at_time</code><span class="sig-paren">(</span><em>real_time_s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics/sc2metric.html#Sc2MetricAnalyzer.supply_created_at_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.supply_created_at_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>The total supply created up to a specified time</p>
+<p>Calculate the total supply created at the specified time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>real_time_s</strong> (<em>int</em>) – The time (in seconds) of the replay to count
+supply.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The amount of supply created in the given time.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.time_to_bases_created">
+<code class="descname">time_to_bases_created</code><span class="sig-paren">(</span><em>base_count</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics/sc2metric.html#Sc2MetricAnalyzer.time_to_bases_created"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.time_to_bases_created" title="Permalink to this definition">¶</a></dt>
+<dd><p>The time at which the number of bases had been created</p>
+<p>Finds the time when the specified number of bases has been reached.
+This does not take into account any bases lost.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>base_count</strong> (<em>int</em>) – The number of bases desired.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The time when the number of bases had been created.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.time_to_supply_created">
+<code class="descname">time_to_supply_created</code><span class="sig-paren">(</span><em>supply_count</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics/sc2metric.html#Sc2MetricAnalyzer.time_to_supply_created"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.time_to_supply_created" title="Permalink to this definition">¶</a></dt>
+<dd><p>The time at which the specified supply had been created</p>
+<p>Finds the time when the specified supply was created. This does not
+take into account supply lost.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>supply_count</strong> (<em>int</em>) – The supply desired.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The time when the supply was created in the replay.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.time_to_supply_created_max_workers">
+<code class="descname">time_to_supply_created_max_workers</code><span class="sig-paren">(</span><em>supply_count</em>, <em>max_workers_counted</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics/sc2metric.html#Sc2MetricAnalyzer.time_to_supply_created_max_workers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.time_to_supply_created_max_workers" title="Permalink to this definition">¶</a></dt>
+<dd><p>The time at which the specified supply had been created</p>
+<p>Finds the time when the specified supply was reached, but only counts a specified
+number of workers towards that supply created count. This does not take into
+account supply lost.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>supply_count</strong> (<em>int</em>) – The supply desired.</p></li>
+<li><p><strong>max_workers_counted</strong> (<em>int</em>) – The maximum number of workers to count
+towards the supply created.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The time when the supply was created in the replay.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.time_to_workers_created">
+<code class="descname">time_to_workers_created</code><span class="sig-paren">(</span><em>worker_count</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics/sc2metric.html#Sc2MetricAnalyzer.time_to_workers_created"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.time_to_workers_created" title="Permalink to this definition">¶</a></dt>
+<dd><p>The time at which the number of workers had been created</p>
+<p>Finds the time that the specified number of workers have been created.
+This does not account for loss of workers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>worker_count</strong> (<em>int</em>) – The number of workers to find the time created.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The time at which the total number of workers were created.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.workers_created">
+<code class="descname">workers_created</code><em class="property"> = None</em><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.workers_created" title="Permalink to this definition">¶</a></dt>
+<dd><p>SupplyCount for each worker created.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>A list of</p>
+</dd>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p>class</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="metrics.sc2metric.Sc2MetricAnalyzer.workers_created_at_time">
+<code class="descname">workers_created_at_time</code><span class="sig-paren">(</span><em>time_s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metrics/sc2metric.html#Sc2MetricAnalyzer.workers_created_at_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metrics.sc2metric.Sc2MetricAnalyzer.workers_created_at_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of workers created up to the specified time</p>
+<p>Determines the total number of workers created at the specified time.
+This function is accumulative and does not handle workers lost.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>time_s</strong> (<em>int</em>) – The time (in seconds) of the replay to count workers.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The number of workers created.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to Starcraft2Metrics’s documentation!</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/sc2metric.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Starcraft2Metrics’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Starcraft2Metrics 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Matthew Johnson.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.0.
+    </div>
+  </body>
+</html>

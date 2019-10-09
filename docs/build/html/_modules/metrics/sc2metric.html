@@ -1,0 +1,609 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>metrics.sc2metric &#8212; Starcraft2Metrics 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Starcraft2Metrics 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for metrics.sc2metric</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">import</span> <span class="nn">metrics.util</span>
+
+
+<div class="viewcode-block" id="Sc2MetricAnalyzer"><a class="viewcode-back" href="../../sc2metric.html#metrics.sc2metric.Sc2MetricAnalyzer">[docs]</a><span class="k">class</span> <span class="nc">Sc2MetricAnalyzer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A class that derives useful metrics from replay files</span>
+
+<span class="sd">    This class is an extension to the ``sc2reader``. It is meant to be used</span>
+<span class="sd">    to offer useful metric data to each player in a Starcraft II replay. The</span>
+<span class="sd">    class contains raw data gathered from each replay to derive its metrics.</span>
+<span class="sd">    The raw data is filled from the :mod:&#39;plugins&#39; associated with this package.</span>
+
+<span class="sd">    Todo:</span>
+<span class="sd">        - **TotalSupply : Total supply created by the player.</span>
+<span class="sd">            (This is NOT current supply at given time)</span>
+<span class="sd">        - **Workers : Total number of workers created by the player.</span>
+<span class="sd">        - **Army : Total army supply created by the player.</span>
+<span class="sd">        - **Upgrades : Total count of upgrades. (+1/2/3 weapons, psionic storm,</span>
+<span class="sd">            charge, etc.)</span>
+<span class="sd">        - TimeTo66Workers : Time at which the user created 66 workers</span>
+<span class="sd">            (3-base saturation).</span>
+<span class="sd">        - TimeTo75Workers : Time at which the user created 75 workers.</span>
+<span class="sd">        - TimeTo3Bases : Time at which the 3 bases are finished.</span>
+<span class="sd">        - TimeTo4Bases : Time at which the 4 bases are finished.</span>
+<span class="sd">        - TimeToMax : Time at which the total supply created is 199 or above</span>
+<span class="sd">            (stops counting workers above 75)</span>
+<span class="sd">        - SupplyCapped : Time spent supply blocked.</span>
+<span class="sd">        - **SupplyCreateRate : Average rate at which supply buildings are</span>
+<span class="sd">            created until 200 supply</span>
+<span class="sd">        - AvgAPM : Average APM</span>
+<span class="sd">        - **AvgEPM : Average EPM</span>
+<span class="sd">        - **AvgSPM : Average SPM</span>
+<span class="sd">        - **AvgMacroCycleTime : Average time spent issuing macro commands</span>
+<span class="sd">            (vs army commands) (or maybe the avg time between giving a worker a</span>
+<span class="sd">            command and issuing another command not to the worker)</span>
+<span class="sd">        - **AvgHarassDeflection : A score that rates the player&#39;s ability</span>
+<span class="sd">            to deflect and minimize damage incurred from harassment attacks.</span>
+<span class="sd">            (works off of minerals/probes/tech/mining time lost?)</span>
+<span class="sd">        - **IdleBaseTime66 : Total time town halls are idle (not making workers) before 66 workers</span>
+<span class="sd">        - **IdleBaseTime75 : Total time town halls are idle (not making workers) before 75 workers</span>
+<span class="sd">        - AvgSQ : Spending Quotient. SQ(i,u)=35(0.00137i-ln(u))+240,</span>
+<span class="sd">            where i=resource collection rate, u=average unspent resources</span>
+<span class="sd">        - AvgSQPreMax : Spending Quotient before maxed out.</span>
+<span class="sd">        - AvgUnspent : Average unspent resources during the game.</span>
+<span class="sd">        - AvgUnspentPreMax : Average unspent resources before maxed out.</span>
+<span class="sd">        - AvgColRate : Average resource collection rate during the game.</span>
+<span class="sd">        - AvgColRatePreMax : Average resource collection rate before maxed out.</span>
+<span class="sd">        - **Units : Dictionary of all the units created, keyed by the units&#39;</span>
+<span class="sd">            names.</span>
+<span class="sd">        - **PPM : average(mean) PAC per minute</span>
+<span class="sd">        - **PAL : PAC action latency. e.g.: how long it takes you to take your</span>
+<span class="sd">            first action after each fixation shift. (mean average)</span>
+<span class="sd">        - **APP : Actions per PAC. The average(mean) number of actions you</span>
+<span class="sd">            take each PAC</span>
+<span class="sd">        - **GAP : How long it takes you, after finishing your actions in</span>
+<span class="sd">            one PAC to establish a new fixaction. (mean average)</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialization of the class&quot;&quot;&quot;</span>
+        
+        <span class="c1">#: list(:class:`metrics.metric_containers.SupplyCount`): A list of :class:`~metrics.metric_containers.SupplyCount` for each army supply created.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">army_created</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1">#: A list of :class:SupplyCount for each worker created.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workers_created</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1">#: A list of :class:SupplyCount for each unit created.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">supply_created</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1">#: A list of :class:BaseCount for each base created.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bases_created</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_food_used</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_food_made</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resources</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">avg_apm</span> <span class="o">=</span> <span class="mi">0</span>
+        
+
+<div class="viewcode-block" id="Sc2MetricAnalyzer.metrics"><a class="viewcode-back" href="../../sc2metric.html#metrics.sc2metric.Sc2MetricAnalyzer.metrics">[docs]</a>    <span class="k">def</span> <span class="nf">metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A dictionairy of basic metrics.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;TimeToMax&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_to_supply_created_max_workers</span><span class="p">(</span><span class="mi">198</span><span class="p">,</span> <span class="mi">75</span><span class="p">),</span>
+                <span class="s1">&#39;TimeTo3Bases&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_to_bases_created</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+                <span class="s1">&#39;TimeTo4Bases&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_to_bases_created</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+                <span class="s1">&#39;TimeTo66Workers&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_to_workers_created</span><span class="p">(</span><span class="mi">66</span><span class="p">),</span>
+                <span class="s1">&#39;TimeTo75Workers&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_to_workers_created</span><span class="p">(</span><span class="mi">75</span><span class="p">),</span>
+                <span class="s1">&#39;AvgAPM&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">avg_apm</span><span class="p">,</span>
+                <span class="s1">&#39;AvgSQ&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">avg_sq</span><span class="p">(),</span>
+                <span class="s1">&#39;AvgSQPreMax&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">avg_sq_pre_max</span><span class="p">(),</span>
+                <span class="s1">&#39;AvgUnspent&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">aur</span><span class="p">(),</span>
+                <span class="s1">&#39;AvgUnspentPreMax&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">aur_pre_max</span><span class="p">(),</span>
+                <span class="s1">&#39;AvgColRate&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">avg_rcr</span><span class="p">(),</span>
+                <span class="s1">&#39;AvgColRatePreMax&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">avg_rcr_pre_max</span><span class="p">(),</span>
+                <span class="s1">&#39;SupplyCapped&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">supply_capped</span><span class="p">()</span>
+               <span class="p">}</span>             </div>
+        
+
+<div class="viewcode-block" id="Sc2MetricAnalyzer.first_max"><a class="viewcode-back" href="../../sc2metric.html#metrics.sc2metric.Sc2MetricAnalyzer.first_max">[docs]</a>    <span class="k">def</span> <span class="nf">first_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the time at which the player first reached max supply.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">next</span><span class="p">((</span><span class="n">fd</span><span class="o">.</span><span class="n">second</span> <span class="k">for</span> <span class="n">fd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_food_used</span>
+                     <span class="k">if</span> <span class="n">fd</span><span class="o">.</span><span class="n">supply</span> <span class="o">&gt;=</span> <span class="mi">200</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_sq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources</span><span class="p">):</span>
+        <span class="n">sum_res_col_rate</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">sum_unspent_res</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">resources</span><span class="p">:</span>
+            <span class="n">sum_res_col_rate</span> <span class="o">+=</span> <span class="n">res</span><span class="o">.</span><span class="n">res_col</span>
+            <span class="n">sum_unspent_res</span> <span class="o">+=</span> <span class="n">res</span><span class="o">.</span><span class="n">res_unspent</span>
+
+        <span class="n">avg_col_rate</span> <span class="o">=</span> <span class="n">sum_res_col_rate</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span>
+        <span class="n">avg_unspent</span> <span class="o">=</span> <span class="n">sum_unspent_res</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span>
+
+        <span class="c1"># SQ(i,u)=35(0.00137i-ln(u))+240, where i=resource collection rate,</span>
+        <span class="c1">#   u=average unspent resources</span>
+        <span class="n">sq</span> <span class="o">=</span> <span class="mi">35</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.00137</span> <span class="o">*</span> <span class="n">avg_col_rate</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">avg_unspent</span><span class="p">))</span> <span class="o">+</span> <span class="mi">240</span>
+                
+        <span class="k">return</span> <span class="n">sq</span>
+
+
+<div class="viewcode-block" id="Sc2MetricAnalyzer.avg_sq"><a class="viewcode-back" href="../../sc2metric.html#metrics.sc2metric.Sc2MetricAnalyzer.avg_sq">[docs]</a>    <span class="k">def</span> <span class="nf">avg_sq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Average Spending Quotient</span>
+
+<span class="sd">        Calculates the average Spending Quotient (SQ).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The average Spending Quotient (SQ).</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sq</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Sc2MetricAnalyzer.avg_sq_at_time"><a class="viewcode-back" href="../../sc2metric.html#metrics.sc2metric.Sc2MetricAnalyzer.avg_sq_at_time">[docs]</a>    <span class="k">def</span> <span class="nf">avg_sq_at_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_s</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Average Spending Quotient up to a specified time</span>
+
+<span class="sd">        Calculates the average Spending Quotient (SQ) up until the specified</span>
+<span class="sd">        time.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            time_s (int): The time in the replay to stop calculating spending</span>
+<span class="sd">                quotient.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The average Spending Quotient (SQ) up until the specified time.</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">resources</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">res</span><span class="p">:</span> <span class="n">res</span><span class="o">.</span><span class="n">second</span> <span class="o">&lt;=</span> <span class="n">time_s</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sq</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Sc2MetricAnalyzer.avg_sq_pre_max"><a class="viewcode-back" href="../../sc2metric.html#metrics.sc2metric.Sc2MetricAnalyzer.avg_sq_pre_max">[docs]</a>    <span class="k">def</span> <span class="nf">avg_sq_pre_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Average Spending Quotient before max supply</span>
+
+<span class="sd">        Calculates the average Spending Quotient (SQ) up until the player first</span>
+<span class="sd">        reaches max supply.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The average Spending Quotient (SQ) up until the player first</span>
+<span class="sd">                maxes.</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">max_s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">first_max</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">max_s</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">avg_sq_at_time</span><span class="p">(</span><span class="n">max_s</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">avg_sq</span><span class="p">()</span></div>
+        
+
+    <span class="k">def</span> <span class="nf">_aur</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">sum_aur</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">resources</span><span class="p">:</span>
+                <span class="n">sum_aur</span> <span class="o">+=</span> <span class="n">res</span><span class="o">.</span><span class="n">res_unspent</span>
+
+            <span class="k">return</span> <span class="n">sum_aur</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Sc2MetricAnalyzer.aur"><a class="viewcode-back" href="../../sc2metric.html#metrics.sc2metric.Sc2MetricAnalyzer.aur">[docs]</a>    <span class="k">def</span> <span class="nf">aur</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Average Unspent Resources</span>
+
+<span class="sd">        Calculates the Average Unspent Resources (AUR) during the game.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The Average Unspent Resources (AUR)</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aur</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Sc2MetricAnalyzer.aur_at_time"><a class="viewcode-back" href="../../sc2metric.html#metrics.sc2metric.Sc2MetricAnalyzer.aur_at_time">[docs]</a>    <span class="k">def</span> <span class="nf">aur_at_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_s</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Averague Unspent Resources up to a specified time</span>
+
+<span class="sd">        Calculates the Average Unspent Resources (AUR) up until the specified</span>
+<span class="sd">        time.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            time_s (int): The time in the replay to stop calculating average</span>
+<span class="sd">                unspent resources.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The Average Unspent Resources (AUR) up until the specified</span>
+<span class="sd">                time.</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">resources</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">res</span><span class="p">:</span> <span class="n">res</span><span class="o">.</span><span class="n">second</span> <span class="o">&lt;=</span> <span class="n">time_s</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aur</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Sc2MetricAnalyzer.aur_pre_max"><a class="viewcode-back" href="../../sc2metric.html#metrics.sc2metric.Sc2MetricAnalyzer.aur_pre_max">[docs]</a>    <span class="k">def</span> <span class="nf">aur_pre_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Average Unspent Resources before max supply</span>
+
+<span class="sd">        Calculates the Average Unspent Resources (AUR) up until the player first</span>
+<span class="sd">        reaches max supply.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The Average Unspent Resources (AUR) up until the player first</span>
+<span class="sd">                maxes.</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">max_s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">first_max</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">max_s</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">aur_at_time</span><span class="p">(</span><span class="n">max_s</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">aur</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_avg_rcr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">sum_rcr</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">resources</span><span class="p">:</span>
+                <span class="n">sum_rcr</span> <span class="o">+=</span> <span class="n">res</span><span class="o">.</span><span class="n">res_col</span>
+
+            <span class="k">return</span> <span class="n">sum_rcr</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Sc2MetricAnalyzer.avg_rcr"><a class="viewcode-back" href="../../sc2metric.html#metrics.sc2metric.Sc2MetricAnalyzer.avg_rcr">[docs]</a>    <span class="k">def</span> <span class="nf">avg_rcr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Average Resource Collection Rate</span>
+
+<span class="sd">        Calculates the average Resource Collection Rate (RCR) during the game.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The average Resource Collection Rate (RCR)</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_avg_rcr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Sc2MetricAnalyzer.avg_rcr_at_time"><a class="viewcode-back" href="../../sc2metric.html#metrics.sc2metric.Sc2MetricAnalyzer.avg_rcr_at_time">[docs]</a>    <span class="k">def</span> <span class="nf">avg_rcr_at_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_s</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Average Resource Collection Rate up to a specified time</span>
+
+<span class="sd">        Calculates the average Resource Collection Rate (RCR) up until the</span>
+<span class="sd">        specified time.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            time_s (int): The time in the replay to stop calculating average</span>
+<span class="sd">                resource collection rate.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The average Resource Collection Rate (RCR) up until the</span>
+<span class="sd">                specified time.</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">resources</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">res</span><span class="p">:</span> <span class="n">res</span><span class="o">.</span><span class="n">second</span> <span class="o">&lt;=</span> <span class="n">time_s</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_avg_rcr</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Sc2MetricAnalyzer.avg_rcr_pre_max"><a class="viewcode-back" href="../../sc2metric.html#metrics.sc2metric.Sc2MetricAnalyzer.avg_rcr_pre_max">[docs]</a>    <span class="k">def</span> <span class="nf">avg_rcr_pre_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Average Resource Collection Rate before max supply</span>
+
+<span class="sd">        Calculates the average Resource Collection Rate (RCR) up until the</span>
+<span class="sd">        player first reaches max supply.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The average Resource Collection Rate (RCR) up until the player</span>
+<span class="sd">                first maxes.</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">max_s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">first_max</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">max_s</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">avg_rcr_at_time</span><span class="p">(</span><span class="n">max_s</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">avg_rcr</span><span class="p">()</span></div>
+            
+
+<div class="viewcode-block" id="Sc2MetricAnalyzer.supply_capped"><a class="viewcode-back" href="../../sc2metric.html#metrics.sc2metric.Sc2MetricAnalyzer.supply_capped">[docs]</a>    <span class="k">def</span> <span class="nf">supply_capped</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Time spent supply capped</span>
+
+<span class="sd">        Determines the amount of time the player was supply capped this game.</span>
+<span class="sd">        Supply capped is acknowledged when supply of units = supply created</span>
+<span class="sd">        when supply created &lt; 200.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The amount of time spent supply capped.</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fd_made</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_food_made</span>
+        <span class="n">fd_used</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_food_used</span>
+
+        <span class="n">sc</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">used</span> <span class="ow">in</span> <span class="n">fd_used</span><span class="p">:</span>
+            <span class="n">made</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">md</span><span class="p">:</span> <span class="n">md</span><span class="o">.</span><span class="n">second</span> <span class="o">&lt;=</span> <span class="n">used</span><span class="o">.</span><span class="n">second</span><span class="p">,</span> <span class="n">fd_made</span><span class="p">))</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">used</span><span class="o">.</span><span class="n">supply</span> <span class="o">==</span> <span class="n">made</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">made</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">supply</span>
+                <span class="ow">and</span> <span class="n">made</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">made</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">supply</span> <span class="o">&lt;</span> <span class="mi">200</span><span class="p">):</span>
+                <span class="n">sc</span> <span class="o">+=</span> <span class="p">(</span><span class="n">used</span><span class="o">.</span><span class="n">second</span> <span class="o">-</span> <span class="n">made</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">made</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">second</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">sc</span></div>
+            
+
+<div class="viewcode-block" id="Sc2MetricAnalyzer.workers_created_at_time"><a class="viewcode-back" href="../../sc2metric.html#metrics.sc2metric.Sc2MetricAnalyzer.workers_created_at_time">[docs]</a>    <span class="k">def</span> <span class="nf">workers_created_at_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_s</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Number of workers created up to the specified time</span>
+
+<span class="sd">        Determines the total number of workers created at the specified time.</span>
+<span class="sd">        This function is accumulative and does not handle workers lost.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            time_s (int): The time (in seconds) of the replay to count workers.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The number of workers created.</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">workers</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workers_created</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">idx</span>
+               <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">workers_created</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">second</span> <span class="o">&lt;</span> <span class="n">time_s</span><span class="p">):</span>
+            <span class="n">workers</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">workers</span></div>
+
+
+<div class="viewcode-block" id="Sc2MetricAnalyzer.army_created_at_time"><a class="viewcode-back" href="../../sc2metric.html#metrics.sc2metric.Sc2MetricAnalyzer.army_created_at_time">[docs]</a>    <span class="k">def</span> <span class="nf">army_created_at_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_time_s</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The army supply created up to a specified time</span>
+
+<span class="sd">        Calculate the total army supply created at the specified time.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            game_time_s (int): The time (in seconds) of the replay to count army</span>
+<span class="sd">                supply.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The amount of army supply created in the given time.</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">army_created</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">idx</span>
+               <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">army_created</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">second</span> <span class="o">&lt;=</span> <span class="n">game_time_s</span><span class="p">):</span>
+            <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">army_created</span><span class="p">[</span><span class="n">idx</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">supply</span></div>
+
+
+<div class="viewcode-block" id="Sc2MetricAnalyzer.supply_created_at_time"><a class="viewcode-back" href="../../sc2metric.html#metrics.sc2metric.Sc2MetricAnalyzer.supply_created_at_time">[docs]</a>    <span class="k">def</span> <span class="nf">supply_created_at_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">real_time_s</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The total supply created up to a specified time</span>
+
+<span class="sd">        Calculate the total supply created at the specified time.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            real_time_s (int): The time (in seconds) of the replay to count</span>
+<span class="sd">                supply.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The amount of supply created in the given time.</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">supply</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">supply</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workers_created</span><span class="p">(</span><span class="n">real_time_s</span><span class="p">)</span>
+        <span class="n">supply</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">army_created</span><span class="p">(</span><span class="n">real_time_s</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">supply</span></div>
+
+
+<div class="viewcode-block" id="Sc2MetricAnalyzer.time_to_workers_created"><a class="viewcode-back" href="../../sc2metric.html#metrics.sc2metric.Sc2MetricAnalyzer.time_to_workers_created">[docs]</a>    <span class="k">def</span> <span class="nf">time_to_workers_created</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_count</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The time at which the number of workers had been created</span>
+
+<span class="sd">        Finds the time that the specified number of workers have been created.</span>
+<span class="sd">        This does not account for loss of workers.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            worker_count (int): The number of workers to find the time created.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The time at which the total number of workers were created.</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">worker_count</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workers_created</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">workers_created</span><span class="p">[</span><span class="n">worker_count</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">second</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Sc2MetricAnalyzer.time_to_supply_created"><a class="viewcode-back" href="../../sc2metric.html#metrics.sc2metric.Sc2MetricAnalyzer.time_to_supply_created">[docs]</a>    <span class="k">def</span> <span class="nf">time_to_supply_created</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">supply_count</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The time at which the specified supply had been created</span>
+
+<span class="sd">        Finds the time when the specified supply was created. This does not</span>
+<span class="sd">        take into account supply lost.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            supply_count (int): The supply desired.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The time when the supply was created in the replay.</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">supp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">sp</span><span class="p">:</span> <span class="n">sp</span><span class="o">.</span><span class="n">supply</span> <span class="o">&lt;=</span> <span class="n">supply_count</span><span class="p">,</span>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">supply_created</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">supp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">supp</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">supp</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">second</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+        
+
+<div class="viewcode-block" id="Sc2MetricAnalyzer.time_to_supply_created_max_workers"><a class="viewcode-back" href="../../sc2metric.html#metrics.sc2metric.Sc2MetricAnalyzer.time_to_supply_created_max_workers">[docs]</a>    <span class="k">def</span> <span class="nf">time_to_supply_created_max_workers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">supply_count</span><span class="p">,</span>
+                                           <span class="n">max_workers_counted</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The time at which the specified supply had been created</span>
+
+<span class="sd">        Finds the time when the specified supply was reached, but only counts a specified</span>
+<span class="sd">        number of workers towards that supply created count. This does not take into</span>
+<span class="sd">        account supply lost.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            supply_count (int): The supply desired.</span>
+<span class="sd">            max_workers_counted (int): The maximum number of workers to count</span>
+<span class="sd">                towards the supply created.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The time when the supply was created in the replay.</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">supp</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">workers</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">sc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">supply_created</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">sc</span><span class="o">.</span><span class="n">is_worker</span> <span class="ow">or</span> <span class="n">workers</span> <span class="o">&lt;</span> <span class="n">max_workers_counted</span><span class="p">:</span>
+                <span class="n">supp</span> <span class="o">+=</span> <span class="n">sc</span><span class="o">.</span><span class="n">unit_supply</span>
+                <span class="k">if</span> <span class="n">supp</span> <span class="o">&gt;=</span> <span class="n">supply_count</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">sc</span><span class="o">.</span><span class="n">second</span>
+                <span class="k">if</span> <span class="n">sc</span><span class="o">.</span><span class="n">is_worker</span><span class="p">:</span>
+                    <span class="n">workers</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Sc2MetricAnalyzer.time_to_bases_created"><a class="viewcode-back" href="../../sc2metric.html#metrics.sc2metric.Sc2MetricAnalyzer.time_to_bases_created">[docs]</a>    <span class="k">def</span> <span class="nf">time_to_bases_created</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_count</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The time at which the number of bases had been created</span>
+
+<span class="sd">        Finds the time when the specified number of bases has been reached.</span>
+<span class="sd">        This does not take into account any bases lost.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            base_count (int): The number of bases desired.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The time when the number of bases had been created.</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">base_count</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bases_created</span><span class="p">)</span> <span class="ow">and</span> <span class="n">base_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bases_created</span><span class="p">[</span><span class="n">base_count</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">second</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>   </div></div>
+        
+
+<span class="c1">##    def units_created(self, real_time_s):</span>
+<span class="c1">##        if not &#39;UnitBornEvent&#39; in self._events or not &#39;UnitInitEvent&#39; in self._events:</span>
+<span class="c1">##            return 0</span>
+<span class="c1">##        units_created = {&quot;Probe&quot;: 0, &quot;Zealot&quot;: 0, &quot;Sentry&quot;: 0, &quot;Stalker&quot;: 0, &quot;Adept&quot;: 0, &quot;HighTemplar&quot;: 0,</span>
+<span class="c1">##                         &quot;DarkTemplar&quot;: 0, &quot;Archon&quot;: 0, &quot;Observer&quot;: 0, &quot;Immortal&quot;: 0, &quot;Colossus&quot;: 0,</span>
+<span class="c1">##                         &quot;Disruptor&quot;: 0, &quot;Phoenix&quot;: 0, &quot;Oracle&quot;: 0, &quot;VoidRay&quot;: 0, &quot;Carrier&quot;: 0, &quot;Tempest&quot;: 0}</span>
+<span class="c1">##</span>
+<span class="c1">##        unit_born_events = self._events[&#39;UnitBornEvent&#39;]</span>
+<span class="c1">##        unit_init_events = self._events[&#39;UnitInitEvent&#39;]</span>
+<span class="c1">##        game_time_s = util.convert_realtime_to_gametime_r(self._replay, real_time_s)</span>
+<span class="c1">##        </span>
+<span class="c1">##        player_ube = list(filter(lambda ube: ube.control_pid == self._player_id, unit_born_events))</span>
+<span class="c1">##        player_uie = list(filter(lambda uie: uie.control_pid == self._player_id, unit_init_events))</span>
+<span class="c1">##</span>
+<span class="c1">##        for ube in player_ube:</span>
+<span class="c1">##            if (ube.second &lt;= game_time_s) and (ube.unit.name in units_created) and (not self._isHallucinated(ube.unit)):</span>
+<span class="c1">##                units_created[ube.unit.name] += 1</span>
+<span class="c1">##</span>
+<span class="c1">##        for uie in player_uie:</span>
+<span class="c1">##            if (uie.second &lt;= game_time_s) and (uie.unit.name in units_created) and (not self._isHallucinated(uie.unit)):</span>
+<span class="c1">##                units_created[uie.unit.name] += 1</span>
+<span class="c1">##</span>
+<span class="c1">##        return units_created</span>
+
+<span class="c1">##    def encode_json(self):</span>
+<span class="c1">##        if isinstance(self, Sc2MetricAnalyzer):</span>
+<span class="c1">##            res_dict = {&#39;__ResourceCount__&#39;: True}</span>
+<span class="c1">##            for res in self.resources:</span>
+<span class="c1">##                res_dict.update(res.to_dict())</span>
+<span class="c1">##</span>
+<span class="c1">##</span>
+<span class="c1">##            </span>
+<span class="c1">##            return {&#39;__Sc2MetricAnalyzer__&#39;: True,</span>
+<span class="c1">##                    &#39;army_created&#39;: self.army_created,</span>
+<span class="c1">##                    &#39;workers_created&#39;: self.workers_created,</span>
+<span class="c1">##                    &#39;supply_created&#39;: self.supply_created,</span>
+<span class="c1">##                    &#39;bases_created&#39;: self.bases_created,</span>
+<span class="c1">##                    &#39;current_food_used&#39;: self.current_food_used,</span>
+<span class="c1">##                    &#39;current_food_made&#39;: self.current_food_made,</span>
+<span class="c1">##                    &#39;resources&#39;: self.resources,</span>
+<span class="c1">##                    &#39;avg_apm&#39;: self.avg_apm</span>
+<span class="c1">##                    }</span>
+<span class="c1">##        else:</span>
+<span class="c1">##            type_name = z.__class__.__name__</span>
+<span class="c1">##            raise TypeError(f&quot;Object of type &#39;{type_name}&#39; is not JSON serializable&quot;)</span>
+
+    
+
+   
+<span class="c1">########## Testing ###########</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="n">ma</span> <span class="o">=</span> <span class="n">Sc2MetricAnalyzer</span><span class="p">(</span><span class="s2">&quot;..</span><span class="se">\\</span><span class="s2">test</span><span class="se">\\</span><span class="s2">test_replays</span><span class="se">\\</span><span class="s2">Year Zero LE (9).SC2Replay&quot;</span><span class="p">,</span>
+                           <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Starcraft2Metrics 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Matthew Johnson.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.0.
+    </div>
+  </body>
+</html>

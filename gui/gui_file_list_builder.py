@@ -1,5 +1,5 @@
 import PySimpleGUI as sg
-
+from gui_locate_file_and_name import GuiLocateFileAndName
 
 # def showFileListBuilder():
 #     # Add file
@@ -48,16 +48,12 @@ class GuiFileListBuilder(object):
             self.filename = fn
             self.name = nm
 
-    def __init__(self):
-        self.file_list = []
+        def __str__(self):
+            return "{}".format(self.name)
 
-        # Add file
-        self._layout_add = [
-            [sg.Text('Name', size=(15,1)), sg.InputText()],
-            [sg.Text('Location', size=(15,1)), sg.Input(), sg.FolderBrowse()],
-            [sg.Button('Ok'), sg.Button('Cancel')]
-        ]
-
+    def __init__(self, file_list = []):
+        self.file_list = file_list
+        self._tmp_file_list = file_list.copy()
 
         # Main window
         self._column1 = [[sg.Button('Add')],
@@ -65,7 +61,7 @@ class GuiFileListBuilder(object):
                 [sg.Button('Remove')]]
 
         self._layout = [
-            [sg.Listbox(values=('Name1 : Location1', 'Name2 : Location2'), size=(30, 3)), sg.Column(self._column1)],
+            [sg.Listbox(values=self._tmp_file_list,  key='-FILELIST-', size=(30, 3)), sg.Column(self._column1)],
             [sg.Button('Ok')]
         ]
 
@@ -77,15 +73,14 @@ class GuiFileListBuilder(object):
             event, values = self.window.Read()
 
             if event == 'Add':
-                one_shot_win = sg.Window('Add File', self._layout_add)
-                event_add, values_add = one_shot_win.Read()
+                loc_file = GuiLocateFileAndName()
+                event_add = loc_file.show_dialog()
                 if event_add == 'Ok':
-                    self.file_list.append(GuiFileListBuilder.FileListTuple(values_add[0], values_add[1]))
-                    one_shot_win.Close()
-                if event_add == 'Cancel':
-                    one_shot_win.Close()
+                    self._tmp_file_list.append(GuiFileListBuilder.FileListTuple(loc_file.name, loc_file.filename))
+                    self.window['-FILELIST-'].Update(self._tmp_file_list)
                     
             if event == 'Ok':
+                self.file_list = self._tmp_file_list
                 break
 
             if event == 'Cancel':

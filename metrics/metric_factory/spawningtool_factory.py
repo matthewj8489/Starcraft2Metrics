@@ -35,6 +35,7 @@ class SpawningtoolFactory(object):
         meta.date = datetime.utcfromtimestamp(self._build['unix_timestamp']).strftime('%Y-%m-%d %H:%M;%S')
         for plyr in self._build['players'].values():
             meta.players.append("({0}){1}".format(plyr['race'][0], plyr['name']))
+            meta.player.append(plyr)
             if plyr['is_winner']:
                 meta.winner = plyr['name']
 

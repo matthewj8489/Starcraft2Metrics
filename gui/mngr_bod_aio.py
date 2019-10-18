@@ -1,4 +1,8 @@
 
+
+from metrics.build_order_detect import BuildOrderDetect
+from metrics.bod import BuildOrderDeviation
+
 class MngrBodAio(object):
 
     def __init__(self):
@@ -15,7 +19,7 @@ class MngrBodAio(object):
     def get_build_library(self):
         return self.dmy
 
-    def analyze_replay(self, rep_file_name):
+    def get_bod_results_from_replay(self, rep_file_name):
         return ('BOD\r\n'
                 '---------\r\n'
                 'Blink/Robo : 11.08%\r\n'

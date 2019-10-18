@@ -82,7 +82,7 @@ def open_bod_window(mngr):
             open_build_lib_window(mngr)
 
         if event == 'Analyze':
-            bod_window['-OUTPUT-'].Update(mngr.analyze_replay(values[0]))
+            bod_window['-OUTPUT-'].Update(mngr.get_bod_results_from_replay(values[0]))
 
     bod_window.close()
 

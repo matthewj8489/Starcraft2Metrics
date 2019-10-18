@@ -16,10 +16,25 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 # import gui
-from gui.mngr_bod_aio import MngrBodAio
+from metrics.gui.mngr_bod_aio import MngrBodAio
 
 class TestMngrBodAio(unittest.TestCase):
+
+#region add_to_build_library
 
     def test_(self):
         self.assertEqual(1, 0)
 
+#endregion
+
+#region remove_from_build_library
+
+#endregion
+
+#region get_build_library
+
+#endregion
+
+#region get_bod_results_from_replay
+
+#endregion

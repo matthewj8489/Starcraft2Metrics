@@ -88,12 +88,26 @@ class BuildOrderElement(object):
     def to_string(self):
         return "({0})|{1}|{2}|{3}s".format(self.build_num, self.name, self.supply, self.time)
 
+    def __eq__(self, other):
+        if isinstance(other, BuildOrderElement):
+            return (self.build_num == other.build_num and
+                    self.name == other.name and
+                    self.supply == other.supply and
+                    self.time == other.time and
+                    self.frame == other.frame)
+        else:
+            return False
+
+
 
 class BuildOrder(object):
         
-    def __init__(self):
-        self.build = []
-        self.name = ''
+    def __init__(self, name='', build=None):
+        if build:
+            self.build = build
+        else:
+            self.build = []
+        self.name = name
 
     def serialize(self):
         serial = self.__dict__
@@ -104,13 +118,26 @@ class BuildOrder(object):
 
         return serial
         
-        
     def deserialize(self, json_obj):        
         self.__dict__ = json_obj
         blds = []
         for bld in self.build:
             blds.append(BuildOrderElement(bld['build_num'], bld['name'], bld['supply'], bld['time'], bld['frame']))
         self.__dict__['build'] = blds
+
+    def __eq__(self, other):
+        if isinstance(other, BuildOrder):
+            if not self.name == other.name:
+                return False
+            if not len(self.build) == len(other.build):
+                return False
+            for x in range(len(self.build)):
+                if not self.build[x] == other.build[x]:
+                    return False
+            return True
+        else:
+            return False
+
         
 
 class ReplayMetadata(object):

@@ -9,7 +9,7 @@ class MngrBodAio(object):
         Initializes the manager.
 
         Args:
-            build_lib (BuildOrder[]):   A library of known builds.
+            build_lib (BuildOrderLibrary):   A library of known builds.
 
             bo_fact (IBuildOrderFactory): A factory to generate build orders from a replay file.
 

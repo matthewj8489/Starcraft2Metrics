@@ -42,3 +42,6 @@ tests/unit/plugins/__pycache__/test_apm_tracker_plugin.cpython-37.pyc
 tests/unit/plugins/__pycache__/test_bases_created_plugin.cpython-37.pyc
 tests/unit/plugins/__pycache__/test_resource_tracker_plugin.cpython-37.pyc
 tests/unit/plugins/__pycache__/test_supply.cpython-37.pyc
+metrics/__pycache__/neural_network.cpython-37.pyc
+metrics/metric_factory/__pycache__/i_build_order_factory.cpython-37.pyc
+tests/__pycache__/context.cpython-37.pyc

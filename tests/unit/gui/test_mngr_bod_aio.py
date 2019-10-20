@@ -10,7 +10,7 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 # import gui
-from .context import metrics
+from context import metrics
 from metrics.gui.mngr_bod_aio import MngrBodAio
 from metrics.metric_factory.i_build_order_factory import IBuildOrderFactory
 from metrics.metric_containers import BuildOrder
@@ -38,7 +38,7 @@ class TestMngrBodAio(unittest.TestCase):
         mngr.add_to_build_library("my_build", "my_player", "my_file")
 
         self.assertEqual(1, bol.build_count())
-        self.assertEqual(fact.build, bol.get_build_by_index(1))
+        self.assertEqual(fact.build, bol.get_build_by_index(0))
 
 
 #endregion

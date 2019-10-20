@@ -6,7 +6,7 @@ else:
     import unittest
 
 
-from .context import metrics
+from context import metrics
 from metrics.build_order_library import BuildOrderLibrary
 from metrics.metric_containers import BuildOrder
 from metrics.metric_containers import BuildOrderElement

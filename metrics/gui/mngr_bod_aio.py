@@ -30,7 +30,8 @@ class MngrBodAio(object):
             file_name (str): The complete path to the .SC2Replay replay file.
 
         """
-        yield
+        bo = self._bo_fact.generateBuildOrder(player_name, file_name, build_name)
+        self._build_lib.add_build(bo)
 
     def remove_from_build_library(self, build):
         yield

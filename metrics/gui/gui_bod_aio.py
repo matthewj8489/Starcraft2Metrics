@@ -34,7 +34,7 @@ def open_build_lib_window(mngr):
     ]
 
     build_lib_layout = [
-        [sg.Listbox(values=mngr.get_build_library(), key='-BUILDLIST-', size=(30, 3)), sg.Column(build_lib_column)],
+        [sg.Listbox(values=mngr.get_builds(), key='-BUILDLIST-', size=(30, 3)), sg.Column(build_lib_column)],
         [sg.Button('Ok')]
     ]
 
@@ -48,12 +48,12 @@ def open_build_lib_window(mngr):
 
         if event == 'Add':
             open_add_build_window(mngr)
-            build_lib_window['-BUILDLIST-'].Update(mngr.get_build_library())
+            build_lib_window['-BUILDLIST-'].Update(mngr.get_builds())
 
         if event == 'Remove':
             if '-BUILDLIST-' in values and len(values['-BUILDLIST-']) > 0:
                 mngr.remove_from_build_library(values['-BUILDLIST-'][0])
-                build_lib_window['-BUILDLIST-'].Update(mngr.get_build_library())
+                build_lib_window['-BUILDLIST-'].Update(mngr.get_builds())
             
 
     build_lib_window.close()

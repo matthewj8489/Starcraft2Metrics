@@ -98,6 +98,8 @@ class BuildOrderElement(object):
         else:
             return False
 
+    def __str__(self):
+        return self.to_string()
 
 
 class BuildOrder(object):
@@ -137,6 +139,9 @@ class BuildOrder(object):
             return True
         else:
             return False
+
+    def __str__(self):
+        return self.name
 
         
 

@@ -5,6 +5,9 @@ class BuildOrderLibrary(object):
     def __init__(self, builds=[]):
         self._builds = builds
 
+    def get_builds(self):
+        return self._builds
+
     def build_count(self):
         """Returns the number of builds contained in the library."""
         return len(self._builds)

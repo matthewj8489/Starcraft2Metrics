@@ -34,10 +34,10 @@ class MngrBodAio(object):
         self._build_lib.add_build(bo)
 
     def remove_from_build_library(self, build):
-        yield
+        self._build_lib.remove_build_by_build_order(build)
 
-    def get_build_library(self):
-        yield
+    def get_builds(self):
+        return self._build_lib.get_builds()
 
     def get_bod_results_from_replay(self, rep_file_name):
         yield

@@ -46,8 +46,6 @@ class MngrBodAio(object):
 
         # get a build order from the replay file and player name
 
-        # loop through all builds in the build library and run detect_build_order
-        # to determine the confidence that the replay build order is the same as 
-        # the one in the build library
+        # get the closest build from the build library
 
         return closest_match_build_name, confidence, bo_dev

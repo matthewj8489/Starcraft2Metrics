@@ -5,6 +5,8 @@ if sys.version_info[:2] < (2, 7):
 else:
     import unittest
 
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 from context import metrics
 from metrics.build_order_library import BuildOrderLibrary
@@ -142,6 +144,56 @@ class TestBuildOrderLibrary(unittest.TestCase):
 #endregion
 
 #region save_library
+
+#endregion
+
+#region load_library
+
+#endregion
+
+#region get_closest_matching_build
+
+    def _detect_build_order_returns(self, compare_bo, depth=-1):
+        if compare_bo.name == "my_first":
+            return self._detect_bo_values[0][0], self._detect_bo_values[0][1]
+        elif compare_bo.name == "my_second":
+            return self._detect_bo_values[1][0], self._detect_bo_values[1][1]
+        else:
+            return self._detect_bo_values[2][0], self._detect_bo_values[2][1]
+
+    @patch('metrics.build_order_detect.BuildOrderDetect.detect_build_order')
+    def test_closest_build_is_correct(self, detect_bo_mock):
+        self._detect_bo_values = [[80, MagicMock()], [97, MagicMock()], [70, MagicMock()]]
+        detect_bo_mock.side_effect = self._detect_build_order_returns
+
+        bol = BuildOrderLibrary(self.get_builds())
+
+        closest_build, confidence, closest_build_bod = bol.get_closest_matching_build(None)
+
+        self.assertEqual("my_second", closest_build.name)
+
+    @patch('metrics.build_order_detect.BuildOrderDetect.detect_build_order')
+    def test_closest_confidence_is_correct(self, detect_bo_mock):
+        self._detect_bo_values = [[80, MagicMock()], [97, MagicMock()], [70, MagicMock()]]
+        detect_bo_mock.side_effect = self._detect_build_order_returns
+
+        bol = BuildOrderLibrary(self.get_builds())
+
+        closest_build, confidence, closest_build_bod = bol.get_closest_matching_build(None)
+
+        self.assertEqual(97, confidence)
+
+    @patch('metrics.build_order_detect.BuildOrderDetect.detect_build_order')
+    def test_closest_bod_is_correct(self, detect_bo_mock):
+        self._detect_bo_values = [[80, MagicMock(ident="first")], [97, MagicMock(ident="second")], [70, MagicMock(ident="third")]]
+        detect_bo_mock.side_effect = self._detect_build_order_returns
+
+        bol = BuildOrderLibrary(self.get_builds())
+
+        closest_build, confidence, closest_build_bod = bol.get_closest_matching_build(None)
+
+        self.assertEqual("second", closest_build_bod.ident)
+    
 
 #endregion
 

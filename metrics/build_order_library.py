@@ -1,4 +1,4 @@
-
+from metrics.build_order_detect import BuildOrderDetect
 
 class BuildOrderLibrary(object):
 
@@ -86,12 +86,29 @@ class BuildOrderLibrary(object):
         yield
 
     def get_closest_matching_build(self, build):
+        """Returns the closest build in the library to the given build.
+
+        Args:
+            build (BuildOrder): The build to find the closest match to.
+
+        Returns:
+            BuildOrder: The closest build in the library.
+            int:        The confidence that the given build is the same as the returned build.
+            BuildOrderDeviation:    The BOD object used to determine the confidence.
+
+        """
         closest_build = None
-        confidence = 1
+        closest_confidence = 0
         closest_build_bod = None
 
         # loop through all builds in the build library and run detect_build_order
         # to determine the confidence that the replay build order is the same as 
         # the one in the build library
+        for bld in self._builds:
+            conf, bod = BuildOrderDetect.detect_build_order(bld, build)
+            if conf > closest_confidence:
+                closest_build = bld
+                closest_confidence = conf
+                closest_build_bod = bod
 
-        return closest_build, confidence, closest_build_bod
+        return closest_build, closest_confidence, closest_build_bod

@@ -84,3 +84,14 @@ class BuildOrderLibrary(object):
 
     def load_library(self, filename):
         yield
+
+    def get_closest_matching_build(self, build):
+        closest_build = None
+        confidence = 1
+        closest_build_bod = None
+
+        # loop through all builds in the build library and run detect_build_order
+        # to determine the confidence that the replay build order is the same as 
+        # the one in the build library
+
+        return closest_build, confidence, closest_build_bod

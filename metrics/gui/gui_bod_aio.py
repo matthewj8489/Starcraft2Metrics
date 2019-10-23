@@ -66,6 +66,7 @@ def open_bod_window(mngr):
         [sg.Menu(bod_menu, tearoff=True)],
         [sg.Text('Replay')],
         [sg.Input(), sg.FileBrowse()],
+        [sg.Text('Player Name'), sg.InputText()],
         [sg.Multiline(disabled=True, key='-OUTPUT-', size=(45, 15))],
         [sg.Button('Analyze'), sg.Button('Exit')]
     ]
@@ -82,7 +83,7 @@ def open_bod_window(mngr):
             open_build_lib_window(mngr)
 
         if event == 'Analyze':
-            bod_window['-OUTPUT-'].Update(mngr.get_bod_results_from_replay(values[0]))
+            bod_window['-OUTPUT-'].Update(mngr.get_bod_results_from_replay(values[0], values[1]))
 
     bod_window.close()
 

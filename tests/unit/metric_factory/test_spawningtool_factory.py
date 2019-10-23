@@ -31,7 +31,7 @@ class TestSpawningToolFactory(unittest.TestCase):
         return {'name': name, 'supply': supply, 'time': time_str, 'frame': frame}
         
 
-    ########################## generateBuildOrderElements ##########################
+#region generateBuildOrderElements
 
     @patch('metrics.metric_factory.spawningtool_factory.spawningtool.parser')
     def test_build_order_elements_generated_correctly(self, spawn_parse_mock):
@@ -101,7 +101,23 @@ class TestSpawningToolFactory(unittest.TestCase):
         self.assertEqual(50, boe[0].frame)
 
 
-    ########################## generateReplayMetadata ##########################
+#endregion
+
+#region generateBuildOrder
+
+    @patch('metrics.metric_factory.spawningtool_factory.spawningtool.parser')
+    def test_build_order_name_is_correct_when_given_build_name(self, spawn_parse_mock):
+        mock_build = self._create_mock_build(['Faker'])
+
+        spawn_parse_mock.parse_replay.return_value = mock_build
+
+        fact = SpawningtoolFactory(None)
+
+        bo = fact.generateBuildOrder('Faker', None, "my_build")
+
+        self.assertEqual("my_build", bo.name)
+
+#endregion
 
     #@patch('metrics.metric_factory.spawningtool_factory.spawningtool.parser')
     #def test_

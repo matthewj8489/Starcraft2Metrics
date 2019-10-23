@@ -4,14 +4,15 @@ from datetime import datetime
 
 import spawningtool.parser
 from metrics.metric_containers import *
+from metrics.metric_factory.i_build_order_factory import IBuildOrderFactory
 
 #metricfactory.spawningtool
-class SpawningtoolFactory(object):
+class SpawningtoolFactory(IBuildOrderFactory):
 
     def __init__(self, file_path, cache_dir=None):
         self._build = spawningtool.parser.parse_replay(file_path, cache_dir=cache_dir)
-    
-    def generateBuildOrderElements(self, player_name):
+
+    def _generate_build_order_elements(self, build, player_name):
         boe = []
         build_num = 1
 
@@ -27,6 +28,13 @@ class SpawningtoolFactory(object):
 
         return boe
 
+    def generateBuildOrderElements(self, player_name):
+        return self._generate_build_order_elements(self._build, player_name)
+
+    def generateBuildOrder(self, player_name, file_name, build_name=''):
+        tmp_build = spawningtool.parser.parse_replay(file_name)
+        boe = self._generate_build_order_elements(tmp_build, player_name)
+        return BuildOrder(name=build_name, build=boe)
 
     def generateReplayMetadata(self):
         meta = ReplayMetadata()

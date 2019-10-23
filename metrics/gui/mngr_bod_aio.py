@@ -39,5 +39,15 @@ class MngrBodAio(object):
     def get_builds(self):
         return self._build_lib.get_builds()
 
-    def get_bod_results_from_replay(self, rep_file_name):
-        yield
+    def get_bod_results_from_replay(self, rep_file_name, player_name):
+        closest_match_build_name = ""
+        confidence = ""
+        bo_dev = 0
+
+        # get a build order from the replay file and player name
+
+        # loop through all builds in the build library and run detect_build_order
+        # to determine the confidence that the replay build order is the same as 
+        # the one in the build library
+
+        return closest_match_build_name, confidence, bo_dev

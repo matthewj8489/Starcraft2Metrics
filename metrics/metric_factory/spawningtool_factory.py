@@ -9,14 +9,17 @@ from metrics.metric_factory.i_build_order_factory import IBuildOrderFactory
 #metricfactory.spawningtool
 class SpawningtoolFactory(IBuildOrderFactory):
 
-    def __init__(self, file_path, cache_dir=None):
-        self._build = spawningtool.parser.parse_replay(file_path, cache_dir=cache_dir)
+    def __init__(self, file_path="", cache_dir=None):
+        if file_path:
+            self._build = spawningtool.parser.parse_replay(file_path, cache_dir=cache_dir)
+        else:
+            self._build = None
 
     def _generate_build_order_elements(self, build, player_name):
         boe = []
         build_num = 1
 
-        for plyr in self._build['players'].values():
+        for plyr in build['players'].values():
             if plyr['name'] == player_name:
                 for bo in plyr['buildOrder']:
                     boe.append(BuildOrderElement(build_num,

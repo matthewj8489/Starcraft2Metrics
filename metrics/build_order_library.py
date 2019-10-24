@@ -105,7 +105,7 @@ class BuildOrderLibrary(object):
         # to determine the confidence that the replay build order is the same as 
         # the one in the build library
         for bld in self._builds:
-            conf, bod = BuildOrderDetect.detect_build_order(bld, build)
+            conf, bod = BuildOrderDetect.detect_build_order(bld.build, build.build)
             if conf > closest_confidence:
                 closest_build = bld
                 closest_confidence = conf

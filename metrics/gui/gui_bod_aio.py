@@ -83,13 +83,20 @@ def open_bod_window(mngr):
             open_build_lib_window(mngr)
 
         if event == 'Analyze':
-            bod_window['-OUTPUT-'].Update(mngr.get_bod_results_from_replay(values[0], values[1]))
+            bod_window['-OUTPUT-'].Update(mngr.get_bod_results_from_replay(values[1], values[2]))
 
     bod_window.close()
 
 
 if __name__ == '__main__':
-    from mngr_bod_aio import MngrBodAio
+    import os
+    import sys
 
-    mngr = MngrBodAio()
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir)))
+
+    from metrics.gui.mngr_bod_aio import MngrBodAio
+    from metrics.build_order_library import BuildOrderLibrary
+    from metrics.metric_factory.spawningtool_factory import SpawningtoolFactory
+
+    mngr = MngrBodAio(BuildOrderLibrary(), SpawningtoolFactory())
     open_bod_window(mngr)

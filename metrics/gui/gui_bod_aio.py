@@ -101,9 +101,9 @@ if __name__ == '__main__':
 
     bol = BuildOrderLibrary()
     try:
-        bol.load_library("C:/Users/matthew/Documents/gitprojects/Starcraft2Metrics/build_library.json")
+        bol.load_library("C:/Users/matthew/Documents/Starcraft2Metrics/build_library.json")
     except:
         pass
 
-    mngr = MngrBodAio(BuildOrderLibrary(), SpawningtoolFactory(), "build_library.json")
+    mngr = MngrBodAio(bol, SpawningtoolFactory(), "build_library.json")
     open_bod_window(mngr)

@@ -26,6 +26,16 @@ class MockBuildOrderFactory(IBuildOrderFactory):
         self.build.name = build_name
         return self.build
 
+class MockBuildOrderLibrary(BuildOrderLibrary):
+
+    def __init__(self, build, confidence, bod):
+        self.mock_build = build
+        self.mock_confidence = confidence
+        self.mock_bod = bod
+
+    def get_closest_matching_build(self, build):
+        return self.mock_build, self.mock_confidence, self.mock_bod
+
 class TestMngrBodAio(unittest.TestCase):
 
 #region add_to_build_library
@@ -52,6 +62,16 @@ class TestMngrBodAio(unittest.TestCase):
 #endregion
 
 #region get_bod_results_from_replay
+
+    def test_returns_correct_string_from_bod_results_from_replay(self):
+        bol = MockBuildOrderLibrary(BuildOrder(name="my_mock_build"), 95, MagicMock(dev=0.15))
+        fact = MockBuildOrderFactory()
+        mngr = MngrBodAio(bol, fact)
+
+        res = mngr.get_bod_results_from_replay("", "my_mock_name")
+
+        self.assertEqual("build: my_mock_build | confidence: 95 | deviation: 0.15", res)
+
 
 #endregion
 

@@ -1,9 +1,6 @@
-from metrics.build_order_detect import BuildOrderDetect
-from metrics.bod import BuildOrderDeviation
-
 class MngrBodAio(object):
 
-    def __init__(self, build_lib, bo_fact):
+    def __init__(self, build_lib, bo_fact, build_lib_filepath):
         """Constructor
 
         Initializes the manager.
@@ -16,6 +13,7 @@ class MngrBodAio(object):
         """
         self._build_lib = build_lib
         self._bo_fact = bo_fact
+        self._build_lib_filepath = build_lib_filepath
 
     def add_to_build_library(self, build_name, player_name, file_name):
         """Add build to build library
@@ -51,3 +49,6 @@ class MngrBodAio(object):
         closest_match_build, confidence, bo_dev = self._build_lib.get_closest_matching_build(bo)
 
         return "build: {} | confidence: {} | deviation: {}".format(closest_match_build.name, confidence, bo_dev.dev)
+
+    def save_build_library(self):
+        self._build_lib.save_library(self._build_lib_filepath)

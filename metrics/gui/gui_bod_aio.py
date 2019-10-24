@@ -44,6 +44,7 @@ def open_build_lib_window(mngr):
         event, values = build_lib_window.Read()
 
         if event is None or event == 'Ok':
+            mngr.save_build_library()
             break
 
         if event == 'Add':
@@ -98,5 +99,11 @@ if __name__ == '__main__':
     from metrics.build_order_library import BuildOrderLibrary
     from metrics.metric_factory.spawningtool_factory import SpawningtoolFactory
 
-    mngr = MngrBodAio(BuildOrderLibrary(), SpawningtoolFactory())
+    bol = BuildOrderLibrary()
+    try:
+        bol.load_library("C:/Users/matthew/Documents/gitprojects/Starcraft2Metrics/build_library.json")
+    except:
+        pass
+
+    mngr = MngrBodAio(BuildOrderLibrary(), SpawningtoolFactory(), "build_library.json")
     open_bod_window(mngr)

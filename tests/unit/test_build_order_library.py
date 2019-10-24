@@ -145,9 +145,19 @@ class TestBuildOrderLibrary(unittest.TestCase):
 
 #region save_library
 
+    def test_FileNotFoundError_is_raised_when_saving_library_with_empty_filename(self):
+        bol = BuildOrderLibrary(self.get_builds())
+
+        self.assertRaises(FileNotFoundError, bol.save_library, "")
+
 #endregion
 
 #region load_library
+
+    def test_FileNotFoundError_is_raised_when_loading_library_with_empty_filename(self):
+        bol = BuildOrderLibrary(self.get_builds())
+
+        self.assertRaises(FileNotFoundError, bol.load_library, "")
 
 #endregion
 

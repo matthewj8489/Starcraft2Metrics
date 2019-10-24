@@ -1,4 +1,7 @@
+import json
+import copy
 from metrics.build_order_detect import BuildOrderDetect
+from metrics.metric_containers import BuildOrder
 
 class BuildOrderLibrary(object):
 
@@ -80,10 +83,40 @@ class BuildOrderLibrary(object):
         self._builds.remove(build)
 
     def save_library(self, filename):
-        yield
+        """Saves the build library to a json file
+
+        Args:
+            filename (str): The full file name and path to store the library into.
+
+        Raises:
+            FileNotFoundError: If an invalid path is given.
+
+        """
+        j_builds = []
+        for bld in self._builds:
+            j_builds.append(bld.serialize())
+
+        with open(filename, 'w') as bch_fl:
+            json.dump(j_builds, bch_fl)
 
     def load_library(self, filename):
-        yield
+        """Loads the library from a valid json file.
+
+        Args:
+            filename (str): The full file name and path to load the library from.
+
+        Raises:
+            FileNotFoundError: If an invalid path is given.
+
+        """
+        self._builds = []
+        with open(filename, 'r') as bch_fl:
+            j_builds = json.load(bch_fl)
+            for j_bld in j_builds:
+                bld = BuildOrder()
+                bld.deserialize(copy.deepcopy(j_bld))
+                self._builds.append(bld)
+        
 
     def get_closest_matching_build(self, build):
         """Returns the closest build in the library to the given build.

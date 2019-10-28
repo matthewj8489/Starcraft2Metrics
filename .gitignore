@@ -45,3 +45,4 @@ tests/unit/plugins/__pycache__/test_supply.cpython-37.pyc
 metrics/__pycache__/neural_network.cpython-37.pyc
 metrics/metric_factory/__pycache__/i_build_order_factory.cpython-37.pyc
 tests/__pycache__/context.cpython-37.pyc
+build_library.json

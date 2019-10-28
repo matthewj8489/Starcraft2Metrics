@@ -5,21 +5,19 @@ from metrics.neural_network import NeuralNetwork
 class BuildOrderDetect(object):
 
     def detect_build_order(bo, compare_bo, depth=-1):
-        """Determines how likely a build order is modeled after the benchmark build.
-
-        Determines the confidence that the given build order is modeled after the
-        benchmark build order contained here.
+        """Determines how closely two build orders match each other.
 
         Args:
-            compare_bo (BuildOrderElement[]): An array of BuildOrderElements to
-                determine if it closely matches the benchmark build order.
+            bo (BuildOrderElement[]): A build order to compare against.
+
+            compare_bo (BuildOrderElement[]): A build order that will be compared to bo.
                 
             (depth) (int): Optional. The depth with which to traverse the build order. If
                 not defined (-1), the entire build order will be used.
 
         Returns:
-            int: The confidence (0.0 - 1.0) that the given build order is a derivative
-                of the benchmark build order.
+            int: The confidence (0.0 - 1.0) that the compare_bo build order is a derivative
+                of the bo build order.
 
             BuildOrderDeviation: The BOD object used to determine the confidence.
                 

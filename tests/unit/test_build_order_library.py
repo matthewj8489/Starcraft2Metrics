@@ -178,7 +178,7 @@ class TestBuildOrderLibrary(unittest.TestCase):
 
         bol = BuildOrderLibrary(self.get_builds())
 
-        closest_build, confidence, closest_build_bod = bol.get_closest_matching_build(None)
+        closest_build, confidence, closest_build_bod = bol.get_closest_matching_build(MagicMock())
 
         self.assertEqual("my_second", closest_build.name)
 
@@ -189,7 +189,7 @@ class TestBuildOrderLibrary(unittest.TestCase):
 
         bol = BuildOrderLibrary(self.get_builds())
 
-        closest_build, confidence, closest_build_bod = bol.get_closest_matching_build(None)
+        closest_build, confidence, closest_build_bod = bol.get_closest_matching_build(MagicMock())
 
         self.assertEqual(97, confidence)
 
@@ -200,7 +200,7 @@ class TestBuildOrderLibrary(unittest.TestCase):
 
         bol = BuildOrderLibrary(self.get_builds())
 
-        closest_build, confidence, closest_build_bod = bol.get_closest_matching_build(None)
+        closest_build, confidence, closest_build_bod = bol.get_closest_matching_build(MagicMock())
 
         self.assertEqual("second", closest_build_bod.ident)
     

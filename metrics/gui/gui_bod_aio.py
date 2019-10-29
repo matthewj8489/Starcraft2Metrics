@@ -34,7 +34,8 @@ def open_build_lib_window(mngr):
     ]
 
     build_lib_layout = [
-        [sg.Listbox(values=mngr.get_builds(), key='-BUILDLIST-', size=(30, 3)), sg.Column(build_lib_column)],
+        [sg.Listbox(values=mngr.get_builds(), key='-BUILDLIST-', size=(30, 10), enable_events=True), sg.Column(build_lib_column)],
+        [sg.Listbox(values=[], key='-BUILDORDER-', size=(45, 20))],
         [sg.Button('Ok')]
     ]
 
@@ -55,7 +56,9 @@ def open_build_lib_window(mngr):
             if '-BUILDLIST-' in values and len(values['-BUILDLIST-']) > 0:
                 mngr.remove_from_build_library(values['-BUILDLIST-'][0])
                 build_lib_window['-BUILDLIST-'].Update(mngr.get_builds())
-            
+
+        if event == '-BUILDLIST-' and len(values['-BUILDLIST-']):
+            build_lib_window['-BUILDORDER-'].Update(values['-BUILDLIST-'][0].build)            
 
     build_lib_window.close()
 
@@ -84,7 +87,7 @@ def open_bod_window(mngr):
             open_build_lib_window(mngr)
 
         if event == 'Analyze':
-            bod_window['-OUTPUT-'].Update(mngr.get_bod_results_from_replay(values[1], values[2]))
+            bod_window['-OUTPUT-'].Update(mngr.get_bod_results_from_replay(values[1], values[2]), append=True)
 
     bod_window.close()
 

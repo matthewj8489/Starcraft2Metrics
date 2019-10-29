@@ -88,6 +88,12 @@ class BuildOrderElement(object):
     def to_string(self):
         return "({0})|{1}|{2}|{3}s".format(self.build_num, self.name, self.supply, self.time)
 
+    def to_time_str(self, time_s):
+        minutes = int(time_s / 60)
+        seconds = time_s % 60
+
+        return "{:02d}:{:02d}".format(minutes, seconds)
+
     def __eq__(self, other):
         if isinstance(other, BuildOrderElement):
             return (self.build_num == other.build_num and
@@ -99,7 +105,7 @@ class BuildOrderElement(object):
             return False
 
     def __str__(self):
-        return self.to_string()
+        return "{:3d} ({}) | {}".format(self.supply, self.to_time_str(self.time), self.name)
 
 import copy
 class BuildOrder(object):

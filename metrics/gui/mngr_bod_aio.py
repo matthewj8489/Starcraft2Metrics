@@ -1,3 +1,5 @@
+import os
+
 class MngrBodAio(object):
 
     def __init__(self, build_lib, bo_fact, build_lib_filepath):
@@ -48,7 +50,7 @@ class MngrBodAio(object):
         # get the closest build from the build library
         closest_match_build, confidence, bo_dev = self._build_lib.get_closest_matching_build(bo)
 
-        return "build: {} | confidence: {} | deviation: {}".format(closest_match_build.name, confidence, bo_dev.dev)
+        return "{}\r\n--------\r\nbuild: {}\r\nconfidence: {:.2f}%\r\ndeviation: {:.2f}%\r\n\r\n".format(os.path.basename(rep_file_name), closest_match_build.name, confidence * 100, bo_dev.dev * 100)
 
     def save_build_library(self):
         self._build_lib.save_library(self._build_lib_filepath)

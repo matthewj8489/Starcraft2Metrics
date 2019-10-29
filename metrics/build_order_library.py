@@ -114,7 +114,8 @@ class BuildOrderLibrary(object):
             j_builds = json.load(bch_fl)
             for j_bld in j_builds:
                 bld = BuildOrder()
-                bld.deserialize(copy.deepcopy(j_bld))
+                #bld.deserialize(copy.deepcopy(j_bld))
+                bld.deserialize(j_bld)
                 self._builds.append(bld)
         
 

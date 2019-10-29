@@ -101,7 +101,7 @@ class BuildOrderElement(object):
     def __str__(self):
         return self.to_string()
 
-
+import copy
 class BuildOrder(object):
         
     def __init__(self, name='', build=None):
@@ -112,10 +112,10 @@ class BuildOrder(object):
         self.name = name
 
     def serialize(self):
-        serial = self.__dict__
+        serial = copy.deepcopy(self.__dict__)
         bld_s = []
         for bld in self.build:
-            bld_s.append(bld.__dict__)
+            bld_s.append(copy.deepcopy(bld.__dict__))
         serial['build'] = bld_s
 
         return serial

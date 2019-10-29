@@ -101,7 +101,8 @@ if __name__ == '__main__':
 
     bol = BuildOrderLibrary()
     try:
-        bol.load_library("C:/Users/matthew/Documents/Starcraft2Metrics/build_library.json")
+        #bol.load_library("C:/Users/matthew/Documents/Starcraft2Metrics/build_library.json")
+        bol.load_library("build_library.json")
     except:
         pass
 

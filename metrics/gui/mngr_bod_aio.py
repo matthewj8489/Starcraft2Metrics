@@ -50,7 +50,12 @@ class MngrBodAio(object):
         # get the closest build from the build library
         closest_match_build, confidence, bo_dev = self._build_lib.get_closest_matching_build(bo)
 
-        return "{}\r\n--------\r\nbuild: {}\r\nconfidence: {:.2f}%\r\ndeviation: {:.2f}%\r\n\r\n".format(os.path.basename(rep_file_name), closest_match_build.name, confidence * 100, bo_dev.dev * 100)
+        #return "{}\r\n--------\r\nbuild: {}\r\nconfidence: {:.2f}%\r\ndeviation: {:.2f}%\r\n\r\n".format(os.path.basename(rep_file_name), closest_match_build.name, confidence * 100, bo_dev.dev * 100)
+        ret = "{}\r\n--------\r\nbuild: {}\r\nconfidence: {:.2f}%\r\ndeviation: {:.2f}%\r\n".format(os.path.basename(rep_file_name), closest_match_build.name, confidence * 100, bo_dev.dev * 100)
+        ret += "total build elements: {}\r\n".format(sum(x for x in range(bo_dev.get_bench_total_builds())))
+        for key, value in bo_dev.tag_order_dev.items():
+            ret += "{}:{}\r\n".format(key, value)
+        return ret
 
     def save_build_library(self):
         self._build_lib.save_library(self._build_lib_filepath)

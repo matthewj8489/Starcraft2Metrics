@@ -1,5 +1,6 @@
 import itertools
 import math
+from metrics.unit_categories import get_tags
 
 # Outputs:
 # dev - a metric that averages the scaled values of time deviation and
@@ -94,6 +95,7 @@ class BuildOrderDeviation(object):
         self.acc_order_dev = []
         #self.dev_arr = []
         self.bode_arr = []
+        self.tag_order_dev = {}
         self.bench_depth = len(self._bench_bo)
 
 
@@ -150,13 +152,19 @@ class BuildOrderDeviation(object):
         for idx in range(bo_depth):
             bode = BuildOrderDeviationElement(self._bench_bo[idx], cmp_bo[idx])
             self.bode_arr.append(bode)
+            unit_tags = get_tags(self._bench_bo[idx].name)
 
             self.discrepency += bode.discrepency
             if cmp_bo[idx] is not None:
                 self.time_dev += bode.time_dev
-                self.order_dev += bode.order_dev
+                self.order_dev += bode.order_dev                
                 self.acc_time_dev.append(bode.time_dev)
                 self.acc_order_dev.append(bode.order_dev)
+                for tg in unit_tags:
+                    if tg in self.tag_order_dev:
+                        self.tag_order_dev[tg] += bode.order_dev
+                    else:
+                        self.tag_order_dev[tg] = bode.order_dev
             else:
                 self.time_dev_p += abs(self._bench_bo[-1].time - self._bench_bo[idx].time)
                 self.order_dev_p += abs(self._bench_bo[-1].build_num - self._bench_bo[idx].build_num)

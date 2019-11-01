@@ -9,7 +9,7 @@ PRODUCTION_TAG = 'production'
 TECH_TAG = 'tech'
 STAT_TAG = 'stat'
 
-Sc2UnitCategories = {
+Sc2UnitTags = {
     'Probe': [WORKER_TAG],
     'Nexus': [BUILDING_TAG, BASE_TAG],
     'Pylon': [BUILDING_TAG, SUPPLY_TAG],
@@ -61,7 +61,7 @@ Sc2UnitCategories = {
 }
 
 def get_tags(unit_name):
-    if unit_name in Sc2UnitCategories:
-        return Sc2UnitCategories[unit_name]
+    if unit_name in Sc2UnitTags:
+        return Sc2UnitTags[unit_name]
     else:
         return []

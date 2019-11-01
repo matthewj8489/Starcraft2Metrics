@@ -12,6 +12,7 @@ else:
 import metrics
 from metrics.bod import BuildOrderDeviation
 from metrics.metric_containers import *
+from metrics.unit_categories import *
 
 class TestBuildOrderDeviation(unittest.TestCase):  
 
@@ -210,8 +211,7 @@ class TestBuildOrderDeviation(unittest.TestCase):
         self.assertEqual(bo_dev.discrepency, 0)
 
         
-
-############################ TEST ORDER DEVIATION ############################
+#region order_dev
 
     def test_order_deviation_calculated_correctly_when_no_deviation(self):
         golden_bo = []
@@ -294,6 +294,48 @@ class TestBuildOrderDeviation(unittest.TestCase):
 
         self.assertEqual(bo_dev.order_dev, 0)
 
+#endregion
+
+#region tag_order_dev
+
+
+    def test_tag_order_dev_is_not_incremented_when_units_do_not_differ(self):
+        golden_bo = []
+        compare_bo = []
+        golden_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        golden_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        golden_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        compare_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        bo_dev = BuildOrderDeviation(golden_bo)
+        bo_dev.calculate_deviations(compare_bo)
+
+        self.assertEqual(bo_dev.tag_order_dev[BUILDING_TAG], 0)
+        self.assertEqual(bo_dev.tag_order_dev[SUPPLY_TAG], 0)
+
+
+    def test_tag_order_dev_is_incremented_when_units_with_tags_have_orders_that_differ(self):
+        golden_bo = []
+        compare_bo = []
+        golden_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        golden_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        golden_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(2, 'Assimilator', 15, 50, 200))
+        compare_bo.append(BuildOrderElement(3, 'Pylon', 14, 20, 90))
+
+        bo_dev = BuildOrderDeviation(golden_bo)
+        bo_dev.calculate_deviations(compare_bo)
+
+        self.assertEqual(bo_dev.tag_order_dev[BUILDING_TAG], 2)
+        self.assertEqual(bo_dev.tag_order_dev[SUPPLY_TAG], 1)
+
+
+#endregion
 
 ############################ TEST DISCREPENCIES ############################
 

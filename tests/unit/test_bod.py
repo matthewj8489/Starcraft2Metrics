@@ -16,7 +16,7 @@ from metrics.unit_categories import *
 
 class TestBuildOrderDeviation(unittest.TestCase):  
 
-############################ TIME DEVIATION TESTS ############################
+#region time_deviation
 
     def test_time_deviation_calculated_correctly_when_late_on_time(self):
         golden_bo = []
@@ -133,8 +133,9 @@ class TestBuildOrderDeviation(unittest.TestCase):
         #self.assertEqual(bo_dev.time_dev, 30)
         self.assertEqual(bo_dev.time_dev, 0)
 
+#endregion
 
-############################ TEST DEVIATION ARRAY ############################
+#region dev_array
 
     def test_dev_arr_is_correct_size_when_build_order_is_correct(self):
         golden_bo = []
@@ -152,9 +153,9 @@ class TestBuildOrderDeviation(unittest.TestCase):
 
         self.assertEqual(3, len(bo_dev.bode_arr))
         
+#endregion
 
-
-############################ TEST DEPTH BUILD NUM LIMITOR ############################
+#region depth_build_num_limitor
 
     def test_build_order_comparison_is_limited_when_setting_build_num_limitor(self):
         golden_bo = []
@@ -210,7 +211,8 @@ class TestBuildOrderDeviation(unittest.TestCase):
         self.assertEqual(bo_dev.dev, 0)
         self.assertEqual(bo_dev.discrepency, 0)
 
-        
+#endregion
+
 #region order_dev
 
     def test_order_deviation_calculated_correctly_when_no_deviation(self):
@@ -335,9 +337,26 @@ class TestBuildOrderDeviation(unittest.TestCase):
         self.assertEqual(bo_dev.tag_order_dev[SUPPLY_TAG], 1)
 
 
+    def test_tag_order_dev_is_incremented_when_multiple_elements_with_the_same_tag_have_differing_order(self):
+        golden_bo = []
+        compare_bo = []
+        golden_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        golden_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        golden_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(2, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(3, 'Pylon', 14, 20, 90))
+        compare_bo.append(BuildOrderElement(4, 'Assimilator', 15, 50, 200))
+
+        bo_dev = BuildOrderDeviation(golden_bo)
+        bo_dev.calculate_deviations(compare_bo)
+
+        self.assertEqual(bo_dev.tag_order_dev[BUILDING_TAG], 2)
+
 #endregion
 
-############################ TEST DISCREPENCIES ############################
+#region discrepencies
 
     def test_discrepencies_when_not_missing_build_order_units(self):
         golden_bo = []
@@ -406,8 +425,9 @@ class TestBuildOrderDeviation(unittest.TestCase):
 
         self.assertEqual(bo_dev.discrepency, 1)
 
+#endregion
 
-############################ TEST UNIT TOTALS ############################
+#region unit_totals
 
     def test_unit_totals_are_calculated_correctly_for_bench(self):
         golden_bo = []
@@ -474,8 +494,9 @@ class TestBuildOrderDeviation(unittest.TestCase):
 
         self.assertFalse('Zealot' in golden_totals)
 
+#endregion
 
-############################ TEST TIME DEV PLUS ############################
+#region time_dev_plus
 
     def test_time_dev_p_is_correct_when_build_unit_is_missing(self):
         golden_bo = []
@@ -526,8 +547,9 @@ class TestBuildOrderDeviation(unittest.TestCase):
 
         self.assertEqual(bo_dev.time_dev_p, 30)
 
+#endregion
 
-############################ TEST ORDER DEV PLUS ############################
+#region order_dev_plus
 
     def test_order_dev_p_is_correct_when_build_unit_is_missing(self):
         golden_bo = []
@@ -595,8 +617,101 @@ class TestBuildOrderDeviation(unittest.TestCase):
 
         self.assertEqual(bo_dev.order_dev_p, 1)
 
+#endregion
 
-############################ TEST DEVIATION ############################
+#region tag_order_dev_plus
+
+    def test_tag_order_dev_p_is_not_incremented_when_units_do_not_differ(self):
+        golden_bo = []
+        compare_bo = []
+        golden_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        golden_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        golden_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        compare_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        bo_dev = BuildOrderDeviation(golden_bo)
+        bo_dev.calculate_deviations(compare_bo)
+
+        self.assertFalse(BUILDING_TAG in bo_dev.tag_order_dev_p)
+        self.assertFalse(SUPPLY_TAG in bo_dev.tag_order_dev_p)
+
+
+    def test_tag_order_dev_p_is_incremented_when_build_order_element_is_missing(self):
+        golden_bo = []
+        compare_bo = []
+        golden_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        golden_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        golden_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(2, 'Assimilator', 15, 50, 200))
+        compare_bo.append(BuildOrderElement(3, 'Probe', 12, 0, 0))
+
+        bo_dev = BuildOrderDeviation(golden_bo)
+        bo_dev.calculate_deviations(compare_bo)
+
+        self.assertEqual(bo_dev.tag_order_dev_p[BUILDING_TAG], 1)
+        self.assertEqual(bo_dev.tag_order_dev_p[SUPPLY_TAG], 1)
+
+
+    def test_tag_order_dev_p_is_incremented_when_multiple_elements_with_the_same_tag_are_missing(self):
+        golden_bo = []
+        compare_bo = []
+        golden_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        golden_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        golden_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+        golden_bo.append(BuildOrderElement(4, 'Probe', 12, 0, 0))
+
+        compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(2, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(3, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(4, 'Probe', 12, 0, 0))
+                        
+        bo_dev = BuildOrderDeviation(golden_bo)
+        bo_dev.calculate_deviations(compare_bo)
+
+        self.assertEqual(bo_dev.tag_order_dev_p[BUILDING_TAG], 3)
+
+
+    def test_tag_order_dev_p_calculated_correctly_when_build_has_different_element(self):
+        golden_bo = []
+        compare_bo = []
+        golden_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        golden_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        golden_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(2, 'Probe', 14, 20, 90))
+        compare_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        bo_dev = BuildOrderDeviation(golden_bo)
+        bo_dev.calculate_deviations(compare_bo)
+
+        self.assertEqual(bo_dev.tag_order_dev_p[SUPPLY_TAG], 1)
+
+
+    def test_order_dev_p_is_correct_when_build_unit_is_not_missing_but_greater_than_ORDER_DEV_GRACE(self):
+        golden_bo = []
+        compare_bo = []
+        golden_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        golden_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        golden_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(2, 'Assimilator', 16, 55, 205))
+        compare_bo.append(BuildOrderElement(23, 'Pylon', 17, 65, 215))
+
+        bo_dev = BuildOrderDeviation(golden_bo)
+        bo_dev.calculate_deviations(compare_bo)
+
+        self.assertEqual(bo_dev.tag_order_dev_p[SUPPLY_TAG], 1)
+
+#endregion
+
+#region deviation
 
     def test_deviation_is_zero_when_builds_are_exactly_the_same(self):
         golden_bo = []
@@ -614,7 +729,80 @@ class TestBuildOrderDeviation(unittest.TestCase):
 
         self.assertEqual(bo_dev.dev, 0)
 
-
+#endregion
         
+#region get_scaled_tag_order_dev
+
+    def test_scaled_tag_order_dev_is_zero_when_tag_has_not_occurred_in_build(self):
+        golden_bo = []
+        compare_bo = []
+        golden_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        golden_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        golden_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(2, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(3, 'Pylon', 14, 20, 90))
+        compare_bo.append(BuildOrderElement(4, 'Assimilator', 15, 50, 200))
+
+        bo_dev = BuildOrderDeviation(golden_bo)
+        bo_dev.calculate_deviations(compare_bo)
+
+        self.assertEqual(0, bo_dev.get_scaled_tag_order_dev(ARMY_TAG))
+
+
+    def test_scaled_tag_order_dev_is_correct_when_elements_are_ordered_different(self):
+        golden_bo = []
+        compare_bo = []
+        golden_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        golden_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        golden_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(2, 'Assimilator', 15, 50, 200))
+        compare_bo.append(BuildOrderElement(3, 'Pylon', 14, 20, 90))
+        
+        bo_dev = BuildOrderDeviation(golden_bo)
+        bo_dev.calculate_deviations(compare_bo)
+
+        self.assertEqual(2 / 6, bo_dev.get_scaled_tag_order_dev(BUILDING_TAG))
+
+
+    def test_scaled_tag_order_dev_is_correct_when_elements_are_missing(self):
+        golden_bo = []
+        compare_bo = []
+        golden_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        golden_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        golden_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(2, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+                        
+        bo_dev = BuildOrderDeviation(golden_bo)
+        bo_dev.calculate_deviations(compare_bo)
+
+        self.assertEqual(1 / 6, bo_dev.get_scaled_tag_order_dev(SUPPLY_TAG))
+        
+
+    def test_scaled_tag_order_dev_is_correct_when_elements_are_ordered_different_and_missing(self):
+        golden_bo = []
+        compare_bo = []
+        golden_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        golden_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        golden_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(2, 'Assimilator', 15, 50, 200))
+        compare_bo.append(BuildOrderElement(3, 'Probe', 12, 0, 0))
+                
+        bo_dev = BuildOrderDeviation(golden_bo)
+        bo_dev.calculate_deviations(compare_bo)
+
+        self.assertEqual(2 / 6, bo_dev.get_scaled_tag_order_dev(BUILDING_TAG))
+
+
+#endregion
+
 if __name__ == '__main__':
     unittest.main()

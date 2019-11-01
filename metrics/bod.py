@@ -96,6 +96,7 @@ class BuildOrderDeviation(object):
         #self.dev_arr = []
         self.bode_arr = []
         self.tag_order_dev = {}
+        self.tag_order_dev_p = {}
         self.bench_depth = len(self._bench_bo)
 
 
@@ -168,6 +169,11 @@ class BuildOrderDeviation(object):
             else:
                 self.time_dev_p += abs(self._bench_bo[-1].time - self._bench_bo[idx].time)
                 self.order_dev_p += abs(self._bench_bo[-1].build_num - self._bench_bo[idx].build_num)
+                for tg in unit_tags:
+                    if tg in self.tag_order_dev_p:
+                        self.tag_order_dev_p[tg] += abs(self._bench_bo[-1].build_num - self._bench_bo[idx].build_num)
+                    else:
+                        self.tag_order_dev_p[tg] = abs(self._bench_bo[-1].build_num - self._bench_bo[idx].build_num)
 
         self.discrepency += self._calculate_additional_bo_units_discrepencies(compare_bo, bo_depth)
         self.dev = (self.get_scaled_time_dev(depth) + self.get_scaled_order_dev(depth)) / 2
@@ -248,6 +254,19 @@ class BuildOrderDeviation(object):
         bch_bo = self._bench_bo[0:bo_depth]
         dis = len(bch_bo)
         return self.discrepency / dis
+
+
+    def get_scaled_tag_order_dev(self, tag, depth=-1):
+        """Returns the total order deviation of the given tag scaled to the sum of the
+        build numbers in the benchmark."""
+        od = 0
+        bo_depth = self._calculate_depth(depth, self._bench_bo)
+        bch_bo = self._bench_bo[0:bo_depth]
+        od = sum(bo.build_num for bo in bch_bo)
+        tod = self.tag_order_dev[tag] if tag in self.tag_order_dev else 0
+        todp = self.tag_order_dev_p[tag] if tag in self.tag_order_dev_p else 0
+        return (tod + todp) / od
+
 
 
     def _calculate_additional_bo_units_discrepencies(self, compare_bo, depth=-1):

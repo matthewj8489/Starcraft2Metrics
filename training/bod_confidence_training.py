@@ -4,12 +4,14 @@ import random
 import json
 
 if __name__ == '__main__':
-    sys.path.insert(0,os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, 'metrics')))
+    sys.path.insert(0,os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
 
-from neural_network import NeuralNetwork    
-from bod import BuildOrderDeviation
-from metric_factory.spawningtool_factory import SpawningtoolFactory
-from metric_containers import *
+import metrics
+from metrics.neural_network import NeuralNetwork    
+from metrics.bod import BuildOrderDeviation
+from metrics.metric_factory.spawningtool_factory import SpawningtoolFactory
+from metrics.metric_containers import *
+from metrics.unit_categories import *
 
 bench_fact = SpawningtoolFactory('build_order_detect_training_test_replays/pvt_blink_robo_benchmark.SC2Replay')
 bo_bench = bench_fact.generateBuildOrderElements('Gemini')
@@ -91,7 +93,18 @@ def get_additional_train_data(td_path, rep_tuple, bod_bench):
             bod = bod_bench
             if len(bo) > 0:
                 bod.calculate_deviations(bo)
-                train_data_tmp.append([[bod.get_scaled_order_dev(), bod.get_scaled_discrepency()], [tup[1]]])
+                #train_data_tmp.append([[bod.get_scaled_order_dev(), bod.get_scaled_discrepency()], [tup[1]]])
+                train_data_tmp.append([[bod.get_scaled_order_dev(),
+                                        bod.get_scaled_tag_order_dev(WORKER_TAG),
+                                        bod.get_scaled_tag_order_dev(ARMY_TAG),
+                                        bod.get_scaled_tag_order_dev(BUILDING_TAG),
+                                        bod.get_scaled_tag_order_dev(UPGRADE_TAG),
+                                        bod.get_scaled_tag_order_dev(BASE_TAG),
+                                        bod.get_scaled_tag_order_dev(SUPPLY_TAG),
+                                        bod.get_scaled_tag_order_dev(PRODUCTION_TAG),
+                                        bod.get_scaled_tag_order_dev(TECH_TAG),
+                                        bod.get_scaled_tag_order_dev(STAT_TAG),
+                                        bod.get_scaled_discrepency()], [tup[1]]])
                 print(bod.dev, ":", bod.get_scaled_discrepency(), ":", tup[1], ":", tup[0])
         
         with open(td_path, 'w') as td_fl:
@@ -112,7 +125,8 @@ train_data += get_additional_train_data(os.path.join(test_reps, 'pvz_sentry_drop
 
 
 ### Train
-nn = NeuralNetwork(2, 3, 1)
+#nn = NeuralNetwork(2, 3, 1)
+nn = NeuralNetwork(11, 4, 1)
 
 for i in range(100000):
     tr_in, tr_out = random.choice(train_data)

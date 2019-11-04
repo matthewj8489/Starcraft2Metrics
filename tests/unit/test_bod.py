@@ -12,7 +12,7 @@ else:
 import metrics
 from metrics.bod import BuildOrderDeviation
 from metrics.metric_containers import *
-from metrics.unit_categories import *
+import metrics.unit_constants as uc
 
 class TestBuildOrderDeviation(unittest.TestCase):  
 
@@ -315,8 +315,8 @@ class TestBuildOrderDeviation(unittest.TestCase):
         bo_dev = BuildOrderDeviation(golden_bo)
         bo_dev.calculate_deviations(compare_bo)
 
-        self.assertEqual(bo_dev.tag_order_dev[BUILDING_TAG], 0)
-        self.assertEqual(bo_dev.tag_order_dev[SUPPLY_TAG], 0)
+        self.assertEqual(bo_dev.tag_order_dev[uc.BUILDING_TAG], 0)
+        self.assertEqual(bo_dev.tag_order_dev[uc.SUPPLY_TAG], 0)
 
 
     def test_tag_order_dev_is_incremented_when_units_with_tags_have_orders_that_differ(self):
@@ -333,8 +333,8 @@ class TestBuildOrderDeviation(unittest.TestCase):
         bo_dev = BuildOrderDeviation(golden_bo)
         bo_dev.calculate_deviations(compare_bo)
 
-        self.assertEqual(bo_dev.tag_order_dev[BUILDING_TAG], 2)
-        self.assertEqual(bo_dev.tag_order_dev[SUPPLY_TAG], 1)
+        self.assertEqual(bo_dev.tag_order_dev[uc.BUILDING_TAG], 2)
+        self.assertEqual(bo_dev.tag_order_dev[uc.SUPPLY_TAG], 1)
 
 
     def test_tag_order_dev_is_incremented_when_multiple_elements_with_the_same_tag_have_differing_order(self):
@@ -352,7 +352,7 @@ class TestBuildOrderDeviation(unittest.TestCase):
         bo_dev = BuildOrderDeviation(golden_bo)
         bo_dev.calculate_deviations(compare_bo)
 
-        self.assertEqual(bo_dev.tag_order_dev[BUILDING_TAG], 2)
+        self.assertEqual(bo_dev.tag_order_dev[uc.BUILDING_TAG], 2)
 
 #endregion
 
@@ -635,8 +635,8 @@ class TestBuildOrderDeviation(unittest.TestCase):
         bo_dev = BuildOrderDeviation(golden_bo)
         bo_dev.calculate_deviations(compare_bo)
 
-        self.assertFalse(BUILDING_TAG in bo_dev.tag_order_dev_p)
-        self.assertFalse(SUPPLY_TAG in bo_dev.tag_order_dev_p)
+        self.assertFalse(uc.BUILDING_TAG in bo_dev.tag_order_dev_p)
+        self.assertFalse(uc.SUPPLY_TAG in bo_dev.tag_order_dev_p)
 
 
     def test_tag_order_dev_p_is_incremented_when_build_order_element_is_missing(self):
@@ -653,8 +653,8 @@ class TestBuildOrderDeviation(unittest.TestCase):
         bo_dev = BuildOrderDeviation(golden_bo)
         bo_dev.calculate_deviations(compare_bo)
 
-        self.assertEqual(bo_dev.tag_order_dev_p[BUILDING_TAG], 1)
-        self.assertEqual(bo_dev.tag_order_dev_p[SUPPLY_TAG], 1)
+        self.assertEqual(bo_dev.tag_order_dev_p[uc.BUILDING_TAG], 1)
+        self.assertEqual(bo_dev.tag_order_dev_p[uc.SUPPLY_TAG], 1)
 
 
     def test_tag_order_dev_p_is_incremented_when_multiple_elements_with_the_same_tag_are_missing(self):
@@ -673,7 +673,7 @@ class TestBuildOrderDeviation(unittest.TestCase):
         bo_dev = BuildOrderDeviation(golden_bo)
         bo_dev.calculate_deviations(compare_bo)
 
-        self.assertEqual(bo_dev.tag_order_dev_p[BUILDING_TAG], 3)
+        self.assertEqual(bo_dev.tag_order_dev_p[uc.BUILDING_TAG], 3)
 
 
     def test_tag_order_dev_p_calculated_correctly_when_build_has_different_element(self):
@@ -690,7 +690,7 @@ class TestBuildOrderDeviation(unittest.TestCase):
         bo_dev = BuildOrderDeviation(golden_bo)
         bo_dev.calculate_deviations(compare_bo)
 
-        self.assertEqual(bo_dev.tag_order_dev_p[SUPPLY_TAG], 1)
+        self.assertEqual(bo_dev.tag_order_dev_p[uc.SUPPLY_TAG], 1)
 
 
     def test_order_dev_p_is_correct_when_build_unit_is_not_missing_but_greater_than_ORDER_DEV_GRACE(self):
@@ -707,7 +707,7 @@ class TestBuildOrderDeviation(unittest.TestCase):
         bo_dev = BuildOrderDeviation(golden_bo)
         bo_dev.calculate_deviations(compare_bo)
 
-        self.assertEqual(bo_dev.tag_order_dev_p[SUPPLY_TAG], 1)
+        self.assertEqual(bo_dev.tag_order_dev_p[uc.SUPPLY_TAG], 1)
 
 #endregion
 
@@ -748,7 +748,7 @@ class TestBuildOrderDeviation(unittest.TestCase):
         bo_dev = BuildOrderDeviation(golden_bo)
         bo_dev.calculate_deviations(compare_bo)
 
-        self.assertEqual(0, bo_dev.get_scaled_tag_order_dev(ARMY_TAG))
+        self.assertEqual(0, bo_dev.get_scaled_tag_order_dev(uc.ARMY_TAG))
 
 
     def test_scaled_tag_order_dev_is_correct_when_elements_are_ordered_different(self):
@@ -765,7 +765,7 @@ class TestBuildOrderDeviation(unittest.TestCase):
         bo_dev = BuildOrderDeviation(golden_bo)
         bo_dev.calculate_deviations(compare_bo)
 
-        self.assertEqual(2 / 6, bo_dev.get_scaled_tag_order_dev(BUILDING_TAG))
+        self.assertEqual(2 / 6, bo_dev.get_scaled_tag_order_dev(uc.BUILDING_TAG))
 
 
     def test_scaled_tag_order_dev_is_correct_when_elements_are_missing(self):
@@ -782,7 +782,7 @@ class TestBuildOrderDeviation(unittest.TestCase):
         bo_dev = BuildOrderDeviation(golden_bo)
         bo_dev.calculate_deviations(compare_bo)
 
-        self.assertEqual(1 / 6, bo_dev.get_scaled_tag_order_dev(SUPPLY_TAG))
+        self.assertEqual(1 / 6, bo_dev.get_scaled_tag_order_dev(uc.SUPPLY_TAG))
         
 
     def test_scaled_tag_order_dev_is_correct_when_elements_are_ordered_different_and_missing(self):
@@ -799,7 +799,7 @@ class TestBuildOrderDeviation(unittest.TestCase):
         bo_dev = BuildOrderDeviation(golden_bo)
         bo_dev.calculate_deviations(compare_bo)
 
-        self.assertEqual(2 / 6, bo_dev.get_scaled_tag_order_dev(BUILDING_TAG))
+        self.assertEqual(2 / 6, bo_dev.get_scaled_tag_order_dev(uc.BUILDING_TAG))
 
 
 #endregion

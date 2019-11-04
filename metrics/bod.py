@@ -1,6 +1,6 @@
 import itertools
 import math
-from metrics.unit_categories import get_tags
+from metrics.unit_constants import get_tags
 
 # Outputs:
 # dev - a metric that averages the scaled values of time deviation and

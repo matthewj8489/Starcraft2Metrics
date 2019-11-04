@@ -77,6 +77,16 @@ for pth in os.listdir(chargelot_allin_path):
         rep_tuples['chargelot_allin'].append([rep_path, 1])
         rep_tuples['sentry_drop_soul_train'].append([rep_path, 0])
 
+unknown_path = os.path.join(test_reps, 'unknown/')
+for pth in os.listdir(unknown_path):
+    rep_path = os.path.join(unknown_path, pth)
+    if os.path.splitext(pth)[1] == '.SC2Replay':
+        rep_tuples['blink_robo'].append([rep_path, 0])
+        rep_tuples['2_gate_expand'].append([rep_path, 0])
+        rep_tuples['dt_archon_drop'].append([rep_path, 0])
+        rep_tuples['chargelot_allin'].append([rep_path, 0])
+        rep_tuples['sentry_drop_soul_train'].append([rep_path, 0])
+
 
 # find the bod metrics for each replay tuple and add them to the train_data
 train_data = []

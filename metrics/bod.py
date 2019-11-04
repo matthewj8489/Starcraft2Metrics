@@ -246,6 +246,18 @@ class BuildOrderDeviation(object):
         od = sum(bo.build_num for bo in bch_bo)
         return (self.order_dev + self.order_dev_p) / od
 
+    
+    def get_average_order_dev(self, depth=-1):
+        """Returns the average (median) order deviation."""
+        ary = []
+        for idx in range(len(self.bode_arr)):
+            ary.append(self.bode_arr[idx].order_dev)
+        ary.sort()
+        if len(ary) > 0:
+            return ary[int(idx / 2)]
+        else:
+            return 0
+
 
     def get_scaled_discrepency(self, depth=-1):
         """Returns the total discrepencies scaled to the sum of the total number of

@@ -804,5 +804,83 @@ class TestBuildOrderDeviation(unittest.TestCase):
 
 #endregion
 
+#region get_average_order_dev
+
+    def test_avg_order_dev_is_zero_when_builds_have_not_deviated(self):
+        golden_bo = []
+        compare_bo = []
+        golden_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        golden_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        golden_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        compare_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        bo_dev = BuildOrderDeviation(golden_bo)
+        bo_dev.calculate_deviations(compare_bo)
+
+        self.assertEqual(0, bo_dev.get_average_order_dev())
+
+
+    def test_avg_order_dev_is_correct_when_elements_are_ordered_different(self):
+        golden_bo = []
+        compare_bo = []
+        golden_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        golden_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        golden_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(2, 'Assimilator', 15, 50, 200))
+        compare_bo.append(BuildOrderElement(3, 'Pylon', 14, 20, 90))
+        
+        bo_dev = BuildOrderDeviation(golden_bo)
+        bo_dev.calculate_deviations(compare_bo)
+
+        # deviations are: 0, 1, 1
+        self.assertEqual(1, bo_dev.get_average_order_dev())
+
+
+    def test_avg_order_dev_is_correct_when_elements_are_missing(self):
+        golden_bo = []
+        compare_bo = []
+        golden_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        golden_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        golden_bo.append(BuildOrderElement(3, 'Probe', 12, 30, 110))
+        golden_bo.append(BuildOrderElement(4, 'Assimilator', 15, 50, 200))
+
+        compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(2, 'Probe', 12, 20, 90))
+        compare_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+        compare_bo.append(BuildOrderElement(4, 'Assimilator', 15, 60, 220))
+                        
+        bo_dev = BuildOrderDeviation(golden_bo)
+        bo_dev.calculate_deviations(compare_bo)
+
+        # deviations are: 0, 2, 1, 0
+        self.assertEqual(0, bo_dev.get_average_order_dev())
+        
+
+    def test_avg_order_dev_is_correct_when_elements_are_ordered_different_and_missing(self):
+        golden_bo = []
+        compare_bo = []
+        golden_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        golden_bo.append(BuildOrderElement(2, 'Pylon', 14, 20, 90))
+        golden_bo.append(BuildOrderElement(3, 'Assimilator', 15, 50, 200))
+
+        compare_bo.append(BuildOrderElement(1, 'Probe', 12, 0, 0))
+        compare_bo.append(BuildOrderElement(2, 'Assimilator', 15, 50, 200))
+        compare_bo.append(BuildOrderElement(3, 'Probe', 12, 0, 0))
+                
+        bo_dev = BuildOrderDeviation(golden_bo)
+        bo_dev.calculate_deviations(compare_bo)
+
+        # deviation are: 0, 1, 1
+        self.assertEqual(1, bo_dev.get_average_order_dev())
+
+
+#endregion
+
+
 if __name__ == '__main__':
     unittest.main()

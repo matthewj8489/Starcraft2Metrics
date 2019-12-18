@@ -1,3 +1,4 @@
 mpyq
 sc2reader
+spawningtool
 sphinx-argparse

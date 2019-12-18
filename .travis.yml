@@ -4,6 +4,7 @@ python:
 # command to install dependencies
 install:
     - pip install sc2reader
+    - pip install spawningtool
     - python setup.py develop
 # command to run tests
 script:
